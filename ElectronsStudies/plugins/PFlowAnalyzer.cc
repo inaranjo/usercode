@@ -37,8 +37,13 @@ void PFlowAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 
   float mvaFbrem = -99;
 
+//   for (int i = 0; i<50;i++){
+//     h1_->Fill(1);
+//   }
+
+
   for ( reco::PFCandidateCollection::const_iterator pfCandidate = pfCandidates->begin();
-	pfCandidate != pfCandidates->end(); ++pfCandidate ) {
+	pfCandidate != pfCandidates->end(); ++pfCandidate ) {	      
     reco::PFCandidateElectronExtraRef pfElectron = pfCandidate->electronExtraRef();
     if (pfElectron.isNonnull()){
       mvaFbrem = pfElectron->mvaVariable( reco::PFCandidateElectronExtra::MVA_Fbrem);
