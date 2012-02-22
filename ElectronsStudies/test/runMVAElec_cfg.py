@@ -16,7 +16,7 @@ else:
     print "Running on Data"
 
 if runOnMC:
-    process.GlobalTag.globaltag = cms.string('START42_V14B::All')
+    process.GlobalTag.globaltag = cms.string('START44_V10::All')
 else:
     process.GlobalTag.globaltag = cms.string('GR_R_42_V19::All')
 
@@ -30,8 +30,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
-    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_9_2_Yj1.root'
-    #'/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eltau_skim_v3/0cb778f639e73adb31d917d2dd1fbf14/tautauSkimmAOD_9_1_M2n.root'
+    '/store/user/inaranjo/DYJets-50-madgraph-tauola-Chamonix12/embedded_9_2_cIx.root'
     )
     )
 ########################## analyzer ###############################
