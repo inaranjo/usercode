@@ -34,16 +34,11 @@ process.source = cms.Source(
     )
     )
 ########################## analyzer ###############################
-## process.PFAnalyzer = cms.EDAnalyzer(
-##     "PFlowAnalyzer",
-##     srcPFCandidates = cms.InputTag("PFCandidates"),
-##     srcPFJets = cms.InputTag("PFJets"),
-##     srcPFMEt = cms.InputTag("PFMEt"),
-##     dqmDirectory = cms.string ("dqmDirectory") 
-##     )
+
 process.PFAnalyzer = cms.EDAnalyzer(
     "PFlowAnalyzer",
-    srcPFCandidates = cms.InputTag("particleFlow","electrons")
+    srcGsfElectrons = cms.InputTag("gsfElectrons"),
+    debug = cms.bool(False)
     )
 
 

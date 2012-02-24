@@ -6,55 +6,32 @@
 #include "DataFormats/METReco/interface/MET.h"
 #include "DataFormats/Common/interface/Handle.h"
 
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-
-#include "FWCore/ServiceRegistry/interface/Service.h"
 
 PFlowAnalyzer::PFlowAnalyzer(const edm::ParameterSet& cfg)
-{
-  srcPFCandidates_  = cfg.getParameter<edm::InputTag>("srcPFCandidates");
+  :  plotsAllEta_(0)
+{ 
+  srcGsfElectrons_  = cfg.getParameter<edm::InputTag>("srcGsfElectrons");
+  debug_  = cfg.getParameter<bool>("debug");
 } 
 
 PFlowAnalyzer::~PFlowAnalyzer()
 {
-  
+  delete plotsAllEta_;
 }
 
 void PFlowAnalyzer::beginJob()
-{
-  edm::Service<TFileService> fs;
-  h1_ = fs->make<TH1F>("h1","h1",150,0,5);
-  //h1_ = new plotEntryType();
-  //h1_ = fs->make<TH1F>("h1","h1",150,0,100);
-  }
-
+{ 
+  plotsAllEta_       = new plotEntryType("PFMVAInput",-0.1, 9.9);
+  plotsAllEta_->bookHistograms();
+}
 
 
 void PFlowAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 {
-  edm::Handle<reco::PFCandidateCollection> pfCandidates;
-  evt.getByLabel(srcPFCandidates_, pfCandidates);
-
-  float mvaFbrem = -99;
-
-//   for (int i = 0; i<50;i++){
-//     h1_->Fill(1);
-//   }
-
-
-  for ( reco::PFCandidateCollection::const_iterator pfCandidate = pfCandidates->begin();
-	pfCandidate != pfCandidates->end(); ++pfCandidate ) {	      
-    reco::PFCandidateElectronExtraRef pfElectron = pfCandidate->electronExtraRef();
-    if (pfElectron.isNonnull()){
-      mvaFbrem = pfElectron->mvaVariable( reco::PFCandidateElectronExtra::MVA_Fbrem);
-      std::cout<<"   "<<mvaFbrem<<std::endl;
-      h1_->Fill(mvaFbrem);
-    }
-  }
+  edm::Handle<reco::GsfElectronCollection> gsfElectrons;
+  evt.getByLabel(srcGsfElectrons_, gsfElectrons);
   
-//   h1_->bookHistograms();
-//   h1_->fillHistograms(*pfCandidates);
-   
+  plotsAllEta_->fillHistograms(*gsfElectrons,debug_);
    
 }
 
