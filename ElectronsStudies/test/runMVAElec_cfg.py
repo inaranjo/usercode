@@ -22,9 +22,9 @@ else:
 
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 
 process.source = cms.Source(
@@ -84,22 +84,21 @@ process.selectPrimaryVertex = cms.Sequence(
     )
 
 
-########################## Electrons and Taus from Z ###############################
-
-#/CMSSW/TauAnalysis/GenSimTools/python/gen_decaysFromZs_cfi.py
-
-#from TauAnalysis/GenSimTools/python/gen_decaysFromZs_cfi import *
-
-## process.load("TauAnalysis.GenSimTools.gen_decaysFromZs_cfi")
-
+########################## Electrons from Z ###############################
+process.load("PhysicsTools/JetMCAlgos/TauGenJets_cfi")
+process.load("TauAnalysis.GenSimTools.gen_decaysFromZs_cfi")
 
 
 ########################## analyzer ###############################
 
 process.PFAnalyzer = cms.EDAnalyzer(
     "PFlowAnalyzer",
-    srcGsfElectrons = cms.InputTag("gsfElectrons"),
     srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
+    srcGsfElectrons = cms.InputTag("gsfElectrons"),
+    srcPFTaus = cms.InputTag("hpsPFTauProducer"),
+    srcGenElectrons = cms.InputTag("genElectronsFromZs"),
+    #srcGenElectrons = cms.InputTag("genElectronsFromZtautauDecays"),
+    srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
     debug = cms.bool(False)
     )
 
@@ -107,6 +106,8 @@ process.PFAnalyzer = cms.EDAnalyzer(
 ########################## path ###############################
 
 process.p = cms.Path(process.selectPrimaryVertex*
+                     process.tauGenJets*
+                     process.produceGenDecayProductsFromZs*
                      process.PFAnalyzer
                      )
 

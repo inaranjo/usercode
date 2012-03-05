@@ -26,6 +26,8 @@
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
 
+#include "DataFormats/Math/interface/deltaR.h"
+
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
@@ -49,6 +51,9 @@ class PFlowAnalyzer : public edm::EDAnalyzer
   void endJob();
   
   edm::InputTag srcGsfElectrons_;
+  edm::InputTag srcPFTaus_;
+  edm::InputTag srcGenElectrons_;
+  edm::InputTag srcGenTaus_;
   edm::InputTag srcPrimaryVertex_;
   bool debug_;
   
@@ -71,6 +76,7 @@ class PFlowAnalyzer : public edm::EDAnalyzer
       TFileDirectory dir = fs->mkdir(directory_);
 
       hNumPV_ = dir.make<TH1F>("hNumPV","hNumPV",numPVMax-numPVMin,numPVMin,numPVMax);
+
       hElecAbsEta_ = dir.make<TH1F>("hElecAbsEta","hElecAbsEta",100,absEtaMin,absEtaMax);
       hElecPt_ = dir.make<TH1F>("hElecPt","hElecPt",100,ptMin,ptMax);
       hEtotOverPin_ = dir.make<TH1F>("hEtotOverPin","hEtotOverPin",100,0,4);
@@ -92,7 +98,13 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 
     }
     
-    void fillHistograms(const reco::GsfElectronCollection& Electrons,bool debug_, int numPV_)
+    void fillHistograms(const reco::GsfElectronCollection& GsfElectrons, 
+			const reco::CandidateView& GenElectrons,
+			const reco::PFCandidateCollection& PfTaus, 
+			const reco::CandidateView& GenTaus, 
+			bool debug_, 
+			int numPV_
+			)
     {
       int numPV = numPV_;
       double ElecAbsEta = -99;
@@ -121,19 +133,42 @@ class PFlowAnalyzer : public edm::EDAnalyzer
       
       if(numPV>=numPVMin_ && numPV<numPVMax_){
 	
-	for ( reco::GsfElectronCollection::const_iterator Electron = Electrons.begin();
-	      Electron != Electrons.end(); ++Electron ) {	      
-	  
-	  ElecAbsEta = TMath::Abs(Electron->eta());
-	  ElecPt = Electron->pt();
+	int countEle = 0;
+	for ( reco::GsfElectronCollection::const_iterator GsfElectron = GsfElectrons.begin();
+	      GsfElectron != GsfElectrons.end(); ++GsfElectron ) {
+	      
+	  if (debug_){
+	    std::cout<<std::endl;
+	    std::cout<<"GsfElectron number : "<<countEle<<std::endl;
+	  }
+	  countEle++;
+ 	  //////////////Matching GsfElectron with GenElectron//////////////
+	  bool GsfEleGenEleMatch = false;
+	  int countGenEle = 0;
+
+	  for ( reco::CandidateView::const_iterator GenElectron = GenElectrons.begin();
+		GenElectron != GenElectrons.end(); ++GenElectron ) {
+	    if(debug_){
+	      std::cout<<"  GenElectron number : "<<countGenEle<<std::endl;
+	      std::cout<<"  DeltaR GsfEle-GenEle :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl;
+	    }
+	    countGenEle++;
+	    if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<0.3)GsfEleGenEleMatch = true;
+	  }
+	  if(!GsfEleGenEleMatch)continue;
+ 	  //////////////Matching GsfElectron with GenElectron//////////////
+
+
+	  ElecAbsEta = TMath::Abs(GsfElectron->eta());
+	  ElecPt = GsfElectron->pt();
 
 	  if(ElecAbsEta>absEtaMin_ && ElecAbsEta<absEtaMax_ && ElecPt>ptMin_ && ElecPt< ptMax_) {
 
-	    reco::SuperClusterRef pfSuperCluster = Electron->pflowSuperCluster();
+	    reco::SuperClusterRef pfSuperCluster = GsfElectron->pflowSuperCluster();
 	    if(pfSuperCluster.isNonnull() && pfSuperCluster.isAvailable()){
 	      Ee = 0.;
 	      Egamma = 0.;
-	      //std::cout<<"SuperCluster accessed   "<<std::endl;
+	      if (debug_)std::cout<<"SuperCluster accessed   "<<std::endl;
 	      for (reco::CaloCluster_iterator pfCluster = pfSuperCluster->clustersBegin();
 		   pfCluster != pfSuperCluster->clustersEnd(); ++pfCluster ) {
 		double pfClusterEn = (*pfCluster)->energy();
@@ -142,33 +177,31 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 	      }
 	    }
 	    
-	    //std::cout<<"Ee :   "<<Ee<<" Egamma :  "<<Egamma<<std::endl;
+	    if(debug_)std::cout<<"Ee :   "<<Ee<<" Egamma :  "<<Egamma<<std::endl;
 	    
-	    double Pin = TMath::Sqrt(Electron->trackMomentumAtVtx().Mag2());
-	    double Pout = TMath::Sqrt(Electron->trackMomentumOut().Mag2()); 
+	    double Pin = TMath::Sqrt(GsfElectron->trackMomentumAtVtx().Mag2());
+	    double Pout = TMath::Sqrt(GsfElectron->trackMomentumOut().Mag2()); 
 	    if (debug_)std::cout<<"Pin :   "<<Pin<<" Pout :  "<<Pout<<std::endl;
-	    
-	    
 
 	    EtotOverPin = (Ee+Egamma)/Pin;
-	    EeOverPout = Electron->eEleClusterOverPout();
+	    EeOverPout = GsfElectron->eEleClusterOverPout();
 	    EgammaOverPdif = Egamma/(Pin-Pout);
-	    EarlyBrem = Electron->mvaInput().earlyBrem;
-	    LateBrem = Electron->mvaInput().lateBrem;
-	    Logsihih = log(Electron->mvaInput().sigmaEtaEta);
-	    DeltaEta = Electron->mvaInput().deltaEta;
-	    HoE = Electron->showerShape().hcalDepth2OverEcal ;
-	    HoEBc = Electron->showerShape().hcalDepth2OverEcalBc ;
-	    Fbrem = Electron->fbrem();
-	    if (Electron->closestCtfTrackRef().isNonnull()){
-	      Chi2KF = Electron->closestCtfTrackRef()->normalizedChi2();
-	      NHits = Electron->closestCtfTrackRef()->numberOfValidHits();
+	    EarlyBrem = GsfElectron->mvaInput().earlyBrem;
+	    LateBrem = GsfElectron->mvaInput().lateBrem;
+	    Logsihih = log(GsfElectron->mvaInput().sigmaEtaEta);
+	    DeltaEta = GsfElectron->mvaInput().deltaEta;
+	    HoE = GsfElectron->showerShape().hcalDepth2OverEcal ;
+	    //HoEBc = GsfElectron->showerShape().hcalDepth2OverEcalBc ;
+	    Fbrem = GsfElectron->fbrem();
+	    if (GsfElectron->closestCtfTrackRef().isNonnull()){
+	      Chi2KF = GsfElectron->closestCtfTrackRef()->normalizedChi2();
+	      NHits = GsfElectron->closestCtfTrackRef()->numberOfValidHits();
 	    }
-	    if(Electron->gsfTrack().isNonnull()){
-	      Chi2GSF = Electron->gsfTrack()->normalizedChi2();
-	      GSFResol = Electron->gsfTrack()->ptError()/Electron->gsfTrack()->pt();
-	      GSFlnPt = log(Electron->gsfTrack()->pt())*TMath::Ln10();
-	      GSFEta = Electron->gsfTrack()->eta();
+	    if(GsfElectron->gsfTrack().isNonnull()){
+	      Chi2GSF = GsfElectron->gsfTrack()->normalizedChi2();
+	      GSFResol = GsfElectron->gsfTrack()->ptError()/GsfElectron->gsfTrack()->pt();
+	      GSFlnPt = log(GsfElectron->gsfTrack()->pt())*TMath::Ln10();
+	      GSFEta = GsfElectron->gsfTrack()->eta();
 	    }
 	    
 	    if(debug_){
@@ -215,8 +248,37 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 	    
 	  }//ElecAbsEta condition
 	  
-	}// loop electrons
+	}// loop GsfElectrons
 	
+
+
+
+/* 	int countPfTau = 0; */
+/* 	for ( reco::PFCandidateCollection::const_iterator PfTau = PfTaus.begin(); */
+/* 	      PfTau != PfTaus.end(); ++PfTau ) { */
+/* /\* 	  if (debug_){ *\/ */
+/* 	    std::cout<<std::endl; */
+/* 	    std::cout<<"PfTau number : "<<countPfTau<<std::endl; */
+/* /\* 	  } *\/ */
+/* 	    countPfTau++; */
+/*  	  //////////////Matching PfTau with GenElectron////////////// */
+/* 	  bool PfTauGenEleMatch = false; */
+/* 	  int countGenEle = 0; */
+
+/* 	  for ( reco::CandidateView::const_iterator GenElectron = GenElectrons.begin(); */
+/* 		GenElectron != GenElectrons.end(); ++GenElectron ) { */
+/* /\* 	    if(debug_){ *\/ */
+/* 	      std::cout<<"  GenElectron number : "<<countGenEle<<std::endl; */
+/* 	      std::cout<<"  DeltaR PfTau-GenEle :"<<deltaR(PfTau->eta(),PfTau->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl; */
+/* /\* 	    } *\/ */
+/* 	    countGenEle++; */
+/* 	    if(deltaR(PfTau->eta(),PfTau->phi(),GenElectron->eta(),GenElectron->phi())<0.3)PfTauGenEleMatch = true; */
+/* 	  } */
+/* 	  if(!PfTauGenEleMatch)continue; */
+/*  	  //////////////Matching PfTau with GenElectron////////////// */
+
+/* 	}// loop PfTaus */
+	      
       }//numPV condition
       
     }//fillHistograms
@@ -232,6 +294,7 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 
     
     TH1F* hNumPV_;
+    //TH1F* hElecMatched_;
     TH1F* hElecAbsEta_;
     TH1F* hElecPt_;
     TH1F* hEtotOverPin_;
