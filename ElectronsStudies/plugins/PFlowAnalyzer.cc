@@ -8,6 +8,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
+
 PFlowAnalyzer::PFlowAnalyzer(const edm::ParameterSet& cfg)
   :  plotsAll_(0),
      plotsNumPV0to10_Barrel_Pt20to30_(0),
@@ -40,6 +41,7 @@ PFlowAnalyzer::PFlowAnalyzer(const edm::ParameterSet& cfg)
   srcPFTaus_  = cfg.getParameter<edm::InputTag>("srcPFTaus");
   srcGenElectrons_  = cfg.getParameter<edm::InputTag>("srcGenElectrons");
   srcGenTaus_  = cfg.getParameter<edm::InputTag>("srcGenTaus");
+  match_  = cfg.getParameter<int>("match");
   debug_  = cfg.getParameter<bool>("debug");
 } 
 
@@ -133,7 +135,7 @@ void PFlowAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
   edm::Handle<reco::GsfElectronCollection> gsfElectrons;
   evt.getByLabel(srcGsfElectrons_, gsfElectrons);
 
-  edm::Handle<reco::PFCandidateCollection> pfTaus;
+  edm::Handle<reco::PFTauCollection> pfTaus;
   evt.getByLabel(srcPFTaus_, pfTaus);
 
   typedef edm::View<reco::Candidate> CandidateView;
@@ -159,31 +161,31 @@ void PFlowAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
   }
 
 
-  plotsAll_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV0to10_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV10to20_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV20to30_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);   
-  plotsNumPV30to40_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV0to10_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV10to20_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV20to30_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);   
-  plotsNumPV30to40_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV0to10_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV10to20_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV20to30_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);   
-  plotsNumPV30to40_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV0to10_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV10to20_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV20to30_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);   
-  plotsNumPV30to40_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV0to10_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV10to20_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV20to30_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);   
-  plotsNumPV30to40_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV0to10_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV10to20_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
-  plotsNumPV20to30_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);   
-  plotsNumPV30to40_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_);
+  plotsAll_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV0to10_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV10to20_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV20to30_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);   
+  plotsNumPV30to40_Barrel_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV0to10_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV10to20_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV20to30_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);   
+  plotsNumPV30to40_Endcap_Pt20to30_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV0to10_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV10to20_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV20to30_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);   
+  plotsNumPV30to40_Barrel_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV0to10_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV10to20_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV20to30_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);   
+  plotsNumPV30to40_Endcap_Pt30to40_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV0to10_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV10to20_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV20to30_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);   
+  plotsNumPV30to40_Barrel_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV0to10_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV10to20_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
+  plotsNumPV20to30_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);   
+  plotsNumPV30to40_Endcap_Pt40to50_->fillHistograms(*gsfElectrons, *genElectrons, *pfTaus, *genTaus, debug_, numPV_, match_);
 
 }
 

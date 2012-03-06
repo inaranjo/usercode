@@ -16,6 +16,8 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateElectronExtra.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateElectronExtraFwd.h"
+#include "DataFormats/TauReco/interface/PFTau.h"
+#include "DataFormats/TauReco/interface/PFTauFwd.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
@@ -55,6 +57,7 @@ class PFlowAnalyzer : public edm::EDAnalyzer
   edm::InputTag srcGenElectrons_;
   edm::InputTag srcGenTaus_;
   edm::InputTag srcPrimaryVertex_;
+  int match_;// 0 no matching, 1 match to GenElectrons, 2 match to GenTaus, 3 match to GenJets
   bool debug_;
   
   struct plotEntryType
@@ -87,7 +90,7 @@ class PFlowAnalyzer : public edm::EDAnalyzer
       hLogsihih_ = dir.make<TH1F>("hLogsihih","hLogsihih",100,-13,-2);
       hDeltaEta_ = dir.make<TH1F>("hDeltaEta","hDeltaEta",100,0,0.05);
       hHoE_ = dir.make<TH1F>("hHoE","hHoE",100,0,0.5);
-      hHoEBc_ = dir.make<TH1F>("hHoEBc","hHoEBc",100,0,0.5);
+/*       hHoEBc_ = dir.make<TH1F>("hHoEBc","hHoEBc",100,0,0.5); */
       hFbrem_ = dir.make<TH1F>("hFbrem","hFbrem",100,-0.2,1.1);
       hChi2KF_ = dir.make<TH1F>("hChi2KF","hChi2KF",50,0,5);
       hChi2GSF_ = dir.make<TH1F>("hChi2GSF","hChi2GSF",50,0,5);
@@ -96,14 +99,29 @@ class PFlowAnalyzer : public edm::EDAnalyzer
       hGSFlnPt_ = dir.make<TH1F>("hGSFlnPt","hGSFlnPt",100,0,15);
       hGSFEta_ = dir.make<TH1F>("hGSFEta","hGSFEta",100,-2.5,2.5);
 
+      hTauAbsEta_ = dir.make<TH1F>("hTauAbsEta","hTauAbsEta",100,absEtaMin,absEtaMax);
+      hTauPt_ = dir.make<TH1F>("hTauPt","hTauPt",100,ptMin,ptMax);
+      hTauSignalPFChargedCands_ = dir.make<TH1F>("hTauSignalPFChargedCands","hTauSignalPFChargedCands",5,0,5);
+      hTauSignalPFGammaCands_ = dir.make<TH1F>("hTauSignalPFGammaCands","hTauSignalPFGammaCands",5,0,5);
+      hTauLeadPFChargedHadrMva_ = dir.make<TH1F>("hTauLeadPFChargedHadrMva","hTauLeadPFChargedHadrMva",100,0,1);
+      hTauLeadPFChargedHadrHoP_ = dir.make<TH1F>("hTauLeadPFChargedHadrHoP","hTauLeadPFChargedHadrHoP",100,0,1);
+      hTauLeadPFChargedHadrEoP_ = dir.make<TH1F>("hTauLeadPFChargedHadrEoP","hTauLeadPFChargedHadrEoP",100,0,1);
+      hTauHasGsf_ = dir.make<TH1F>("hTauHasGsf","hTauHasGsf",2,0,2);
+      hTauVisMass_ = dir.make<TH1F>("hTauVisMass","hTauVisMass",100,0,2);
+      hTauEmFraction_ = dir.make<TH1F>("hTauEmFraction","hTauEmFraction",100,0,1);
+      hGammaEtaMom_ = dir.make<TH1F>("hGammaEtaMom","hGammaEtaMom",100,0,1);
+      hGammaPhiMom_ = dir.make<TH1F>("hGammaPhiMom","hGammaPhiMom",100,0,1);
+      hGammaEnFrac_ = dir.make<TH1F>("hGammaEnFrac","hGammaEnFrac",100,0,1);
+
     }
     
     void fillHistograms(const reco::GsfElectronCollection& GsfElectrons, 
 			const reco::CandidateView& GenElectrons,
-			const reco::PFCandidateCollection& PfTaus, 
+			const reco::PFTauCollection& PfTaus,
 			const reco::CandidateView& GenTaus, 
 			bool debug_, 
-			int numPV_
+			int numPV_,
+			int match_
 			)
     {
       int numPV = numPV_;
@@ -121,7 +139,7 @@ class PFlowAnalyzer : public edm::EDAnalyzer
       float Logsihih = -99;
       float DeltaEta = -99;
       float HoE = -99;
-      float HoEBc = -99;
+/*       float HoEBc = -99; */
       float Fbrem = -99;
       float Chi2KF = -99;
       float Chi2GSF = -99;
@@ -132,32 +150,57 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 
       
       if(numPV>=numPVMin_ && numPV<numPVMax_){
-	
+	hNumPV_->Fill(numPV);
+	if(debug_)std::cout<<"NumPV :"<<numPV<<std::endl;
+
 	int countEle = 0;
 	for ( reco::GsfElectronCollection::const_iterator GsfElectron = GsfElectrons.begin();
 	      GsfElectron != GsfElectrons.end(); ++GsfElectron ) {
-	      
 	  if (debug_){
 	    std::cout<<std::endl;
 	    std::cout<<"GsfElectron number : "<<countEle<<std::endl;
 	  }
-	  countEle++;
- 	  //////////////Matching GsfElectron with GenElectron//////////////
-	  bool GsfEleGenEleMatch = false;
-	  int countGenEle = 0;
+	  //////////////Matching GsfElectron with GenElectron//////////////
+	  if (match_ == 1){
 
-	  for ( reco::CandidateView::const_iterator GenElectron = GenElectrons.begin();
-		GenElectron != GenElectrons.end(); ++GenElectron ) {
-	    if(debug_){
-	      std::cout<<"  GenElectron number : "<<countGenEle<<std::endl;
-	      std::cout<<"  DeltaR GsfEle-GenEle :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl;
+	    bool GsfEleGenEleMatch = false;
+	    int countGenEle = 0;
+
+	    for ( reco::CandidateView::const_iterator GenElectron = GenElectrons.begin();
+		  GenElectron != GenElectrons.end(); ++GenElectron ) {
+	      if(debug_){
+		std::cout<<"  GenElectron number : "<<countGenEle<<std::endl;
+		std::cout<<"  DeltaR GsfEle-GenEle :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl;
+	      }
+	      countGenEle++;
+	      if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<0.3)GsfEleGenEleMatch = true;
 	    }
-	    countGenEle++;
-	    if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<0.3)GsfEleGenEleMatch = true;
+	    if(!GsfEleGenEleMatch)continue;
 	  }
-	  if(!GsfEleGenEleMatch)continue;
  	  //////////////Matching GsfElectron with GenElectron//////////////
+	  
+	  
+ 	  //////////////Matching GsfElectron with GenHadrons from Ztautau//////////////
+	  if(match_ == 2){
+	    bool GsfEleGenTauMatch = false;
+	    int countGenTau = 0;
+	    
+	    for ( reco::CandidateView::const_iterator GenTau = GenTaus.begin();
+		  GenTau != GenTaus.end(); ++GenTau ) {
+	      if(debug_){
+		std::cout<<"  GenTau number : "<<countGenTau<<std::endl;
+		std::cout<<"  DeltaR GsfEle-GenTau :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenTau->eta(),GenTau->phi())<<std::endl;
+	      }
+	      countGenTau++;
+	      if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenTau->eta(),GenTau->phi())<0.3)GsfEleGenTauMatch = true;
+	    }
+	  if(!GsfEleGenTauMatch)continue;
+	  }	  
+ 	  //////////////Matching GsfElectron with GenHadrons from Ztautau//////////////
+	  
 
+	  if (match_ == 3){
+	  }
 
 	  ElecAbsEta = TMath::Abs(GsfElectron->eta());
 	  ElecPt = GsfElectron->pt();
@@ -206,7 +249,6 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 	    
 	    if(debug_){
 	      std::cout<<std::endl;
-	      std::cout<<"NumPV :"<<numPV<<std::endl;
 	      std::cout<<"ElecAbsEta :"<<ElecAbsEta<<std::endl;
 	      std::cout<<"E electron cluster plus photons over Pin :   "<<EtotOverPin<<std::endl;
 	      std::cout<<"E electron cluster over Pout :   "<<EeOverPout<<std::endl;
@@ -216,7 +258,7 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 	      std::cout<<"log(sigma EtaEta with the SC) :  "<<Logsihih<<std::endl;
 	      std::cout<<"PF-cluster GSF track delta-eta :  "<<DeltaEta<<std::endl;
 	      std::cout<<"H over E :   "<<HoE<<std::endl;
-	      std::cout<<"H over E Bc:   "<<HoEBc<<std::endl;
+/* 	      std::cout<<"H over E Bc:   "<<HoEBc<<std::endl; */
 	      std::cout<<"FBrem :   "<<Fbrem<<std::endl;
 	      std::cout<<"Normalized Chi2 KF :   "<<Chi2KF<<std::endl;
 	      std::cout<<"Normalized Chi2 GSF :   "<<Chi2GSF<<std::endl;
@@ -226,7 +268,6 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 	      std::cout<<"GSF Eta :   "<<GSFEta<<std::endl;
 	    }
 	    
-	    hNumPV_->Fill(numPV);
 	    hElecAbsEta_->Fill(ElecAbsEta);
 	    hElecPt_->Fill(ElecPt);
 	    hEtotOverPin_->Fill(EtotOverPin);
@@ -237,7 +278,7 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 	    hLogsihih_->Fill(Logsihih);
 	    hDeltaEta_->Fill(DeltaEta);
 	    hHoE_->Fill(HoE);
-	    hHoEBc_->Fill(HoEBc);
+/* 	    hHoEBc_->Fill(HoEBc); */
 	    hFbrem_->Fill(Fbrem);
 	    hChi2KF_->Fill(Chi2KF);
 	    hChi2GSF_->Fill(Chi2GSF);
@@ -247,37 +288,175 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 	    hGSFEta_->Fill(GSFEta);
 	    
 	  }//ElecAbsEta condition
+	 
+	  countEle++;
 	  
 	}// loop GsfElectrons
 	
 
+	double TauAbsEta = -99;
+	double TauPt = -99;
+	
+	std::vector<float>   GammasdEta;
+	std::vector<float>   GammasdPhi;   
+	std::vector<float>   GammasPt;     
+
+	float TauSignalPFChargedCands = -99;
+	float TauSignalPFGammaCands   = -99; 
+	float TauLeadPFChargedHadrMva = -99; 
+	float TauLeadPFChargedHadrHoP = -99; 
+	float TauLeadPFChargedHadrEoP = -99; 
+	float TauHasGsf               = -99; 
+	float TauVisMass              = -99; 
+	float TauEmFraction           = -99; 
+	float GammaEtaMom             = -99;
+	float GammaPhiMom             = -99;
+	float GammaEnFrac             = -99;
 
 
-/* 	int countPfTau = 0; */
-/* 	for ( reco::PFCandidateCollection::const_iterator PfTau = PfTaus.begin(); */
-/* 	      PfTau != PfTaus.end(); ++PfTau ) { */
-/* /\* 	  if (debug_){ *\/ */
-/* 	    std::cout<<std::endl; */
-/* 	    std::cout<<"PfTau number : "<<countPfTau<<std::endl; */
-/* /\* 	  } *\/ */
-/* 	    countPfTau++; */
-/*  	  //////////////Matching PfTau with GenElectron////////////// */
-/* 	  bool PfTauGenEleMatch = false; */
-/* 	  int countGenEle = 0; */
+	int countPfTau = 0;
+	for ( reco::PFTauCollection::const_iterator PfTau = PfTaus.begin();
+	      PfTau != PfTaus.end(); ++PfTau ) {
+	  if (debug_){
+	    std::cout<<std::endl;
+	    std::cout<<"PfTau number : "<<countPfTau<<std::endl;
+	  }
+	  countPfTau++;
+ 	  //////////////Matching PfTau with GenElectron//////////////
+	  bool PfTauGenEleMatch = true;
+	  if(match_ == 1){
+	    PfTauGenEleMatch = false;
+	    int countGenEle = 0;
+	    
+	    for ( reco::CandidateView::const_iterator GenElectron = GenElectrons.begin();
+		  GenElectron != GenElectrons.end(); ++GenElectron ) {
+	      	    if(debug_){
+	      std::cout<<"  GenElectron number : "<<countGenEle<<std::endl;
+	      std::cout<<"  DeltaR PfTau-GenEle :"<<deltaR(PfTau->eta(),PfTau->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl;
+	      	    }
+	      countGenEle++;
+	      if(deltaR(PfTau->eta(),PfTau->phi(),GenElectron->eta(),GenElectron->phi())<0.3)PfTauGenEleMatch = true;
+	    }
+	  }
+	  if(!PfTauGenEleMatch)continue;
+ 	  //////////////Matching PfTau with GenElectron//////////////
 
-/* 	  for ( reco::CandidateView::const_iterator GenElectron = GenElectrons.begin(); */
-/* 		GenElectron != GenElectrons.end(); ++GenElectron ) { */
-/* /\* 	    if(debug_){ *\/ */
-/* 	      std::cout<<"  GenElectron number : "<<countGenEle<<std::endl; */
-/* 	      std::cout<<"  DeltaR PfTau-GenEle :"<<deltaR(PfTau->eta(),PfTau->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl; */
-/* /\* 	    } *\/ */
-/* 	    countGenEle++; */
-/* 	    if(deltaR(PfTau->eta(),PfTau->phi(),GenElectron->eta(),GenElectron->phi())<0.3)PfTauGenEleMatch = true; */
-/* 	  } */
-/* 	  if(!PfTauGenEleMatch)continue; */
-/*  	  //////////////Matching PfTau with GenElectron////////////// */
 
-/* 	}// loop PfTaus */
+	  //////////////Matching PfTau with GenHadrons from Ztautau//////////////
+	  bool PfTauGenTauMatch = true;
+	  if(match_ == 2){
+	    PfTauGenTauMatch = false;
+	    int countGenTau = 0;
+	    
+	    for ( reco::CandidateView::const_iterator GenTau = GenTaus.begin();
+		  GenTau != GenTaus.end(); ++GenTau ) {
+	      if (debug_){
+		std::cout<<"  GenTau number : "<<countGenTau<<std::endl;
+		std::cout<<"  DeltaR PfTau-GenTau :"<<deltaR(PfTau->eta(),PfTau->phi(),GenTau->eta(),GenTau->phi())<<std::endl;
+	      }
+	      countGenTau++;
+	      if(deltaR(PfTau->eta(),PfTau->phi(),GenTau->eta(),GenTau->phi())<0.3)PfTauGenTauMatch = true;
+	    }
+	  }
+	  if(!PfTauGenTauMatch)continue;
+ 	  //////////////Matching PfTau with GenHadrons from Ztautau//////////////
+	  
+
+	  TauAbsEta = TMath::Abs(PfTau->eta());
+	  TauPt = PfTau->pt();
+
+	  if(TauAbsEta>absEtaMin_ && TauAbsEta<absEtaMax_ && TauPt>ptMin_ && TauPt< ptMax_) {
+
+	    for(unsigned int k = 0 ; k < (PfTau->signalPFGammaCands()).size() ; k++){
+	      reco::PFCandidateRef gamma = (PfTau->signalPFGammaCands()).at(k);
+	      if( (PfTau->leadPFChargedHadrCand()).isNonnull() ){
+		GammasdEta.push_back( gamma->eta() - PfTau->leadPFChargedHadrCand()->eta() );
+		GammasdPhi.push_back( gamma->phi() - PfTau->leadPFChargedHadrCand()->phi() );
+	      }
+	      else{
+		GammasdEta.push_back( gamma->eta() - PfTau->eta() );
+		GammasdPhi.push_back( gamma->phi() - PfTau->phi() );
+	      }
+	      GammasPt.push_back(  gamma->pt() );
+	    }
+	    
+	    float sumPt  = 0;
+	    float dEta   = 0;
+	    float dEta2  = 0;
+	    float dPhi   = 0;
+	    float dPhi2  = 0;
+	    float sumPt2 = 0;
+	    
+	    for(unsigned int k = 0 ; k < GammasPt.size() ; k++){
+	      float pt_k  = GammasPt[k];
+	      float phi_k = GammasdPhi[k];
+	      if (GammasdPhi[k] > TMath::Pi()) phi_k = GammasdPhi[k] - 2*TMath::Pi();
+	      else if(GammasdPhi[k] < -TMath::Pi()) phi_k = GammasdPhi[k] + 2*TMath::Pi();
+	      float eta_k = GammasdEta[k];
+	      sumPt  +=  pt_k;
+	      sumPt2 += (pt_k*pt_k);
+	      dEta   += (pt_k*eta_k);
+	      dEta2  += (pt_k*eta_k*eta_k);
+	      dPhi   += (pt_k*phi_k);
+	      dPhi2  += (pt_k*phi_k*phi_k);  
+	    }
+	    
+	    float GammadPt_ = sumPt/PfTau->pt();
+	    
+	  if(sumPt>0){
+	    dEta  /= sumPt;
+	    dPhi  /= sumPt;
+	    dEta2 /= sumPt;
+	    dPhi2 /= sumPt;
+	  }
+	  
+	  TauSignalPFChargedCands = PfTau->signalPFChargedHadrCands().size();
+	  TauSignalPFGammaCands   = PfTau->signalPFGammaCands().size();
+	  TauLeadPFChargedHadrMva = TMath::Max(PfTau->electronPreIDOutput(),float(-1.0));
+	  TauLeadPFChargedHadrHoP = PfTau->leadPFChargedHadrCand()->hcalEnergy()/PfTau->leadPFChargedHadrCand()->p();
+	  TauLeadPFChargedHadrEoP = PfTau->leadPFChargedHadrCand()->ecalEnergy()/PfTau->leadPFChargedHadrCand()->p();
+	  TauHasGsf               = (PfTau->leadPFChargedHadrCand()->gsfTrackRef()).isNonnull();
+	  TauVisMass              = PfTau->mass();
+	  TauEmFraction           = TMath::Max(PfTau->emFraction(),float(0.0));
+	  GammaEtaMom = TMath::Sqrt(dEta2)*TMath::Sqrt(GammadPt_)*PfTau->pt();
+	  GammaPhiMom = TMath::Sqrt(dPhi2)*TMath::Sqrt(GammadPt_)*PfTau->pt();  
+	  GammaEnFrac = GammadPt_;
+
+	    if(debug_){
+	      std::cout<<std::endl;
+	      std::cout<<"TauAbsEta :"<<TauAbsEta<<std::endl;
+	      std::cout<<"TauPt :"<<TauPt<<std::endl;
+	      std::cout<<"TauSignalPFChargedCands :"<<TauSignalPFChargedCands<<std::endl;
+	      std::cout<<"TauSignalPFGammaCands :"<<TauSignalPFGammaCands<<std::endl;
+	      std::cout<<"TauLeadPFChargedHadrMva :"<<TauLeadPFChargedHadrMva<<std::endl;
+	      std::cout<<"TauLeadPFChargedHadrHoP :"<<TauLeadPFChargedHadrHoP<<std::endl;
+	      std::cout<<"TauLeadPFChargedHadrEoP :"<<TauLeadPFChargedHadrEoP<<std::endl;
+	      std::cout<<"TauHasGsf :"<<TauHasGsf<<std::endl;
+	      std::cout<<"TauVisMass :"<<TauVisMass<<std::endl;
+	      std::cout<<"TauEmFraction :"<<TauEmFraction<<std::endl;
+	      std::cout<<"GammaEtaMom :"<<GammaEtaMom<<std::endl;
+	      std::cout<<"GammaPhiMom :"<<GammaPhiMom<<std::endl;
+	      std::cout<<"GammaEnFrac :"<<GammaEnFrac<<std::endl;
+	    }
+
+	    hTauAbsEta_->Fill(TauAbsEta);
+	    hTauPt_->Fill(TauPt);
+
+	    hTauSignalPFChargedCands_->Fill(TauSignalPFChargedCands); 
+	    hTauSignalPFGammaCands_->Fill(TauSignalPFGammaCands); 
+	    hTauLeadPFChargedHadrMva_->Fill(TauLeadPFChargedHadrMva); 
+	    hTauLeadPFChargedHadrHoP_->Fill(TauLeadPFChargedHadrHoP); 
+	    hTauLeadPFChargedHadrEoP_->Fill(TauLeadPFChargedHadrEoP); 
+	    hTauHasGsf_->Fill(TauHasGsf); 
+	    hTauVisMass_->Fill(TauVisMass); 
+	    hTauEmFraction_->Fill(TauEmFraction); 
+	    hGammaEtaMom_->Fill(GammaEtaMom); 
+	    hGammaPhiMom_->Fill(GammaPhiMom); 
+	    hGammaEnFrac_->Fill(GammaEnFrac); 
+
+	  }
+
+	}// loop PfTaus
 	      
       }//numPV condition
       
@@ -294,7 +473,6 @@ class PFlowAnalyzer : public edm::EDAnalyzer
 
     
     TH1F* hNumPV_;
-    //TH1F* hElecMatched_;
     TH1F* hElecAbsEta_;
     TH1F* hElecPt_;
     TH1F* hEtotOverPin_;
@@ -314,6 +492,19 @@ class PFlowAnalyzer : public edm::EDAnalyzer
     TH1F* hGSFlnPt_;
     TH1F* hGSFEta_;
 
+    TH1F* hTauAbsEta_;
+    TH1F* hTauPt_;
+    TH1F* hTauSignalPFChargedCands_;
+    TH1F* hTauSignalPFGammaCands_;
+    TH1F* hTauLeadPFChargedHadrMva_;
+    TH1F* hTauLeadPFChargedHadrHoP_;
+    TH1F* hTauLeadPFChargedHadrEoP_;
+    TH1F* hTauHasGsf_;
+    TH1F* hTauVisMass_;
+    TH1F* hTauEmFraction_;
+    TH1F* hGammaEtaMom_;
+    TH1F* hGammaPhiMom_;
+    TH1F* hGammaEnFrac_;
   };//plotEntryType
   
   plotEntryType* plotsAll_;
