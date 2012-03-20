@@ -26,58 +26,22 @@
 
 
 
-void plotVariable(string variable = "Elec_Fbrem",
-		  const TString& category = "TauNoGammas",
-		  const TString& xAxisTitle = "Fbrem",
-		  const TString& yAxisTitle = "a.u.",
-		  float xMin = -0.2, 
-		  float xMax = 1,
-		  int nBins = 100, 
-		  int numPVMin = 0, 
-		  int numPVMax = 50,
-		  float PtMin = 10, 
-		  float PtMax = 60,
-		  const TString& Region = "Barrel"
-		   )
+void makeRoot(string variable = "Elec_Fbrem",
+	      const TString& category = "TauNoGammas",
+	      const TString& xAxisTitle = "Fbrem",
+	      const TString& yAxisTitle = "a.u.",
+	      float xMin = -0.2, 
+	      float xMax = 1,
+	      int nBins = 100, 
+	      int numPVMin = 0, 
+	      int numPVMax = 50,
+	      float PtMin = 10, 
+	      float PtMax = 60,
+	      const TString& Region = "Barrel"
+	      )
 {
-  float AbsEtaMin = 0; 
-  float AbsEtaMax = 3.0;
-  if(Region == "Barrel"){
-    AbsEtaMin = 0; 
-    AbsEtaMax = 1.479;
-  }
-  if(Region == "Endcap"){
-    AbsEtaMin = 1.479; 
-    AbsEtaMax = 3.0;
-  }
-  TCanvas *c1 = new TCanvas("c1","",5,30,650,600);
-  c1->SetGrid(0,0);
-  c1->SetFillStyle(4000);
-  c1->SetFillColor(10);
-  c1->SetTicky();
-  c1->SetObjectStat(0);
 
-  gStyle->SetOptStat(0);
-  gStyle->SetTitleFillColor(0);
-  gStyle->SetCanvasBorderMode(0);
-  gStyle->SetCanvasColor(0);
-  gStyle->SetPadBorderMode(0);
-  gStyle->SetPadColor(0);
-  gStyle->SetTitleFillColor(0);
-  gStyle->SetTitleBorderSize(0);
-  gStyle->SetTitleH(0.07);
-  gStyle->SetTitleFontSize(0.1);
-  gStyle->SetTitleStyle(0);
-  gStyle->SetTitleOffset(1.3,"y");
 
-  TLegend* leg = new TLegend(0.55,0.42,0.85,0.85,NULL,"brNDC");
-  leg->SetFillStyle(0);
-  leg->SetBorderSize(0);
-  leg->SetFillColor(10);
-  leg->SetTextSize(0.03);
-  //leg->SetHeader("#splitline{CMS Preliminary}{ #sqrt{s}=7 TeV}");
-
-//   std::string inputFileName = "./rootFiles/nTuple_AntiEMVA_TauNoGammas.root";
   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_DYJetsToLL.root";
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
   if(inputFile->IsZombie()){
@@ -86,232 +50,16 @@ void plotVariable(string variable = "Elec_Fbrem",
   }
 //   TTree* inputTree = (TTree*)inputFile->Get("nTupleTree");
   TTree* inputTree = (TTree*)inputFile->Get("AntiEMVAAnalyzer/tree");
-  std::vector<TH1*> histograms;
+
+  std::string outputFileName = "./root/nTuple_AntiEMVA_TauNoGammas.root";
+  TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
 
 
 
-  std::vector<std::string> matchings ; 
-  matchings.push_back("GenEleMatch");
-  matchings.push_back("GenHadMatch");
-
-  for ( std::vector<std::string>::const_iterator matching = matchings.begin();
-	matching  != matchings.end(); ++matching ) {
-
-
-  TCut PUSelection(Form("NumPV>%i && NumPV<%i",numPVMin,numPVMax));
-  TCut ElecPtSelection (Form("Elec_Pt>%0f && Elec_Pt<%0f",PtMin,PtMax));
-  TCut TauPtSelection (Form("Tau_Pt>%0f && Tau_Pt<%0f",PtMin,PtMax));
-  TCut ElecAbsEtaSelection (Form("Elec_AbsEta>%0f && Elec_AbsEta<%0f",AbsEtaMin,AbsEtaMax));
-  TCut TauAbsEtaSelection (Form("Tau_AbsEta>%0f && Tau_AbsEta<%0f",AbsEtaMin,AbsEtaMax));
-  TCut ElecMatchSelection (Form("Elec_PFTauMatch && Elec_%s",matching->data()));
-  TCut TauMatchSelection (Form("Tau_%s",matching->data()));
-  TCut CategorySelection = "";
-  if (category == "TauNoGammas") CategorySelection = "Tau_NumGammaCands<0.5"; 
-  if (category == "TauHasGammasNoGsfTrack") CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf<0.5";
-  if (category == "TauHasGammasHasGsfTrackPFmvaBelow01")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput<-0.1";
-  if (category == "TauHasGammasHasGsfTrackPFmvaOver01")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput>-0.1";
-
-
-  TCut ElecSelection = CategorySelection && PUSelection && ElecPtSelection && ElecAbsEtaSelection && ElecMatchSelection ;
-  TCut TauSelection = CategorySelection && PUSelection && TauPtSelection && TauAbsEtaSelection && TauMatchSelection ;
-  TCut Selection;
-  if (variable.find("Elec")!=std::string::npos)Selection = ElecSelection;
-  if (variable.find("Tau")!=std::string::npos)Selection = TauSelection;
-  
-  TH1F* hVariable   = new TH1F( "hVariable" ,"" , nBins ,xMin, xMax);
-  hVariable->SetXTitle(Form("%s",variable.data()));
-
-  if (matching->find("EleMatch")!=std::string::npos){
-//     hVariable->SetFillColor(kRed);
-//     hVariable->SetFillStyle(3345);
-    hVariable->SetLineColor(kRed);
-    hVariable->SetLineWidth(2);
-
-  }
-  if (matching->find("HadMatch")!=std::string::npos){
-//     hVariable->SetFillColor(kBlue);
-//     hVariable->SetFillStyle(3354);
-    hVariable->SetLineColor(kGreen);
-    hVariable->SetLineWidth(2);
-
-  }  
-  inputTree->Draw(Form("%s>>hVariable",variable.data()));
-  cout<<"Variable plotted : "<<variable<<endl;
-  cout<<"Matching applied : "<<matching->data()<<endl;
-  cout<<"  Total number of Candidates : "<<hVariable->GetEntries()<<endl;
-  
-  inputTree->Draw(Form("%s>>hVariable",variable.data()),Selection);
-  cout<<"  Number of Cantidates after selection: "<<hVariable->GetEntries()<<endl;
-  
-  hVariable->Scale(1./hVariable->Integral());
-  leg->AddEntry(hVariable,Form("%s",matching->data()));
-
-  histograms.push_back(hVariable);
-  }
-//   double yMin = +1.e+6;
-//   double yMax = -1.e+6;
-  TH1* refHistogram = histograms.front();
-  refHistogram->SetStats(false);
-  refHistogram->SetTitle("");
-//   refHistogram->SetMinimum(yMin);
-//   refHistogram->SetMaximum(yMax);
-
-
-  if (xAxisTitle == "HoHplusE" ) {
-    refHistogram->SetMaximum(1.0);
-    refHistogram->SetMinimum(0.01);
-    c1->SetLogy();
-  }
-
-  if(xAxisTitle == "E_{#gamma}/(P_{in}-P_{out})" ){
-    refHistogram->SetMaximum(0.03);
-    refHistogram->SetMinimum(0.0);
-  }
-
-
-  TAxis* xAxis = refHistogram->GetXaxis();
-  xAxis->SetTitle(xAxisTitle.Data());
-  xAxis->SetTitleOffset(1.15);
-  //if(variable.find("AbsEta")!=std::string::npos)xAxis->SetLimits(AbsEtaMin, AbsEtaMax);
-  TAxis* yAxis = refHistogram->GetYaxis();
-  yAxis->SetTitle(yAxisTitle.Data());
-  yAxis->SetTitleOffset(1.30);
-
-  int numHistograms = histograms.size();
-  for ( int iHistogram = 0; iHistogram < numHistograms; ++iHistogram ) {
-    TH1* histogram = histograms[iHistogram];
-    std::string drawOption = "hist";
-    if ( iHistogram > 0 ) drawOption.append("same");
-    histogram->Draw(drawOption.data());
-    leg->Draw();
-
-
-  }//loop matchings
-  string outputName = Form("plots/%s/plotVariablesAntiEMVA_%s_%s_%s",category.Data(),category.Data(),variable.data(),Region.Data());
-  c1->Print(std::string(outputName).append(".png").data());
-  c1->Print(std::string(outputName).append(".pdf").data());
 }
 
 
 
-void plotAllVariables(){
+void makeAll(){
 
-
-  std::vector<std::string> categories;
-  categories.push_back(std::string("All"));
-  categories.push_back(std::string("TauNoGammas"));
-  categories.push_back(std::string("TauHasGammasNoGsfTrack"));
-  categories.push_back(std::string("TauHasGammasHasGsfTrackPFmvaBelow01"));
-  categories.push_back(std::string("TauHasGammasHasGsfTrackPFmvaOver01"));
-
-  std::vector<std::string> variables;
-  variables.push_back(std::string("Elec_AbsEta"));
-  variables.push_back(std::string("Elec_EeOverPout"));
-   variables.push_back(std::string("Elec_EgammaOverPdif"));
-  variables.push_back(std::string("Elec_EtotOverPin"));
-  variables.push_back(std::string("Tau_AbsEta"));
-  variables.push_back(std::string("Tau_GammaEnFrac_"));
-  variables.push_back(std::string("Tau_EmFraction"));
-  variables.push_back(std::string("Tau_HasGsf"));
-  variables.push_back(std::string("Tau_HadrEoP"));
-  variables.push_back(std::string("Tau_HadrHoP"));
-  variables.push_back(std::string("Tau_NumChargedCands"));
-  variables.push_back(std::string("Tau_NumGammaCands"));
-  variables.push_back(std::string("Tau_VisMass_"));
-
-//   variables.push_back(std::string("Elec_Fbrem"));
-//   variables.push_back(std::string("Elec_Chi2KF"));
-//   variables.push_back(std::string("Elec_EarlyBrem"));
-//   variables.push_back(std::string("Elec_LateBrem"));
-//   variables.push_back(std::string("Elec_NumHits"));
-
-
-  std::map<std::string, std::string> xAxisTitles;
-  xAxisTitles["Elec_AbsEta"]         = "|#eta|(e)" ;
-  xAxisTitles["Elec_Fbrem"]          = "Fbrem";
-  xAxisTitles["Elec_Chi2KF"]         = "Chi2KF";
-  xAxisTitles["Elec_EarlyBrem"]      = "EarlyBrem";
-  xAxisTitles["Elec_LateBrem"]       = "LateBrem";
-  xAxisTitles["Elec_EeOverPout"]     = "E_{e}/P_{out}";
-  xAxisTitles["Elec_EgammaOverPdif"] = "E_{#gamma}/(P_{in}-P_{out})";
-  xAxisTitles["Elec_EtotOverPin"]    = "E_{tot}/P_{in}";
-  xAxisTitles["Elec_NumHits"]        = "NHits";
-  xAxisTitles["Tau_AbsEta"]          = "|#eta|(#tau)";
-  xAxisTitles["Tau_GammaEnFrac_"]     = "GammaEnFrac(#tau)";
-  xAxisTitles["Tau_EmFraction"]      = "EmFraction(#tau)";
-  xAxisTitles["Tau_HasGsf"]          = "TauHasGsf";
-  xAxisTitles["Tau_HadrEoP"]         = "TauHadrEoP";
-  xAxisTitles["Tau_HadrHoP"]         = "TauHadrHoP";
-  xAxisTitles["Tau_NumChargedCands"] = "TauNumChargedHadrCands";
-  xAxisTitles["Tau_NumGammaCands"]   = "TauNumGammaCands";
-  xAxisTitles["Tau_VisMass_"]         = "VisMass(#tau)";
-
-  std::map<std::string, float> xMinValues;
-  xMinValues["Elec_AbsEta"]             = 0.;
-  xMinValues["Elec_Fbrem"]              = -0.2;
-  xMinValues["Elec_Chi2KF"]             = 0.;
-  xMinValues["Elec_EarlyBrem"]          = -2;
-  xMinValues["Elec_LateBrem"]           = -2;
-  xMinValues["Elec_EeOverPout"]         = 0.;
-  xMinValues["Elec_EgammaOverPdif"]     = 0.;
-  xMinValues["Elec_EtotOverPin"]        = 0.;
-  xMinValues["Elec_NumHits"]            = 0.;
-  xMinValues["Tau_AbsEta"]              = 0.;
-  xMinValues["Tau_GammaEnFrac_"]         = 0.;
-  xMinValues["Tau_EmFraction"]          = 0.;
-  xMinValues["Tau_HasGsf"]              = 0.;
-  xMinValues["Tau_HadrEoP"]             = 0.;
-  xMinValues["Tau_HadrHoP"]             = 0.;
-  xMinValues["Tau_NumChargedCands"] = 0.;
-  xMinValues["Tau_NumGammaCands"]       = 0.;
-  xMinValues["Tau_VisMass_"]             = 0.;
-
-  std::map<std::string, float> xMaxValues;
-  xMaxValues["Elec_AbsEta"]             = 3;
-  xMaxValues["Elec_Fbrem"]              = 1;
-  xMaxValues["Elec_Chi2KF"]             = 5;
-  xMaxValues["Elec_EarlyBrem"]          = 2;
-  xMaxValues["Elec_LateBrem"]           = 2;
-  xMaxValues["Elec_EeOverPout"]         = 4.0;
-  xMaxValues["Elec_EgammaOverPdif"]     = 4;
-  xMaxValues["Elec_EtotOverPin"]        = 4;
-  xMaxValues["Elec_NumHits"]            = 30;
-  xMaxValues["Tau_AbsEta"]              = 3;
-  xMaxValues["Tau_GammaEnFrac_"]         = 1;
-  xMaxValues["Tau_EmFraction"]          = 1;
-  xMaxValues["Tau_HasGsf"]              = 2;
-  xMaxValues["Tau_HadrEoP"]             = 1;
-  xMaxValues["Tau_HadrHoP"]             = 1;
-  xMaxValues["Tau_NumChargedCands"] = 5;
-  xMaxValues["Tau_NumGammaCands"]       = 5;
-  xMaxValues["Tau_VisMass_"]             = 1.8;
-
-
-  std::map<std::string, int> nBins;
-  nBins["Elec_AbsEta"]             = 100;
-  nBins["Elec_Fbrem"]              = 100;
-  nBins["Elec_Chi2KF"]             = 50;
-  nBins["Elec_EarlyBrem"]          = 5;
-  nBins["Elec_LateBrem"]           = 5;
-  nBins["Elec_EeOverPout"]         = 100;
-  nBins["Elec_EgammaOverPdif"]     = 100;
-  nBins["Elec_EtotOverPin"]        = 100;
-  nBins["Elec_NumHits"]            = 30;
-  nBins["Tau_AbsEta"]              = 100;
-  nBins["Tau_GammaEnFrac_"]         = 20;
-  nBins["Tau_EmFraction"]          = 100;
-  nBins["Tau_HasGsf"]              = 2;
-  nBins["Tau_HadrEoP"]             = 20;
-  nBins["Tau_HadrHoP"]             = 20;
-  nBins["Tau_NumChargedCands"] = 5;
-  nBins["Tau_NumGammaCands"]       = 5;
-  nBins["Tau_VisMass_"]             = 34;
-
-  for ( std::vector<std::string>::const_iterator category = categories.begin();
-	category != categories.end(); ++category ) {
-    for ( std::vector<std::string>::const_iterator variable = variables.begin();
-	  variable!= variables.end(); ++variable ) {
-      plotVariable(variable->data(), category->data(), xAxisTitles[*variable].data(),"a.u.",xMinValues[*variable], xMaxValues[*variable], nBins[*variable], 0, 50, 10, 60,"Barrel" );
-    }
-  }
 }
