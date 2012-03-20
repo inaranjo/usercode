@@ -352,6 +352,11 @@ void makeRoot(string matching = "Elec",
     if(matching == "Elec" && (Tau_GenEleMatch!=1 || Elec_GenEleMatch!=1)) continue;
     if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
 
+    if(category == "TauNoGammas" && Tau_NumGammaCands>0) continue;
+    if(category == "TauHasGammasNoGsfTrack" && Tau_NumGammaCands<1 && Tau_HasGsf!=1) continue;
+    if(category == "TauHasGammasHasGsfTrackPFmvaBelow01" && Tau_NumGammaCands<1 && Tau_HasGsf==1 && Elec_PFMvaOutput<-0.1) continue;
+    if(category == "TauHasGammasHasGsfTrackPFmvaOver01" && Tau_NumGammaCands<1 && Tau_HasGsf==1 && Elec_PFMvaOutput>=-0.1) continue;
+
     t_run_ = run;
     t_event_ = event;
     t_lumi_ = lumi;
@@ -428,4 +433,11 @@ void makeAll(){
 
   makeRoot("Elec","All");
   makeRoot("Tau","All");
+  makeRoot("Elec","TauNoGammas");
+  makeRoot("Tau","TauNoGammas");
+  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaBelow01");
+  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaBelow01");
+  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaOver01");
+  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaOver01");
+
 }
