@@ -1,5 +1,5 @@
-#ifndef Bianchi_TauTauStudies_JetsCleaner_h
-#define Bianchi_TauTauStudies_JetsCleaner_h
+#ifndef IvoNaranjo_ElectronsStudies_JetsCleaner_h
+#define IvoNaranjo_ElectronsStudies_JetsCleaner_h
 
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
