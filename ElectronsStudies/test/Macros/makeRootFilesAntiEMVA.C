@@ -348,6 +348,10 @@ void makeRoot(string matching = "Elec",
 
     inputTree->GetEntry(iEntry);
 
+
+    if(matching == "Elec" && (Tau_GenEleMatch!=1 || Elec_GenEleMatch!=1)) continue;
+    if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
+
     t_run_ = run;
     t_event_ = event;
     t_lumi_ = lumi;
@@ -422,4 +426,6 @@ void makeRoot(string matching = "Elec",
 
 void makeAll(){
 
+  makeRoot("Elec","All");
+  makeRoot("Tau","All");
 }
