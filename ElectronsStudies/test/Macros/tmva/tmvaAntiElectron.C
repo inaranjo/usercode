@@ -25,18 +25,23 @@
 #endif
 
 
-void TMVAClassification(std::string Cat_ = "All"){
+void TMVAClassification(std::string Cat_ = "All",
+			std::string Sel_ = "Barrel"
+			
+			)
+{
 
   TMVA::Tools::Instance();
 
-  TString outfileName( "TMVA_"+Cat_+".root" );
+  TString outfileName( "tmvaRoot/TMVA_"+Cat_+"_"+Sel_+".root" );
   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
-  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_"+Cat_, outputFile, 
+  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_"+Cat_+"_"+Sel_, outputFile, 
 					      "!V:!Silent:Color:DrawProgressBar" );
 
  
  if(Cat_.find("All")!=string::npos){
+    factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
@@ -56,6 +61,7 @@ void TMVAClassification(std::string Cat_ = "All"){
     factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
   if(Cat_.find("TauNoGammas")!=string::npos){
+    factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
@@ -65,16 +71,17 @@ void TMVAClassification(std::string Cat_ = "All"){
     factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
 
-    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
+//     factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
     factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
     factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
     factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
     factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
     factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
+//     factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
     factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
   if(Cat_.find("TauHasGammasNoGsfTrack")!=string::npos){
+    factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
@@ -94,6 +101,7 @@ void TMVAClassification(std::string Cat_ = "All"){
     factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
   if(Cat_.find("TauHasGammasHasGsfTrackPFmvaBelow01")!=string::npos){
+    factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
@@ -113,6 +121,7 @@ void TMVAClassification(std::string Cat_ = "All"){
     factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
   if(Cat_.find("TauHasGammasHasGsfTrackPFmvaOver01")!=string::npos){
+    factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
@@ -133,20 +142,18 @@ void TMVAClassification(std::string Cat_ = "All"){
   }
 
 
-
-  TFile *fTau = new TFile("../root/tree_AntiEMVA_Ivo_All_Tau.root","READ"); 
-  TFile *fEle = new TFile("../root/tree_AntiEMVA_Ivo_All_Elec.root","READ");
+  TFile *fTau = new TFile(Form("../root/tree_AntiEMVA_Ivo_%s_Tau.root",Cat_.data()),"READ"); 
+  TFile *fEle = new TFile(Form("../root/tree_AntiEMVA_Ivo_%s_Elec.root",Cat_.data()),"READ");
 
 
   TTree *tTau = (TTree*)fTau->Get("tree");
   TTree *tEle = (TTree*)fEle->Get("tree");
  
-  TCut myCutTau = "";
+  TCut myCut = "";
 
-//   if( Cat_.find("_1") !=string::npos)  myCutTau = myCutTau && TCut("signalPFGammaCands>0");
-//   if(Cat_.find("X_0") !=string::npos)  myCutTau = myCutTau && TCut("signalPFGammaCands==0");
-//   if(Cat_.find("1_1") !=string::npos)  myCutTau = myCutTau && TCut("dPhi>-98");
-//   if(Cat_.find("0_1") !=string::npos)  myCutTau = myCutTau && TCut("dPhi<-98");
+  if( Sel_.find("Barrel") !=string::npos)  myCut = myCut && TCut("Elec_AbsEta<1.479 && Tau_AbsEta<1.479");
+  if(Sel_.find("Endcap") !=string::npos)  myCut = myCut && TCut("Elec_AbsEta>1.479 && Tau_AbsEta>1.479 && Elec_AbsEta<3.0 && Tau_AbsEta<3.0");
+
 
 
   ////////////////// compute the weights
@@ -155,7 +162,7 @@ void TMVAClassification(std::string Cat_ = "All"){
   factory->AddBackgroundTree( tEle );
 //   factory->SetWeightExpression("puWeight");
 
-  factory->PrepareTrainingAndTestTree( myCutTau,myCutTau,
+  factory->PrepareTrainingAndTestTree( myCut,myCut,
 				       "nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
   
   
@@ -179,12 +186,17 @@ void TMVAClassification(std::string Cat_ = "All"){
 }
 
 void TMVAAllClassification(){
-  TMVAClassification("All");
-  TMVAClassification("TauNoGammas");
-  TMVAClassification("TauHasGammasNoGsfTrack");
-  TMVAClassification("TauHasGammasHasGsfTrackPFmvaBelow01");
-  TMVAClassification("TauHasGammasHasGsfTrackPFmvaOver01");
+  TMVAClassification("All","Barrel");
+  TMVAClassification("TauNoGammas","Barrel");
+  TMVAClassification("TauHasGammasNoGsfTrack","Barrel");
+  TMVAClassification("TauHasGammasHasGsfTrackPFmvaBelow01","Barrel");
+  TMVAClassification("TauHasGammasHasGsfTrackPFmvaOver01","Barrel");
 
+  TMVAClassification("All","Endcap");
+  TMVAClassification("TauNoGammas","Endcap");
+  TMVAClassification("TauHasGammasNoGsfTrack","Endcap");
+  TMVAClassification("TauHasGammasHasGsfTrackPFmvaBelow01","Endcap");
+  TMVAClassification("TauHasGammasHasGsfTrackPFmvaOver01","Endcap");
 }
 
 void TMVAClassificationApplication(double effS_ = 0.80 ) 
