@@ -22,24 +22,31 @@
 #include <iostream>
 #include <iomanip>
 
-#define DEBUG true
+#define DEBUG false
 
 void makeRoot(string matching = "Elec",
-	      string category = "TauNoGammas"
+	      string category = "TauNoGammas",
+	      string discriminator = ""
 	      )
 {
 
 
 //   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_DYJetsToLL.root";
-  std::string inputFileName = "../AntiEMVA.root";
+//   std::string inputFileName = "../AntiEMVA.root";
+//   std::string inputFileName = "../AntiEMVA_Ivo-PFTauAntiEMed.root";
+  std::string inputFileName = "../AntiEMVA_Ivo";
+  if(discriminator=="PFTauAntiEMed") inputFileName.append(Form("-%s",discriminator.data()));
+ inputFileName.append(".root");
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
   if(inputFile->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
 
+//   std::string outputFileName = Form("./root/tree_AntiEMVA_Ivo-PFTauAntiEMed_%s_%s.root",category.data(),matching.data());
+  std::string outputFileName = Form("./root/tree_AntiEMVA_Ivo_%s_%s.root",category.data(),matching.data());
+  if(discriminator=="PFTauAntiEMed") outputFileName = Form("./root/tree_AntiEMVA_Ivo-%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
 
-  std::string outputFileName = Form("./root/tree_AntiEMVA_%s_%s.root",category.data(),matching.data());
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
 
@@ -129,8 +136,8 @@ void makeRoot(string matching = "Elec",
   mytree->Branch("Elec_EtotOverPin",&t_Elec_EtotOverPin_,"Elec_EtotOverPin/F");
   mytree->Branch("Elec_EeOverPout",&t_Elec_EeOverPout_,"Elec_EeOverPout/F");
   mytree->Branch("Elec_EgammaOverPdif",&t_Elec_EgammaOverPdif_,"Elec_EgammaOverPdif/F");
-  mytree->Branch("Elec_EarlyBrem",&t_Elec_EarlyBrem_,"Elec_EarlyBrem[NumGsfEle]/I");
-  mytree->Branch("Elec_LateBrem",&t_Elec_LateBrem_,"Elec_LateBrem[NumGsfEle]/I");
+  mytree->Branch("Elec_EarlyBrem",&t_Elec_EarlyBrem_,"Elec_EarlyBrem/I");
+  mytree->Branch("Elec_LateBrem",&t_Elec_LateBrem_,"Elec_LateBrem/I");
   mytree->Branch("Elec_Logsihih",&t_Elec_Logsihih_,"Elec_Logsihih/F");
   mytree->Branch("Elec_DeltaEta",&t_Elec_DeltaEta_,"Elec_DeltaEta/F");
   mytree->Branch("Elec_HoHplusE",&t_Elec_HoHplusE_,"Elec_HoHplusE/F");
@@ -341,7 +348,7 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchStatus("Elec_GSFTracklnPt", 1);
   inputTree->SetBranchStatus("Elec_GSFTrackEta", 1);
 
-  if (DEBUG) cout<< "Number of entries : "<<nEntries<<endl;
+  cout<< "Number of entries : "<<nEntries<<endl;
 
   for (int iEntry = 0; iEntry<nEntries ; iEntry++){
     if(iEntry%200==0) cout << iEntry << endl;
@@ -416,12 +423,74 @@ void makeRoot(string matching = "Elec",
     t_Elec_GSFTracklnPt_ = Elec_GSFTracklnPt ;
     t_Elec_GSFTrackEta_ = Elec_GSFTrackEta ;
 
+    if(DEBUG){
+      cout<<endl;
+      cout<<" run : "<<t_run_<<endl;
+      cout<<" event : "<<t_event_<<endl;
+      cout<<" lumi : "<<t_lumi_<<endl;
+      cout<<" NumPV : "<<t_NumPV_<<endl;
+      cout<<" NumGsfEle : "<<t_NumGsfEle_<<endl;
+      cout<<" NumPFTaus : "<<t_NumPFTaus_<<endl;
+      cout<<" NumGenEle : "<<t_NumGenEle_<<endl;
+      cout<<" NumGenHad : "<<t_NumGenHad_<<endl;
+      cout<<" NumGenJet : "<<t_NumGenJet_<<endl;
+      
+      cout<<" Tau_GsfEleMatch :"<<t_Tau_GsfEleMatch_<<endl;
+      cout<<" Tau_GenEleMatch :"<<t_Tau_GenEleMatch_<<endl;
+      cout<<" Tau_GenEleFromZMatch :"<<t_Tau_GenEleFromZMatch_<<endl;
+      cout<<" Tau_GenEleFromZTauTauMatch :"<<t_Tau_GenEleFromZTauTauMatch_<<endl;
+      cout<<" Tau_GenHadMatch :"<<t_Tau_GenHadMatch_<<endl;
+      cout<<" Tau_GenJetMatch :"<<t_Tau_GenJetMatch_<<endl;
+      cout<<" Tau_AbsEta :"<<t_Tau_AbsEta_<<endl;
+      cout<<" Tau_Pt : "<<t_Tau_Pt_<<endl;
+      cout<<" Tau_HasGsf :"<<t_Tau_HasGsf_<<endl; 
+      cout<<" Tau_EmFraction :"<<t_Tau_EmFraction_<<endl; 
+      cout<<" Tau_NumChargedCands :"<<t_Tau_NumChargedCands_<<endl;
+      cout<<" Tau_NumGammaCands :"<<t_Tau_NumGammaCands_<<endl; 
+      cout<<" Tau_HadrHoP :"<<t_Tau_HadrHoP_<<endl; 
+      cout<<" Tau_HadrEoP :"<<t_Tau_HadrEoP_<<endl; 
+      cout<<" Tau_VisMass :"<<t_Tau_VisMass_<<endl; 
+      cout<<" Tau_GammaEtaMom :"<<t_Tau_GammaEtaMom_<<endl;
+      cout<<" Tau_GammaPhiMom :"<<t_Tau_GammaPhiMom_<<endl;
+      cout<<" Tau_GammaEnFrac :"<<t_Tau_GammaEnFrac_<<endl;
+      cout<<" Tau_HadrMva :"<<t_Tau_HadrMva_<<endl; 
     
+      cout<<" Elec_GenEleMatch :"<<t_Elec_GenEleMatch_<<endl;
+      cout<<" Elec_GenEleFromZMatch :"<<t_Elec_GenEleFromZMatch_<<endl;
+      cout<<" Elec_GenEleFromZTauTauMatch :"<<t_Elec_GenEleFromZTauTauMatch_<<endl;
+      cout<<" Elec_PFTauMatch :"<<t_Elec_PFTauMatch_<<endl;
+      cout<<" Elec_GenHadMatch :"<<t_Elec_GenHadMatch_<<endl;
+      cout<<" Elec_GenJetMatch :"<<t_Elec_GenJetMatch_<<endl;
+      cout<<" Elec_AbsEta :"<<t_Elec_AbsEta_<<endl;
+      cout<<" Elec_Pt :"<<t_Elec_Pt_<<endl;
+      cout<<" Elec_PFMvaOutput : "<<t_Elec_PFMvaOutput_<<endl;
+      cout<<" Elec_Ee :"<<t_Elec_Ee_<<endl;
+      cout<<" Elec_Egamma :"<<t_Elec_Egamma_<<endl;
+      cout<<" Elec_Pin :"<<t_Elec_Pin_<<endl;
+      cout<<" Elec_Pout : "<<t_Elec_Pout_<<endl;
+      cout<<" Elec_EtotOverPin :"<<t_Elec_EtotOverPin_<<endl;
+      cout<<" Elec_EeOverPout : "<<t_Elec_EeOverPout_<<endl;
+      cout<<" Elec_EgammaOverPdif :"<<t_Elec_EgammaOverPdif_<<endl;
+      cout<<" Elec_EarlyBrem :"<<t_Elec_EarlyBrem_ <<endl;
+      cout<<" Elec_LateBrem :"<<t_Elec_LateBrem_<<endl;
+      cout<<" Elec_Logsihih :"<<t_Elec_Logsihih_<<endl;
+      cout<<" Elec_DeltaEta :"<<t_Elec_DeltaEta_<<endl;
+      cout<<" Elec_HoHplusE :"<<t_Elec_HoHplusE_<<endl;
+      cout<<" Elec_Fbrem :"<<t_Elec_Fbrem_<<endl;
+      cout<<" Elec_Chi2KF :"<<t_Elec_Chi2KF_<<endl;
+      cout<<" Elec_Chi2GSF :"<<t_Elec_Chi2GSF_<<endl;
+      cout<<" Elec_NumHits :"<<t_Elec_NumHits_<<endl;
+      cout<<" Elec_GSFTrackResol :"<<t_Elec_GSFTrackResol_<<endl;
+      cout<<" Elec_GSFTracklnPt : "<<t_Elec_GSFTracklnPt_<<endl;
+      cout<<" Elec_GSFTrackEta :"<<t_Elec_GSFTrackEta_<<endl;
+    }
+
     mytree->Fill();
 
   }
-    mytree->Write();
-
+  mytree->Write();
+  
+  cout<<"Creating file : "<<outputFileName.data()<<endl;
   inputFile->Close();
   outputFile->Close();
   return;
@@ -431,13 +500,26 @@ void makeRoot(string matching = "Elec",
 
 void makeAll(){
 
-  makeRoot("Elec","All");
-  makeRoot("Tau","All");
-  makeRoot("Elec","TauNoGammas");
-  makeRoot("Tau","TauNoGammas");
-  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaBelow01");
-  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaBelow01");
-  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaOver01");
-  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaOver01");
+  makeRoot("Elec","All","");
+  makeRoot("Tau","All","");
+  makeRoot("Elec","TauNoGammas","");
+  makeRoot("Tau","TauNoGammas","");
+  makeRoot("Elec","TauHasGammasNoGsfTrack","");
+  makeRoot("Tau","TauHasGammasNoGsfTrack","");
+  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaBelow01","");
+  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaBelow01","");
+  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaOver01","");
+  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaOver01","");
+
+  makeRoot("Elec","All","PFTauAntiEMed");
+  makeRoot("Tau","All","PFTauAntiEMed");
+  makeRoot("Elec","TauNoGammas","PFTauAntiEMed");
+  makeRoot("Tau","TauNoGammas","PFTauAntiEMed");
+  makeRoot("Elec","TauHasGammasNoGsfTrack","PFTauAntiEMed");
+  makeRoot("Tau","TauHasGammasNoGsfTrack","PFTauAntiEMed");
+  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaBelow01","PFTauAntiEMed");
+  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaBelow01","PFTauAntiEMed");
+  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaOver01","PFTauAntiEMed");
+  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaOver01","PFTauAntiEMed");
 
 }

@@ -56,8 +56,8 @@ void AntiEMVAAnalyzer::beginJob()
   tree_->Branch("Elec_EtotOverPin",&Elec_EtotOverPin_,"Elec_EtotOverPin/F");
   tree_->Branch("Elec_EeOverPout",&Elec_EeOverPout_,"Elec_EeOverPout/F");
   tree_->Branch("Elec_EgammaOverPdif",&Elec_EgammaOverPdif_,"Elec_EgammaOverPdif/F");
-  tree_->Branch("Elec_EarlyBrem",&Elec_EarlyBrem_,"Elec_EarlyBrem[NumGsfEle]/I");
-  tree_->Branch("Elec_LateBrem",&Elec_LateBrem_,"Elec_LateBrem[NumGsfEle]/I");
+  tree_->Branch("Elec_EarlyBrem",&Elec_EarlyBrem_,"Elec_EarlyBrem/I");
+  tree_->Branch("Elec_LateBrem",&Elec_LateBrem_,"Elec_LateBrem/I");
   tree_->Branch("Elec_Logsihih",&Elec_Logsihih_,"Elec_Logsihih/F");
   tree_->Branch("Elec_DeltaEta",&Elec_DeltaEta_,"Elec_DeltaEta/F");
   tree_->Branch("Elec_HoHplusE",&Elec_HoHplusE_,"Elec_HoHplusE/F");
@@ -142,14 +142,14 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     edm::LogError("DataNotAvailable")
       << "No PV label available \n";
   const reco::VertexCollection* vertexes = pVertexes.product();
-  if(debug_){
-    std::cout<<"numPV : "<<vertexes->size()<<std::endl;
-    for(unsigned int k = 0; k<vertexes->size(); k++){
-      std::cout << "Vtx[" << k << "] (x,y,z) = (" << ((*vertexes)[k].position()).x()
-		<< "," << ((*vertexes)[k].position()).y() << "," << ((*vertexes)[k].position()).z() << ")"
-		<< std::endl;
-    }
-  }
+//   if(debug_){
+//     std::cout<<"numPV : "<<vertexes->size()<<std::endl;
+//     for(unsigned int k = 0; k<vertexes->size(); k++){
+//       std::cout << "Vtx[" << k << "] (x,y,z) = (" << ((*vertexes)[k].position()).x()
+// 		<< "," << ((*vertexes)[k].position()).y() << "," << ((*vertexes)[k].position()).z() << ")"
+// 		<< std::endl;
+//     }
+//   }
   NumPV_ = vertexes->size();
 
 
@@ -213,6 +213,10 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_HadrHoP_Tab_[NumPFTaus_] = PfTau->leadPFChargedHadrCand()->hcalEnergy()/PfTau->leadPFChargedHadrCand()->p();
     Tau_HadrEoP_Tab_[NumPFTaus_] = PfTau->leadPFChargedHadrCand()->ecalEnergy()/PfTau->leadPFChargedHadrCand()->p();
 
+    GammasdEta.clear();
+    GammasdPhi.clear();
+    GammasPt.clear();
+
     for(unsigned int k = 0 ; k < (PfTau->signalPFGammaCands()).size() ; k++){
       reco::PFCandidateRef gamma = (PfTau->signalPFGammaCands()).at(k);
       if( (PfTau->leadPFChargedHadrCand()).isNonnull() ){
@@ -224,6 +228,7 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 	GammasdPhi.push_back( gamma->phi() - PfTau->phi() );
       }
       GammasPt.push_back(  gamma->pt() );
+//       if (debug_)std::cout<<k<<" Gamma de pt : "<<gamma->pt()<<std::endl;
     }
     
     float sumPt  = 0;
@@ -245,6 +250,8 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       dEta2  += (pt_k*eta_k*eta_k);
       dPhi   += (pt_k*phi_k);
       dPhi2  += (pt_k*phi_k*phi_k);  
+//       if (debug_)std::cout<<k<<" GammaBis de pt : "<<pt_k<<std::endl;
+
     }
     
     float GammadPt_ = sumPt/PfTau->pt();
@@ -262,6 +269,15 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_VisMass_Tab_[NumPFTaus_] = PfTau->mass();
     Tau_HadrMva_Tab_[NumPFTaus_] = TMath::Max(PfTau->electronPreIDOutput(),float(-1.0));
     
+//     if(debug_){
+//       std::cout<<"TauLoop number : "<<NumPFTaus_<<std::endl;
+//       std::cout<<"  GammaEtaMom : "<<Tau_GammaEtaMom_Tab_[NumPFTaus_]<<std::endl;
+//       std::cout<<"  GammaPhiMom : "<<Tau_GammaPhiMom_Tab_[NumPFTaus_]<<std::endl;
+//       std::cout<<"  GammaPt : "<<sumPt<<std::endl;
+//       std::cout<<"  TauPt : "<<PfTau->pt()<<std::endl;
+//       std::cout<<"  GammaEnFrac : "<<Tau_GammaEnFrac_Tab_[NumPFTaus_]<<std::endl;
+//     }
+
     NumPFTaus_++;
   }//Loop on PFTaus
 
@@ -333,23 +349,23 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_GammaEnFrac_            = Tau_GammaEnFrac_Tab_[MatchedTau];
     Tau_HadrMva_                = Tau_HadrMva_Tab_[MatchedTau]; 
     
-    if(debug_){
-      std::cout<<std::endl;
-      std::cout<<"Tau variables :"<<std::endl;
-      std::cout<<"TauAbsEta :"<<Tau_AbsEta_<<std::endl;
-      std::cout<<"TauPt :"<<Tau_Pt_<<std::endl;
-      std::cout<<"TauHasGsf :"<<Tau_HasGsf_<<std::endl;
-      std::cout<<"TauEmFraction :"<<Tau_EmFraction_<<std::endl;
-      std::cout<<"TauNumChargedCands :"<<Tau_NumChargedCands_<<std::endl;
-      std::cout<<"TauNumGammaCands :"<<Tau_NumGammaCands_<<std::endl;      
-      std::cout<<"Tau_HadrHoP :"<<Tau_HadrHoP_<<std::endl;
-      std::cout<<"Tau_HadrEoP :"<<Tau_HadrEoP_<<std::endl;
-      std::cout<<"Tau_VisMass_ :"<<Tau_VisMass_<<std::endl;
-      std::cout<<"Tau_GammaEtaMom_ :"<<Tau_GammaEtaMom_<<std::endl;
-      std::cout<<"Tau_GammaPhiMom_ :"<<Tau_GammaPhiMom_<<std::endl;
-      std::cout<<"Tau_GammaEnFrac_ :"<<Tau_GammaEnFrac_<<std::endl;
-      std::cout<<"Tau_HadrMva_ :"<<Tau_HadrMva_<<std::endl;
-    }
+//     if(debug_){
+//       std::cout<<std::endl;
+//       std::cout<<"Tau variables :"<<std::endl;
+//       std::cout<<"TauAbsEta :"<<Tau_AbsEta_<<std::endl;
+//       std::cout<<"TauPt :"<<Tau_Pt_<<std::endl;
+//       std::cout<<"TauHasGsf :"<<Tau_HasGsf_<<std::endl;
+//       std::cout<<"TauEmFraction :"<<Tau_EmFraction_<<std::endl;
+//       std::cout<<"TauNumChargedCands :"<<Tau_NumChargedCands_<<std::endl;
+//       std::cout<<"TauNumGammaCands :"<<Tau_NumGammaCands_<<std::endl;      
+//       std::cout<<"Tau_HadrHoP :"<<Tau_HadrHoP_<<std::endl;
+//       std::cout<<"Tau_HadrEoP :"<<Tau_HadrEoP_<<std::endl;
+//       std::cout<<"Tau_VisMass_ :"<<Tau_VisMass_<<std::endl;
+//       std::cout<<"Tau_GammaEtaMom_ :"<<Tau_GammaEtaMom_<<std::endl;
+//       std::cout<<"Tau_GammaPhiMom_ :"<<Tau_GammaPhiMom_<<std::endl;
+//       std::cout<<"Tau_GammaEnFrac_ :"<<Tau_GammaEnFrac_<<std::endl;
+//       std::cout<<"Tau_HadrMva_ :"<<Tau_HadrMva_<<std::endl;
+//     }
     /////////////////////////////////////Matchings  /////////////////////////////////////
     if (debug_)std::cout<<"  Electron matchings :"<<std::endl;
 
@@ -411,13 +427,15 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 	else Elec_Egamma_ += pfClusterEn;
       }
     }
-    
+    else continue;
+
     if(debug_)std::cout<<"Elec_Ee :   "<<Elec_Ee_<<" Elec_Egamma :  "<<Elec_Egamma_<<std::endl;
 	    
     Elec_Pin_ = TMath::Sqrt(GsfElectron->trackMomentumAtVtx().Mag2());
     Elec_Pout_ = TMath::Sqrt(GsfElectron->trackMomentumOut().Mag2()); 
     if (debug_)std::cout<<"Elec_Pin :   "<<Elec_Pin_<<" Elec_Pout :  "<<Elec_Pout_<<std::endl;
     
+
     Elec_EtotOverPin_ = (Elec_Ee_+Elec_Egamma_)/Elec_Pin_;
     Elec_EeOverPout_ = Elec_Ee_/Elec_Pout_;
     Elec_EgammaOverPdif_ = Elec_Egamma_/(Elec_Pin_-Elec_Pout_);
@@ -434,6 +452,7 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       Elec_Chi2KF_ = GsfElectron->closestCtfTrackRef()->normalizedChi2();
       Elec_NumHits_ = GsfElectron->closestCtfTrackRef()->numberOfValidHits();
     }
+    else continue;
     Elec_Chi2GSF_ = -99;
     Elec_GSFTrackResol_ = -99;
     Elec_GSFTracklnPt_ = -99;
@@ -444,6 +463,7 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       Elec_GSFTracklnPt_ = log(GsfElectron->gsfTrack()->pt())*TMath::Ln10();
       Elec_GSFTrackEta_ = GsfElectron->gsfTrack()->eta();
     }
+    else continue;
     
     if(debug_){
       std::cout<<"Elec_AbsEta :"<<Elec_AbsEta_<<std::endl;

@@ -73,7 +73,7 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   int NumGenJet_;
 
   std::vector<float>   GammasdEta;
-  std::vector<float>   GammasdPhi;   
+  std::vector<float>   GammasdPhi;
   std::vector<float>   GammasPt;
   int Tau_GsfEleMatch_Tab_[50];
   int Tau_GenEleMatch_Tab_[50];

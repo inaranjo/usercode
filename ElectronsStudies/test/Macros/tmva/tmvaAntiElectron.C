@@ -25,66 +25,139 @@
 #endif
 
 
-void TMVAClassification(std::string bkg_ = "1_1"){
+void TMVAClassification(std::string Cat_ = "All"){
 
   TMVA::Tools::Instance();
 
-  TString outfileName( "TMVA"+bkg_+".root" );
+  TString outfileName( "TMVA_"+Cat_+".root" );
   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
-  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_"+bkg_, outputFile, 
+  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_"+Cat_, outputFile, 
 					      "!V:!Silent:Color:DrawProgressBar" );
 
  
-  if(bkg_.find("X_0")!=string::npos){
-    factory->AddVariable( "leadPFChargedHadrHcalEnergy/leadPFChargedHadrTrackP", "HoP",            "     "     , 'F'  );
-    factory->AddVariable( "emFraction:=TMath::Max(emFraction, 0.0)",    "emFraction"    , "     "     , 'F'  );
+ if(Cat_.find("All")!=string::npos){
+    factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EgammaOverPdif","EgammaOverPdif",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_AbsEta","ElecAbsEta",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EtotOverPin","EtotOverPin",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
+
+    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
-  // 0=no Gsf 1= gammas
-  if(bkg_.find("0_1")!=string::npos){
-    factory->AddVariable( "mva:=TMath::Max(leadPFChargedHadrMva,-1.0)", "mva"    ,  "     "     , 'F'  );
-    factory->AddVariable( "visMass",                                    "visMass",  "GeV/c"     , 'F'  );
-    factory->AddVariable( "dEtaG:=abs(gammadEta[0])",                   "dEtaG",    "     "     , 'F'  );
-    factory->AddVariable( "dPhiG:=TMath::Min(abs(gammadPhi[0]),0.3)",   "dPhiG",    "     "     , 'F'  );
-    factory->AddVariable( "dPtG:=gammaPt[0]/pt",                        "dPtG",     "     "     , 'F'  );
+  if(Cat_.find("TauNoGammas")!=string::npos){
+    factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EgammaOverPdif","EgammaOverPdif",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_AbsEta","ElecAbsEta",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EtotOverPin","EtotOverPin",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
+
+    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
-  // 1= Gsf 1= gammas
-  if(bkg_.find("1_1")!=string::npos){
-    factory->AddVariable( "mva:=TMath::Max(leadPFChargedHadrMva,-1.0)", "mva"    , "     "     , 'F'  );
-    factory->AddVariable( "signalPFGammaCands",   "signalPFGammaCands", "     "     , 'I'  );
-    factory->AddVariable( "visMass",              "visMass",    "GeV/c"     , 'F'  );
-    factory->AddVariable( "dPhi",         "dPhi",    "     "     , 'F'  );
-    factory->AddVariable( "dEta",         "dEta",    "     "     , 'F'  );
-    factory->AddVariable( "sihih",        "sihih",   "     "     , 'F'  );
+  if(Cat_.find("TauHasGammasNoGsfTrack")!=string::npos){
+    factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EgammaOverPdif","EgammaOverPdif",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_AbsEta","ElecAbsEta",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EtotOverPin","EtotOverPin",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
+
+    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
+  }
+  if(Cat_.find("TauHasGammasHasGsfTrackPFmvaBelow01")!=string::npos){
+    factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EgammaOverPdif","EgammaOverPdif",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_AbsEta","ElecAbsEta",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EtotOverPin","EtotOverPin",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
+
+    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
+  }
+  if(Cat_.find("TauHasGammasHasGsfTrackPFmvaOver01")!=string::npos){
+    factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EgammaOverPdif","EgammaOverPdif",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_AbsEta","ElecAbsEta",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EtotOverPin","EtotOverPin",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
+
+    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
 
 
-  TFile *fTau = new TFile("/data_CMS/cms/lbianchini/VbfJetsStudy/Utilities/tauNTuplizer_Tau.root","READ"); 
-  TFile *fEle = new TFile("/data_CMS/cms/lbianchini/VbfJetsStudy/Utilities/tauNTuplizer_Electron.root","READ");
 
-  TString tree = "tauNTuplizer/tree";
+  TFile *fTau = new TFile("../root/tree_AntiEMVA_Ivo_All_Tau.root","READ"); 
+  TFile *fEle = new TFile("../root/tree_AntiEMVA_Ivo_All_Elec.root","READ");
 
-  TTree *tTau = (TTree*)fTau->Get(tree);
-  TTree *tEle = (TTree*)fEle->Get(tree);
+
+  TTree *tTau = (TTree*)fTau->Get("tree");
+  TTree *tEle = (TTree*)fEle->Get("tree");
  
-  TCut myCutTau = "tightestHPSDBWP>0 && charge==1 && pt>20 && abs(eta)<2.3 && tightestAntiMWP>0 && tightestAntiEWP>1 && electronVeto==0 && signalPFChargedHadrCands==1";
+  TCut myCutTau = "";
 
-  if( bkg_.find("_1") !=string::npos)  myCutTau = myCutTau && TCut("signalPFGammaCands>0");
-  if(bkg_.find("X_0") !=string::npos)  myCutTau = myCutTau && TCut("signalPFGammaCands==0");
-  if(bkg_.find("1_1") !=string::npos)  myCutTau = myCutTau && TCut("dPhi>-98");
-  if(bkg_.find("0_1") !=string::npos)  myCutTau = myCutTau && TCut("dPhi<-98");
+//   if( Cat_.find("_1") !=string::npos)  myCutTau = myCutTau && TCut("signalPFGammaCands>0");
+//   if(Cat_.find("X_0") !=string::npos)  myCutTau = myCutTau && TCut("signalPFGammaCands==0");
+//   if(Cat_.find("1_1") !=string::npos)  myCutTau = myCutTau && TCut("dPhi>-98");
+//   if(Cat_.find("0_1") !=string::npos)  myCutTau = myCutTau && TCut("dPhi<-98");
 
 
   ////////////////// compute the weights
 
   factory->AddSignalTree( tTau );
   factory->AddBackgroundTree( tEle );
-  factory->SetWeightExpression("puWeight");
+//   factory->SetWeightExpression("puWeight");
 
   factory->PrepareTrainingAndTestTree( myCutTau,myCutTau,
 				       "nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
   
-  //factory->BookMethod( TMVA::Types::kLikelihood, "Likelihood", "!H:!V" );
   
   factory->BookMethod( TMVA::Types::kBDT, "BDT", 
 		       "!H:!V:NTrees=400:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" );
@@ -105,6 +178,14 @@ void TMVAClassification(std::string bkg_ = "1_1"){
 
 }
 
+void TMVAAllClassification(){
+  TMVAClassification("All");
+  TMVAClassification("TauNoGammas");
+  TMVAClassification("TauHasGammasNoGsfTrack");
+  TMVAClassification("TauHasGammasHasGsfTrackPFmvaBelow01");
+  TMVAClassification("TauHasGammasHasGsfTrackPFmvaOver01");
+
+}
 
 void TMVAClassificationApplication(double effS_ = 0.80 ) 
 {   
@@ -192,7 +273,7 @@ void TMVAClassificationApplication(double effS_ = 0.80 )
   h->Reset();
 
   cout << "Sgn Eff of antiETight wrt antiEMedium = " << Tpass/Tall << endl;
-  cout << "Bkg Eff of antiETight wrt antiEMedium = " << Epass/Eall << endl;
+  cout << "Cat Eff of antiETight wrt antiEMedium = " << Epass/Eall << endl;
   
   float leadPFChargedHadrMva_, visMass_, leadPFChargedHadrHcalEnergy_, leadPFChargedHadrTrackP_;
   float dPhi_,dEta_,sihih_,pt_, hasGsf_, emFraction_;
@@ -323,9 +404,10 @@ void TMVAClassificationApplication(double effS_ = 0.80 )
     totalE += puWeight_;
   }
 
-  cout << "Bkg Efficiency = " << passE/totalE << endl;
+  cout << "Cat Efficiency = " << passE/totalE << endl;
   cout << ">0 gammas and GSF="  << frac11E/(frac11E+frac01E+fracX0E) << endl;
   cout << ">0 gammas and !GSF=" << frac01E/(frac11E+frac01E+fracX0E) << endl;
   cout << "=0 gammas =" << fracX0E/(frac11E+frac01E+fracX0E) << endl;
 
 }
+
