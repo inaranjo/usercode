@@ -15,7 +15,7 @@
 #include "TH1F.h"
 #include "TFile.h"
 
-//#include "TMVAGui.C"
+// #include "TMVAGui.C"
 
 #if not defined(__CINT__) || defined(__MAKECINT__)
 
@@ -25,7 +25,7 @@
 #endif
 
 
-void TMVAClassification(std::string Cat_ = "All",
+void TMVAClassification(std::string Cat_ = "_All",
 			std::string Sel_ = "Barrel"
 			
 			)
@@ -33,14 +33,14 @@ void TMVAClassification(std::string Cat_ = "All",
 
   TMVA::Tools::Instance();
 
-  TString outfileName( "tmvaRoot/TMVA_"+Cat_+"_"+Sel_+".root" );
+  TString outfileName( "tmvaRoot/TMVA"+Cat_+"_"+Sel_+".root" );
   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
-  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_"+Cat_+"_"+Sel_, outputFile, 
+  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification"+Cat_+"_"+Sel_, outputFile, 
 					      "!V:!Silent:Color:DrawProgressBar" );
 
  
- if(Cat_.find("All")!=string::npos){
+ if(Cat_.find("_All")!=string::npos){
     factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
@@ -60,7 +60,7 @@ void TMVAClassification(std::string Cat_ = "All",
     factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
     factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
-  if(Cat_.find("TauNoGammas")!=string::npos){
+  if(Cat_.find("_woG")!=string::npos){
     factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
@@ -71,36 +71,14 @@ void TMVAClassification(std::string Cat_ = "All",
     factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
 
-//     factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
     factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
     factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
     factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
     factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
     factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
-//     factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
     factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
-  if(Cat_.find("TauHasGammasNoGsfTrack")!=string::npos){
-    factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_EgammaOverPdif","EgammaOverPdif",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_AbsEta","ElecAbsEta",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_EtotOverPin","EtotOverPin",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
-    factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
-
-    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
-    factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
-    factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
-  }
-  if(Cat_.find("TauHasGammasHasGsfTrackPFmvaBelow01")!=string::npos){
+  if(Cat_.find("_wGwoGSF")!=string::npos){
     factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
@@ -114,13 +92,12 @@ void TMVAClassification(std::string Cat_ = "All",
     factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
     factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
     factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
     factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
     factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
     factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
     factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
   }
-  if(Cat_.find("TauHasGammasHasGsfTrackPFmvaOver01")!=string::npos){
+  if(Cat_.find("_wGwGSFwoPFMVA")!=string::npos){
     factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
     factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
     factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
@@ -134,7 +111,25 @@ void TMVAClassification(std::string Cat_ = "All",
     factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
     factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
     factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
-    factory->AddVariable( "Tau_HasGsf","TauHasGsf",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
+    factory->AddVariable( "Tau_VisMass","TauVisMass",            "     "     , 'F'  );
+  }
+  if(Cat_.find("_wGwGSFwPFMVA")!=string::npos){
+    factory->AddVariable( "Elec_Fbrem", "Fbrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_Chi2KF", "Chi2KF",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EarlyBrem","EarlyBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EeOverPout","EeOverPout",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EgammaOverPdif","EgammaOverPdif",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_AbsEta","ElecAbsEta",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_EtotOverPin","EtotOverPin",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_LateBrem","LateBrem",            "     "     , 'F'  );
+    factory->AddVariable( "Elec_NumHits","NumHits",            "     "     , 'I'  );
+
+    factory->AddVariable( "Tau_GammaEnFrac","GammaEnFrac",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_AbsEta","PFTauEta",            "     "     , 'F'  );
+    factory->AddVariable( "Tau_EmFraction","TauEmFraction",            "     "     , 'F'  );
     factory->AddVariable( "Tau_HadrEoP","TauHadrEoP",            "     "     , 'F'  );
     factory->AddVariable( "Tau_HadrHoP","TauHadrHoP",            "     "     , 'F'  );
     factory->AddVariable( "Tau_NumGammaCands","TauNumGammaCands",            "     "     , 'I'  );
@@ -142,8 +137,8 @@ void TMVAClassification(std::string Cat_ = "All",
   }
 
 
-  TFile *fTau = new TFile(Form("../root/tree_AntiEMVA_Ivo_%s_Tau.root",Cat_.data()),"READ"); 
-  TFile *fEle = new TFile(Form("../root/tree_AntiEMVA_Ivo_%s_Elec.root",Cat_.data()),"READ");
+  TFile *fTau = new TFile(Form("../root/tree_AntiEMVA%s_Tau.root",Cat_.data()),"READ"); 
+  TFile *fEle = new TFile(Form("../root/tree_AntiEMVA%s_Elec.root",Cat_.data()),"READ");
 
 
   TTree *tTau = (TTree*)fTau->Get("tree");
@@ -186,17 +181,18 @@ void TMVAClassification(std::string Cat_ = "All",
 }
 
 void TMVAAllClassification(){
-  TMVAClassification("All","Barrel");
-  TMVAClassification("TauNoGammas","Barrel");
-  TMVAClassification("TauHasGammasNoGsfTrack","Barrel");
-  TMVAClassification("TauHasGammasHasGsfTrackPFmvaBelow01","Barrel");
-  TMVAClassification("TauHasGammasHasGsfTrackPFmvaOver01","Barrel");
+//   TMVAClassification("_All","Barrel");
+  TMVAClassification("_woG","Barrel");
+//   TMVAClassification("_wGwoGSF","Barrel");
+//   TMVAClassification("_wGwGSFwoPFMVA","Barrel");
+//   TMVAClassification("_wGwGSFwPFMVA","Barrel");
 
-  TMVAClassification("All","Endcap");
-  TMVAClassification("TauNoGammas","Endcap");
-  TMVAClassification("TauHasGammasNoGsfTrack","Endcap");
-  TMVAClassification("TauHasGammasHasGsfTrackPFmvaBelow01","Endcap");
-  TMVAClassification("TauHasGammasHasGsfTrackPFmvaOver01","Endcap");
+//   TMVAClassification("_All","Endcap");
+//   TMVAClassification("_woG","Endcap");
+//   TMVAClassification("_wGwoGSF","Endcap");
+//   TMVAClassification("_wGwGSFwoPFMVA","Endcap");
+//   TMVAClassification("_wGwGSFwPFMVA","Endcap");
+
 }
 
 void TMVAClassificationApplication(double effS_ = 0.80 ) 

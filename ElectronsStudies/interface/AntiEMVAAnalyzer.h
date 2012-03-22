@@ -123,6 +123,9 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   int Elec_GenJetMatch_;
   float Elec_AbsEta_;
   float Elec_Pt_;
+  float Elec_HasSC_;
+  float Elec_HasKF_;
+  float Elec_HasGSF_;
   float Elec_PFMvaOutput_;
   float Elec_Ee_;
   float Elec_Egamma_;

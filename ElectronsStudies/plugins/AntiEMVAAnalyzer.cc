@@ -48,6 +48,9 @@ void AntiEMVAAnalyzer::beginJob()
   tree_->Branch("Elec_GenJetMatch",&Elec_GenJetMatch_,"Elec_GenJetMatch/I");
   tree_->Branch("Elec_AbsEta",&Elec_AbsEta_,"Elec_AbsEta/F");
   tree_->Branch("Elec_Pt",&Elec_Pt_,"Elec_Pt/F");
+  tree_->Branch("Elec_HasSC",&Elec_HasSC_,"Elec_HasSC/F");
+  tree_->Branch("Elec_HasKF",&Elec_HasKF_,"Elec_HasKF/F");
+  tree_->Branch("Elec_HasGSF",&Elec_HasGSF_,"Elec_HasGSF/F");
   tree_->Branch("Elec_PFMvaOutput",&Elec_PFMvaOutput_,"Elec_PFMvaOutput/F");
   tree_->Branch("Elec_Ee",&Elec_Ee_,"Elec_Ee/F");
   tree_->Branch("Elec_Egamma",&Elec_Egamma_,"Elec_Egamma/F");
@@ -412,11 +415,25 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Elec_AbsEta_ = TMath::Abs(GsfElectron->eta());
     Elec_Pt_ = GsfElectron->pt();
     Elec_PFMvaOutput_ = TMath::Max(GsfElectron->mvaOutput().mva,float(-1.0));
+    Elec_EarlyBrem_ = GsfElectron->mvaInput().earlyBrem;
+    Elec_LateBrem_= GsfElectron->mvaInput().lateBrem;
+    Elec_Logsihih_ = log(GsfElectron->mvaInput().sigmaEtaEta);
+    Elec_DeltaEta_ = GsfElectron->mvaInput().deltaEta;
+    Elec_Fbrem_ = GsfElectron->fbrem();
 
+    //Variables related to the SC
+    Elec_HasSC_ = 0;
     Elec_Ee_ = -99;
     Elec_Egamma_ = -99;
+    Elec_Pin_ = -99;
+    Elec_Pout_ = -99;
+    Elec_EtotOverPin_ = -99;
+    Elec_EeOverPout_ = -99;
+    Elec_EgammaOverPdif_ = -99;
+    Elec_HoHplusE_ = -99;
     reco::SuperClusterRef pfSuperCluster = GsfElectron->pflowSuperCluster();
     if(pfSuperCluster.isNonnull() && pfSuperCluster.isAvailable()){
+      Elec_HasSC_ = 1;
       Elec_Ee_ = 0.;
       Elec_Egamma_ = 0.;
       if (debug_)std::cout<<"SuperCluster accessed   "<<std::endl;
@@ -426,48 +443,48 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 	if ( pfCluster == pfSuperCluster->clustersBegin() ) Elec_Ee_ += pfClusterEn;
 	else Elec_Egamma_ += pfClusterEn;
       }
+      Elec_Pin_ = TMath::Sqrt(GsfElectron->trackMomentumAtVtx().Mag2());
+      Elec_Pout_ = TMath::Sqrt(GsfElectron->trackMomentumOut().Mag2()); 
+      Elec_EtotOverPin_ = (Elec_Ee_+Elec_Egamma_)/Elec_Pin_;
+      Elec_EeOverPout_ = Elec_Ee_/Elec_Pout_;
+      Elec_EgammaOverPdif_ = Elec_Egamma_/(Elec_Pin_-Elec_Pout_);
+      Elec_HoHplusE_ = GsfElectron->mvaInput().hadEnergy/(GsfElectron->mvaInput().hadEnergy+Elec_Ee_) ;
+      
     }
-    else continue;
 
     if(debug_)std::cout<<"Elec_Ee :   "<<Elec_Ee_<<" Elec_Egamma :  "<<Elec_Egamma_<<std::endl;
-	    
-    Elec_Pin_ = TMath::Sqrt(GsfElectron->trackMomentumAtVtx().Mag2());
-    Elec_Pout_ = TMath::Sqrt(GsfElectron->trackMomentumOut().Mag2()); 
     if (debug_)std::cout<<"Elec_Pin :   "<<Elec_Pin_<<" Elec_Pout :  "<<Elec_Pout_<<std::endl;
     
-
-    Elec_EtotOverPin_ = (Elec_Ee_+Elec_Egamma_)/Elec_Pin_;
-    Elec_EeOverPout_ = Elec_Ee_/Elec_Pout_;
-    Elec_EgammaOverPdif_ = Elec_Egamma_/(Elec_Pin_-Elec_Pout_);
-    Elec_EarlyBrem_ = GsfElectron->mvaInput().earlyBrem;
-    Elec_LateBrem_= GsfElectron->mvaInput().lateBrem;
-    Elec_Logsihih_ = log(GsfElectron->mvaInput().sigmaEtaEta);
-    Elec_DeltaEta_ = GsfElectron->mvaInput().deltaEta;
-    Elec_HoHplusE_ = GsfElectron->mvaInput().hadEnergy/(GsfElectron->mvaInput().hadEnergy+Elec_Ee_) ;
-    Elec_Fbrem_ = GsfElectron->fbrem();
+    //Variables related to the CtfTrack
+    Elec_HasKF_ = 0;
     Elec_Chi2KF_ = -99;
-    Elec_Chi2GSF_ = -99;
     Elec_NumHits_ = -99;
     if (GsfElectron->closestCtfTrackRef().isNonnull()){
+      Elec_HasKF_ = 1.;
       Elec_Chi2KF_ = GsfElectron->closestCtfTrackRef()->normalizedChi2();
       Elec_NumHits_ = GsfElectron->closestCtfTrackRef()->numberOfValidHits();
     }
-    else continue;
+
+    //Variables related to the GsfTrack
+    Elec_HasGSF_ = 0;
     Elec_Chi2GSF_ = -99;
     Elec_GSFTrackResol_ = -99;
     Elec_GSFTracklnPt_ = -99;
     Elec_GSFTrackEta_ = -99;
     if(GsfElectron->gsfTrack().isNonnull()){
+      Elec_HasGSF_ = 1.;
       Elec_Chi2GSF_ = GsfElectron->gsfTrack()->normalizedChi2();
       Elec_GSFTrackResol_ = GsfElectron->gsfTrack()->ptError()/GsfElectron->gsfTrack()->pt();
       Elec_GSFTracklnPt_ = log(GsfElectron->gsfTrack()->pt())*TMath::Ln10();
       Elec_GSFTrackEta_ = GsfElectron->gsfTrack()->eta();
     }
-    else continue;
     
     if(debug_){
       std::cout<<"Elec_AbsEta :"<<Elec_AbsEta_<<std::endl;
       std::cout<<"Elec_Pt :"<<Elec_Pt_<<std::endl;
+      std::cout<<"Elec_HasSC :"<<Elec_HasSC_<<std::endl;
+      std::cout<<"Elec_HasKF :"<<Elec_HasKF_<<std::endl;
+      std::cout<<"Elec_HasGSF :"<<Elec_HasGSF_<<std::endl;
       std::cout<<"Elec PFMvaOutput :"<<Elec_PFMvaOutput_<<std::endl;
       std::cout<<"E electron cluster plus photons over Pin :   "<<Elec_EtotOverPin_<<std::endl;
       std::cout<<"E electron cluster over Pout :   "<<Elec_EeOverPout_<<std::endl;

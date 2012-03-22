@@ -25,16 +25,16 @@
 #define DEBUG false
 
 void makeRoot(string matching = "Elec",
-	      string category = "TauNoGammas",
+	      string category = "woG",
 	      string discriminator = ""
 	      )
 {
 
 
-//   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_DYJetsToLL.root";
+  std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL";
 //   std::string inputFileName = "../AntiEMVA.root";
 //   std::string inputFileName = "../AntiEMVA_Ivo-PFTauAntiEMed.root";
-  std::string inputFileName = "../AntiEMVA_Ivo";
+//   std::string inputFileName = "../AntiEMVA_Ivo";
   if(discriminator=="PFTauAntiEMed") inputFileName.append(Form("-%s",discriminator.data()));
  inputFileName.append(".root");
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
@@ -44,8 +44,8 @@ void makeRoot(string matching = "Elec",
   }
 
 //   std::string outputFileName = Form("./root/tree_AntiEMVA_Ivo-PFTauAntiEMed_%s_%s.root",category.data(),matching.data());
-  std::string outputFileName = Form("./root/tree_AntiEMVA_Ivo_%s_%s.root",category.data(),matching.data());
-  if(discriminator=="PFTauAntiEMed") outputFileName = Form("./root/tree_AntiEMVA_Ivo-%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
+  std::string outputFileName = Form("./root/tree_AntiEMVA_%s_%s.root",category.data(),matching.data());
+  if(discriminator=="PFTauAntiEMed") outputFileName = Form("./root/tree_AntiEMVA-%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
 
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
@@ -351,7 +351,7 @@ void makeRoot(string matching = "Elec",
   cout<< "Number of entries : "<<nEntries<<endl;
 
   for (int iEntry = 0; iEntry<nEntries ; iEntry++){
-    if(iEntry%200==0) cout << iEntry << endl;
+    if(iEntry%10000==0) cout << iEntry << endl;
 
     inputTree->GetEntry(iEntry);
 
@@ -359,10 +359,10 @@ void makeRoot(string matching = "Elec",
     if(matching == "Elec" && (Tau_GenEleMatch!=1 || Elec_GenEleMatch!=1)) continue;
     if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
 
-    if(category == "TauNoGammas" && Tau_NumGammaCands>0) continue;
-    if(category == "TauHasGammasNoGsfTrack" && Tau_NumGammaCands<1 && Tau_HasGsf!=1) continue;
-    if(category == "TauHasGammasHasGsfTrackPFmvaBelow01" && Tau_NumGammaCands<1 && Tau_HasGsf==1 && Elec_PFMvaOutput<-0.1) continue;
-    if(category == "TauHasGammasHasGsfTrackPFmvaOver01" && Tau_NumGammaCands<1 && Tau_HasGsf==1 && Elec_PFMvaOutput>=-0.1) continue;
+    if(category == "woG" && Tau_NumGammaCands>0) continue;
+    if(category == "wGwoGSF" && (Tau_NumGammaCands<1 || Tau_HasGsf!=1)) continue;
+    if(category == "wGwGSFwoPFMVA" && (Tau_NumGammaCands<1 || Tau_HasGsf==1 || Elec_PFMvaOutput>-0.1)) continue;
+    if(category == "wGwGSFwPFMVA" && (Tau_NumGammaCands<1 || Tau_HasGsf==1 || Elec_PFMvaOutput<=-0.1)) continue;
 
     t_run_ = run;
     t_event_ = event;
@@ -502,24 +502,24 @@ void makeAll(){
 
   makeRoot("Elec","All","");
   makeRoot("Tau","All","");
-  makeRoot("Elec","TauNoGammas","");
-  makeRoot("Tau","TauNoGammas","");
-  makeRoot("Elec","TauHasGammasNoGsfTrack","");
-  makeRoot("Tau","TauHasGammasNoGsfTrack","");
-  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaBelow01","");
-  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaBelow01","");
-  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaOver01","");
-  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaOver01","");
+  makeRoot("Elec","woG","");
+  makeRoot("Tau","woG","");
+  makeRoot("Elec","wGwoGSF","");
+  makeRoot("Tau","wGwoGSF","");
+  makeRoot("Elec","wGwGSFwoPFMVA","");
+  makeRoot("Tau","wGwGSFwoPFMVA","");
+  makeRoot("Elec","wGwGSFwPFMVA","");
+  makeRoot("Tau","wGwGSFwPFMVA","");
 
-  makeRoot("Elec","All","PFTauAntiEMed");
-  makeRoot("Tau","All","PFTauAntiEMed");
-  makeRoot("Elec","TauNoGammas","PFTauAntiEMed");
-  makeRoot("Tau","TauNoGammas","PFTauAntiEMed");
-  makeRoot("Elec","TauHasGammasNoGsfTrack","PFTauAntiEMed");
-  makeRoot("Tau","TauHasGammasNoGsfTrack","PFTauAntiEMed");
-  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaBelow01","PFTauAntiEMed");
-  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaBelow01","PFTauAntiEMed");
-  makeRoot("Elec","TauHasGammasHasGsfTrackPFmvaOver01","PFTauAntiEMed");
-  makeRoot("Tau","TauHasGammasHasGsfTrackPFmvaOver01","PFTauAntiEMed");
+  makeRoot("Elec","All","AntiEMed");
+  makeRoot("Tau","All","AntiEMed");
+  makeRoot("Elec","woG","TauAntiEMed");
+  makeRoot("Tau","woG","AntiEMed");
+  makeRoot("Elec","wGwoGSF","AntiEMed");
+  makeRoot("Tau","wGwoGSF","AntiEMed");
+  makeRoot("Elec","wGwGSFwoPFMVA","AntiEMed");
+  makeRoot("Tau","wGwGSFwoPFMVA","AntiEMed");
+  makeRoot("Elec","wGwGSFwPFMVA","AntiEMed");
+  makeRoot("Tau","wGwGSFwPFMVA","AntiEMed");
 
 }
