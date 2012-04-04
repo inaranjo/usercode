@@ -1,3 +1,13 @@
+//--------------------------------------------------------------------------------------------------
+//  
+//
+// PlotROCCurves
+//
+// Macro plotting efficiencies and ROC Curves for the AntiElectron MVA
+//
+// Authors: I.Naranjo
+//--------------------------------------------------------------------------------------------------
+
 #include "TTree.h"
 #include "TBranch.h"
 #include "TString.h"
@@ -22,11 +32,10 @@
 #include <iostream>
 #include <iomanip>
 
-#define DEBUG false
+#define DEBUG true
 
 
-
-void plotROC(string discr = "",
+void plotCombinedROC(string discr = "",
 	     string Region = "Endcap"
 	     )
 {
@@ -153,8 +162,190 @@ void plotROC(string discr = "",
 
 
 void plotAllROC(){
-  plotROC( "", "Barrel");
-  plotROC( "", "Endcap");
-  plotROC( "-AntiEMed", "Barrel");
-  plotROC( "-AntiEMed", "Endcap");
+//   plotROC( "", "Barrel");
+//   plotROC( "", "Endcap");
+//   plotROC( "-AntiEMed", "Barrel");
+//   plotROC( "-AntiEMed", "Endcap");
+}
+
+
+void plot2ROC(string category = "woG",
+	     string Region = "Endcap"
+	     )
+{
+  std::vector<std::string> categories;
+  categories.push_back(std::string("All"));
+  categories.push_back(std::string("woG"));
+  categories.push_back(std::string("wGwoGSF"));
+  categories.push_back(std::string("wGwGSFwoPFMVA"));
+  categories.push_back(std::string("wGwGSFwPFMVA"));
+
+  float CatProbSig [5];
+  float CatProbBkg [5];
+  float nSig [5];
+  float nBkg [5];
+
+  TCanvas *c1 = new TCanvas("c1","",5,30,650,600);
+  c1->SetGrid(0,0);
+  c1->SetFillStyle(4000);
+  c1->SetFillColor(10);
+  c1->SetTicky();
+  c1->SetObjectStat(0);
+
+  gStyle->SetOptStat(0);
+  gStyle->SetTitleFillColor(0);
+  gStyle->SetCanvasBorderMode(0);
+  gStyle->SetCanvasColor(0);
+  gStyle->SetPadBorderMode(0);
+  gStyle->SetPadColor(0);
+  gStyle->SetTitleFillColor(0);
+  gStyle->SetTitleBorderSize(0);
+  gStyle->SetTitleH(0.07);
+  gStyle->SetTitleFontSize(0.1);
+  gStyle->SetTitleStyle(0);
+  gStyle->SetTitleOffset(1.3,"y");
+
+  TLegend* leg = new TLegend(0.65,0.42,0.95,0.85,NULL,"brNDC");
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetFillColor(10);
+  leg->SetTextSize(0.03);
+  //leg->SetHeader("#splitline{CMS Preliminary}{ #sqrt{s}=7 TeV}");
+
+  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVA_%s_%s.root",category.data(),Region.data());
+  cout<<"opening file : "<<inFileName1<<endl;
+  TFile* inFile1 = new TFile (inFileName1.data(),"READ");
+  if(inFile1->IsZombie()){
+    cout << "No such file!" << endl;
+    return;
+  }
+  TH1F* hROC1 = (TH1F*)inFile1->Get("Method_BDT/BDT/MVA_BDT_effBvsS");
+  hROC1->SetLineColor(kBlue);
+  hROC1->SetLineWidth(2);
+  hROC1->SetTitle("");
+
+  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVA-AntiEMed_%s_%s.root",category.data(),Region.data());
+  cout<<"opening file : "<<inFileName2<<endl;
+  TFile* inFile2 = new TFile (inFileName2.data(),"READ");
+  if(inFile2->IsZombie()){
+    cout << "No such file!" << endl;
+    return;
+  }
+  TH1F* hROC2 = (TH1F*)inFile2->Get("Method_BDT/BDT/MVA_BDT_effBvsS");
+  hROC2->SetLineColor(kRed);
+  hROC2->SetLineWidth(2);
+  hROC2->SetTitle("");
+
+  hROC1->Draw();
+  hROC2->Draw("same");
+
+  leg->AddEntry(hROC1,"No discr");
+  leg->AddEntry(hROC2,"AntiEMed discr");
+  leg->Draw();
+
+}
+
+void computeDiscriminator(string discr = "",
+	     string Region = "Endcap"
+	     )
+{
+  std::vector<std::string> categories;
+  categories.push_back(std::string("All"));
+  categories.push_back(std::string("woG"));
+  categories.push_back(std::string("wGwoGSF"));
+  categories.push_back(std::string("wGwGSFwoPFMVA"));
+  categories.push_back(std::string("wGwGSFwPFMVA"));
+
+  float CatProbSig [5];
+  float CatProbBkg [5];
+  float nSig [5];
+  float nBkg [5];
+  float nSigDiscr [5];
+  float nBkgDiscr [5];
+  float EffSigDiscr [5];
+  float EffBkgDiscr [5];
+
+  for (int k=0; k<5; k++){
+    CatProbSig [k] = 1;
+    CatProbBkg [k] = 1;
+    nSig [k] = 1;
+    nBkg [k] = 1;
+    nSigDiscr [k] = 1;
+    nBkgDiscr [k] = 1;
+    EffSigDiscr [k] = 1;
+    EffBkgDiscr [k] = 1;
+  }
+
+  //////////////Efficiency to pass AntiEMed//////////////
+  if(discr =="-AntiEMed"){
+    cout<<endl;
+    cout<<"Calculating efficiencies to pas AntiEMedium discriminator..."<<endl; 
+    int j = 0;
+    for ( std::vector<std::string>::const_iterator category = categories.begin();
+	category != categories.end(); ++category ) {
+      std::string fSigName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA_%s_Tau.root",category->data());
+      TFile* fSig = new TFile (fSigName.data(),"READ") ;
+      TTree* tSig = (TTree*)fSig->Get("tree");
+      nSig[j] = tSig->GetEntries();
+      std::string fBkgName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA_%s_Elec.root",category->data());
+      TFile* fBkg = new TFile (fBkgName.data(),"READ") ;
+      TTree* tBkg = (TTree*)fBkg->Get("tree");
+      nBkg[j] = tBkg->GetEntries();
+      std::string fSigDiscrName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA%s_%s_Tau.root",discr.data(),category->data());
+      TFile* fSigDiscr = new TFile (fSigDiscrName.data(),"READ") ;
+      TTree* tSigDiscr = (TTree*)fSigDiscr->Get("tree");
+      nSigDiscr[j] = tSigDiscr->GetEntries();
+      std::string fBkgDiscrName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA%s_%s_Elec.root",discr.data(),category->data());
+      TFile* fBkgDiscr = new TFile (fBkgDiscrName.data(),"READ") ;
+      TTree* tBkgDiscr = (TTree*)fBkgDiscr->Get("tree");
+      nBkgDiscr[j] = tBkgDiscr->GetEntries();
+      EffSigDiscr[j]= nSigDiscr[j]/nSig[j];
+      EffBkgDiscr[j]= nBkgDiscr[j]/nBkg[j];
+      if (DEBUG){
+      cout <<"Signal Entries : "<<nSigDiscr[j]<<Form(" Efficiency to pass AntiEMed for category: %s  ",category->data())<<EffSigDiscr[j]<<endl;
+      cout <<"Background Entries : "<<nBkgDiscr[j]<<Form(" Efficiency to pass AntiEMed for category: %s  ",category->data())<<EffBkgDiscr[j]<<endl;
+      }
+      fSig->Close();
+      fBkg->Close();    
+      fSigDiscr->Close();    
+      fBkgDiscr->Close(); 
+      j++;			   
+    }
+  }
+
+
+  ////////////////Probability of different categories//////////////
+  int i = 0;
+  for ( std::vector<std::string>::const_iterator category = categories.begin();
+	category != categories.end(); ++category ) {
+    std::string fSigName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA%s_%s_Tau.root",discr.data(),category->data());
+    cout<<endl;
+    cout<<"opening file for signal : "<<fSigName<<endl;
+    TFile* fSig = new TFile (fSigName.data(),"READ") ;
+    TTree* tSig = (TTree*)fSig->Get("tree");
+    nSig[i] = tSig->GetEntries();
+    std::string fBkgName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA%s_%s_Elec.root",discr.data(),category->data());
+    cout<<"opening file for background : "<<fBkgName<<endl;
+    TFile* fBkg = new TFile (fBkgName.data(),"READ") ;
+    TTree* tBkg = (TTree*)fBkg->Get("tree");
+    nBkg[i] = tBkg->GetEntries();
+    CatProbSig[i]= nSig[i]/nSig[0];
+    CatProbBkg[i]= nBkg[i]/nBkg[0];
+    if(DEBUG){
+    cout <<"Signal Entries : "<<nSig[i]<<Form(" Fraction of category: %s  ",category->data())<<CatProbSig[i]<<endl;
+    cout <<"Background Entries : "<<nBkg[i]<<Form(" Fraction of category: %s  ",category->data())<<CatProbBkg[i]<<endl;
+    }
+    fSig->Close();
+    fBkg->Close(); 
+    i++;
+  }
+
+}
+
+
+void computeAll(){
+  computeDiscriminator( "", "Barrel");
+  computeDiscriminator( "", "Endcap");
+  computeDiscriminator( "-AntiEMed", "Barrel");
+  computeDiscriminator( "-AntiEMed", "Endcap");
 }

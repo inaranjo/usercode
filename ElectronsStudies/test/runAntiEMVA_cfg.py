@@ -26,20 +26,20 @@ else:
 
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
     #'file:/data_CMS/cms/ivo/RootFiles/BJetsFall11/50D32CF1-6D3B-E111-8F8D-003048D462AE.root'
-    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_84_2_gFP.root'
-##     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_85_2_Qjs.root',
-##     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_86_2_HBj.root',
-##     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_87_2_FzR.root',
-##     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_88_1_zDa.root',
+    #'/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_84_2_gFP.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_85_2_Qjs.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_86_2_HBj.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_87_2_FzR.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_88_1_zDa.root'
 ##     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_88_2_zAY.root',
 ##     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_89_1_Tp2.root',
 ##     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_89_2_Fkb.root',
@@ -121,10 +121,16 @@ process.selectedTaus.discriminators = cms.VPSet(
     cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByDecayModeFinding"),
               selectionCut=cms.double(0.5) ),
     cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr"),
-              selectionCut=cms.double(0.5) )## ,
-##     cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByMediumElectronRejection"),
-##               selectionCut=cms.double(0.5) )
+              selectionCut=cms.double(0.5) ),
+    cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByMediumElectronRejection"),
+              selectionCut=cms.double(0.5) )
     )
+
+########################## PAT Taus ###############################
+## from PhysicsTools.PatAlgos.patTemplate_cfg import *
+## from PhysicsTools.PatAlgos.tools.coreTools import *
+## removeAllPATObjectsBut(process, ['Taus'])
+
 
 ########################## Cleaned GenJets ###############################
 process.genLeptonsPtGt10 =  cms.EDFilter("GenParticleSelector",
@@ -155,13 +161,14 @@ process.AntiEMVAAnalyzer = cms.EDAnalyzer(
     srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
     srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
     srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
-    debug = cms.bool(False)
+    debug = cms.bool(True)
     )
 
 
 ########################## path ###############################
 
-process.p = cms.Path(process.selectPrimaryVertex*
+process.p = cms.Path(#process.patDefaultSequence*
+                     process.selectPrimaryVertex*
                      process.tauGenJets*
                      process.produceGenDecayProductsFromZs*
                      process.selectedTaus*

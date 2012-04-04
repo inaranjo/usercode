@@ -20,6 +20,7 @@ AntiEMVAAnalyzer::AntiEMVAAnalyzer(const edm::ParameterSet& cfg)
   srcGenTaus_  = cfg.getParameter<edm::InputTag>("srcGenTaus");
   srcGenJets_  = cfg.getParameter<edm::InputTag>("srcGenJets");
   debug_  = cfg.getParameter<bool>("debug");
+
 } 
 
 
@@ -91,7 +92,17 @@ void AntiEMVAAnalyzer::beginJob()
   tree_->Branch("Tau_GammaPhiMom",&Tau_GammaPhiMom_,"Tau_GammaPhiMom/F");
   tree_->Branch("Tau_GammaEnFrac",&Tau_GammaEnFrac_,"Tau_GammaEnFrac/F");
   tree_->Branch("Tau_HadrMva",&Tau_HadrMva_,"Tau_HadrMva/F");
+  tree_->Branch("Tau_mvaAntiE",&Tau_mvaAntiE_,"Tau_mvaAntiE/F");
 
+  antiE_  = new AntiElectronIDMVA();
+  antiE_->Initialize("BDT", 
+		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_X_0BL_BDT.weights.xml", 
+		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_1_1BL_BDT.weights.xml", 
+		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_0_1BL_BDT.weights.xml", 
+		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_X_0EC_BDT.weights.xml", 
+		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_1_1EC_BDT.weights.xml", 
+		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_0_1EC_BDT.weights.xml" );
+  
 }
 
 
@@ -106,6 +117,9 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 
   edm::Handle<reco::PFTauCollection> PfTaus;
   evt.getByLabel(srcPFTaus_, PfTaus);
+
+//   edm::Handle<pat::TauCollection> tausHandle;
+//   evt.getByLabel(tauTag_,tausHandle);
 
   typedef edm::View<reco::Candidate> CandidateView;
 
@@ -271,6 +285,28 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_GammaEnFrac_Tab_[NumPFTaus_] = GammadPt_;
     Tau_VisMass_Tab_[NumPFTaus_] = PfTau->mass();
     Tau_HadrMva_Tab_[NumPFTaus_] = TMath::Max(PfTau->electronPreIDOutput(),float(-1.0));
+    Tau_mvaAntiE_Tab_[NumPFTaus_] = antiE_->MVAValue(PfTau->eta(),
+						     PfTau->pt(), 
+						     PfTau->signalPFChargedHadrCands().size(),
+						     PfTau->signalPFGammaCands().size(),
+						     TMath::Max(PfTau->electronPreIDOutput(),float(-1.0)),
+						     PfTau->leadPFChargedHadrCand()->hcalEnergy()/PfTau->leadPFChargedHadrCand()->p(),
+						     PfTau->leadPFChargedHadrCand()->ecalEnergy()/PfTau->leadPFChargedHadrCand()->p(),
+						     (PfTau->leadPFChargedHadrCand()->gsfTrackRef()).isNonnull(),
+						     PfTau->mass(),
+						     TMath::Max(PfTau->emFraction(),float(0.0)),
+						     TMath::Sqrt(dEta2)*TMath::Sqrt(GammadPt_)*PfTau->pt(),
+						     TMath::Sqrt(dPhi2)*TMath::Sqrt(GammadPt_)*PfTau->pt(),
+						     GammadPt_
+						     );
+//    double MVAValue(Float_t TauEta,  Float_t TauPt,
+// 		    Float_t TauSignalPFChargedCands, Float_t TauSignalPFGammaCands, 
+// 		    Float_t TauLeadPFChargedHadrMva, 
+// 		    Float_t TauLeadPFChargedHadrHoP , Float_t TauLeadPFChargedHadrEoP, 
+// 		    Float_t TauHasGsf, Float_t TauVisMass,  Float_t TauEmFraction,
+// 		    Float_t GammaEtaMom, Float_t GammaPhiMom, Float_t GammaEnFrac
+// 		    );
+
     
 //     if(debug_){
 //       std::cout<<"TauLoop number : "<<NumPFTaus_<<std::endl;
@@ -293,7 +329,6 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       std::cout<<std::endl;
       std::cout<<"GsfElectron number : "<<NumGsfEle_<<std::endl;
     }
-    //if (NumGsfEle_>49) continue; //Accept first 50 electrons
 
     NumGenEle_ = 0;
     NumGenHad_ = 0;
@@ -351,24 +386,26 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_GammaPhiMom_            = Tau_GammaPhiMom_Tab_[MatchedTau];
     Tau_GammaEnFrac_            = Tau_GammaEnFrac_Tab_[MatchedTau];
     Tau_HadrMva_                = Tau_HadrMva_Tab_[MatchedTau]; 
+    Tau_mvaAntiE_               = Tau_mvaAntiE_Tab_[MatchedTau]; 
     
-//     if(debug_){
-//       std::cout<<std::endl;
-//       std::cout<<"Tau variables :"<<std::endl;
-//       std::cout<<"TauAbsEta :"<<Tau_AbsEta_<<std::endl;
-//       std::cout<<"TauPt :"<<Tau_Pt_<<std::endl;
-//       std::cout<<"TauHasGsf :"<<Tau_HasGsf_<<std::endl;
-//       std::cout<<"TauEmFraction :"<<Tau_EmFraction_<<std::endl;
-//       std::cout<<"TauNumChargedCands :"<<Tau_NumChargedCands_<<std::endl;
-//       std::cout<<"TauNumGammaCands :"<<Tau_NumGammaCands_<<std::endl;      
-//       std::cout<<"Tau_HadrHoP :"<<Tau_HadrHoP_<<std::endl;
-//       std::cout<<"Tau_HadrEoP :"<<Tau_HadrEoP_<<std::endl;
-//       std::cout<<"Tau_VisMass_ :"<<Tau_VisMass_<<std::endl;
-//       std::cout<<"Tau_GammaEtaMom_ :"<<Tau_GammaEtaMom_<<std::endl;
-//       std::cout<<"Tau_GammaPhiMom_ :"<<Tau_GammaPhiMom_<<std::endl;
-//       std::cout<<"Tau_GammaEnFrac_ :"<<Tau_GammaEnFrac_<<std::endl;
-//       std::cout<<"Tau_HadrMva_ :"<<Tau_HadrMva_<<std::endl;
-//     }
+    if(debug_){
+      std::cout<<std::endl;
+      std::cout<<"Tau variables :"<<std::endl;
+      std::cout<<"TauAbsEta :"<<Tau_AbsEta_<<std::endl;
+      std::cout<<"TauPt :"<<Tau_Pt_<<std::endl;
+      std::cout<<"TauHasGsf :"<<Tau_HasGsf_<<std::endl;
+      std::cout<<"TauEmFraction :"<<Tau_EmFraction_<<std::endl;
+      std::cout<<"TauNumChargedCands :"<<Tau_NumChargedCands_<<std::endl;
+      std::cout<<"TauNumGammaCands :"<<Tau_NumGammaCands_<<std::endl;      
+      std::cout<<"Tau_HadrHoP :"<<Tau_HadrHoP_<<std::endl;
+      std::cout<<"Tau_HadrEoP :"<<Tau_HadrEoP_<<std::endl;
+      std::cout<<"Tau_VisMass_ :"<<Tau_VisMass_<<std::endl;
+      std::cout<<"Tau_GammaEtaMom_ :"<<Tau_GammaEtaMom_<<std::endl;
+      std::cout<<"Tau_GammaPhiMom_ :"<<Tau_GammaPhiMom_<<std::endl;
+      std::cout<<"Tau_GammaEnFrac_ :"<<Tau_GammaEnFrac_<<std::endl;
+      std::cout<<"Tau_HadrMva_ :"<<Tau_HadrMva_<<std::endl;
+      std::cout<<"Tau_mvaAntiE_ :"<<Tau_mvaAntiE_<<std::endl;
+    }
     /////////////////////////////////////Matchings  /////////////////////////////////////
     if (debug_)std::cout<<"  Electron matchings :"<<std::endl;
 
@@ -479,30 +516,30 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       Elec_GSFTrackEta_ = GsfElectron->gsfTrack()->eta();
     }
     
-    if(debug_){
-      std::cout<<"Elec_AbsEta :"<<Elec_AbsEta_<<std::endl;
-      std::cout<<"Elec_Pt :"<<Elec_Pt_<<std::endl;
-      std::cout<<"Elec_HasSC :"<<Elec_HasSC_<<std::endl;
-      std::cout<<"Elec_HasKF :"<<Elec_HasKF_<<std::endl;
-      std::cout<<"Elec_HasGSF :"<<Elec_HasGSF_<<std::endl;
-      std::cout<<"Elec PFMvaOutput :"<<Elec_PFMvaOutput_<<std::endl;
-      std::cout<<"E electron cluster plus photons over Pin :   "<<Elec_EtotOverPin_<<std::endl;
-      std::cout<<"E electron cluster over Pout :   "<<Elec_EeOverPout_<<std::endl;
-      std::cout<<"E photons over (Elec_Pin - Elec_Pout) :   "<<Elec_EgammaOverPdif_<<std::endl;
-      std::cout<<"EarlyBrem :   "<<Elec_EarlyBrem_<<std::endl;
-      std::cout<<"LateBrem :   "<<Elec_LateBrem_<<std::endl;
-      std::cout<<"log(sigma EtaEta with the SC) :  "<<Elec_Logsihih_<<std::endl;
-      std::cout<<"PF-cluster GSF track delta-eta :  "<<Elec_DeltaEta_<<std::endl;
-      std::cout<<"H over H plus E :   "<<Elec_HoHplusE_<<std::endl;
-      std::cout<<"FBrem :   "<<Elec_Fbrem_<<std::endl;
-      std::cout<<"Normalized Chi2 KF :   "<<Elec_Chi2KF_<<std::endl;
-      std::cout<<"Normalized Chi2 GSF :   "<<Elec_Chi2GSF_<<std::endl;
-      std::cout<<"Number of valid hits KF :   "<<Elec_NumHits_<<std::endl;
-      std::cout<<"GSFTrack sig(Pt)/Pt :   "<<Elec_GSFTrackResol_<<std::endl;
-      std::cout<<"GSFTrack ln(Pt) :   "<<Elec_GSFTracklnPt_<<std::endl;
-      std::cout<<"GSFTrack Eta :   "<<Elec_GSFTrackEta_<<std::endl;
-      std::cout<<std::endl;
-    }
+//     if(debug_){
+//       std::cout<<"Elec_AbsEta :"<<Elec_AbsEta_<<std::endl;
+//       std::cout<<"Elec_Pt :"<<Elec_Pt_<<std::endl;
+//       std::cout<<"Elec_HasSC :"<<Elec_HasSC_<<std::endl;
+//       std::cout<<"Elec_HasKF :"<<Elec_HasKF_<<std::endl;
+//       std::cout<<"Elec_HasGSF :"<<Elec_HasGSF_<<std::endl;
+//       std::cout<<"Elec PFMvaOutput :"<<Elec_PFMvaOutput_<<std::endl;
+//       std::cout<<"E electron cluster plus photons over Pin :   "<<Elec_EtotOverPin_<<std::endl;
+//       std::cout<<"E electron cluster over Pout :   "<<Elec_EeOverPout_<<std::endl;
+//       std::cout<<"E photons over (Elec_Pin - Elec_Pout) :   "<<Elec_EgammaOverPdif_<<std::endl;
+//       std::cout<<"EarlyBrem :   "<<Elec_EarlyBrem_<<std::endl;
+//       std::cout<<"LateBrem :   "<<Elec_LateBrem_<<std::endl;
+//       std::cout<<"log(sigma EtaEta with the SC) :  "<<Elec_Logsihih_<<std::endl;
+//       std::cout<<"PF-cluster GSF track delta-eta :  "<<Elec_DeltaEta_<<std::endl;
+//       std::cout<<"H over H plus E :   "<<Elec_HoHplusE_<<std::endl;
+//       std::cout<<"FBrem :   "<<Elec_Fbrem_<<std::endl;
+//       std::cout<<"Normalized Chi2 KF :   "<<Elec_Chi2KF_<<std::endl;
+//       std::cout<<"Normalized Chi2 GSF :   "<<Elec_Chi2GSF_<<std::endl;
+//       std::cout<<"Number of valid hits KF :   "<<Elec_NumHits_<<std::endl;
+//       std::cout<<"GSFTrack sig(Pt)/Pt :   "<<Elec_GSFTrackResol_<<std::endl;
+//       std::cout<<"GSFTrack ln(Pt) :   "<<Elec_GSFTracklnPt_<<std::endl;
+//       std::cout<<"GSFTrack Eta :   "<<Elec_GSFTrackEta_<<std::endl;
+//       std::cout<<std::endl;
+//     }
     
     tree_->Fill();
 

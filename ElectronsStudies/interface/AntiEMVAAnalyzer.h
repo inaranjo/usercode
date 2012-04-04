@@ -6,6 +6,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "Bianchi/Utilities/interface/AntiElectronIDMVA.h"
 
 
 #include "TFile.h"
@@ -94,6 +95,7 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   float Tau_GammaPhiMom_Tab_[50];
   float Tau_GammaEnFrac_Tab_[50];
   float Tau_HadrMva_Tab_[50]; 
+  float Tau_mvaAntiE_Tab_[50];
 
   int Tau_GsfEleMatch_;
   int Tau_GenEleMatch_;
@@ -114,6 +116,7 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   float Tau_GammaPhiMom_;
   float Tau_GammaEnFrac_;
   float Tau_HadrMva_; 
+  float Tau_mvaAntiE_;
 
   int Elec_GenEleMatch_;
   int Elec_GenEleFromZMatch_;
@@ -146,6 +149,9 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   float Elec_GSFTrackResol_;
   float Elec_GSFTracklnPt_;
   float Elec_GSFTrackEta_;
+
+
+  AntiElectronIDMVA* antiE_;
 
 
 };//AntiEMVAAnalyzer
