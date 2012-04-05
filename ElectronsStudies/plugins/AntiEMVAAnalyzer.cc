@@ -19,6 +19,7 @@ AntiEMVAAnalyzer::AntiEMVAAnalyzer(const edm::ParameterSet& cfg)
   srcGenElectronsFromZTauTau_  = cfg.getParameter<edm::InputTag>("srcGenElectronsFromZTauTau");
   srcGenTaus_  = cfg.getParameter<edm::InputTag>("srcGenTaus");
   srcGenJets_  = cfg.getParameter<edm::InputTag>("srcGenJets");
+  srcPatTaus_  = cfg.getParameter<edm::InputTag>("srcPatTaus");
   debug_  = cfg.getParameter<bool>("debug");
 
 } 
@@ -93,6 +94,9 @@ void AntiEMVAAnalyzer::beginJob()
   tree_->Branch("Tau_GammaEnFrac",&Tau_GammaEnFrac_,"Tau_GammaEnFrac/F");
   tree_->Branch("Tau_HadrMva",&Tau_HadrMva_,"Tau_HadrMva/F");
   tree_->Branch("Tau_mvaAntiE",&Tau_mvaAntiE_,"Tau_mvaAntiE/F");
+  tree_->Branch("Tau_AntiELoose",&Tau_AntiELoose_,"Tau_AntiELoose/F");
+  tree_->Branch("Tau_AntiEMedium",&Tau_AntiEMedium_,"Tau_AntiEMedium/F");
+  tree_->Branch("Tau_AntiETight",&Tau_AntiETight_,"Tau_AntiETight/F");
 
   antiE_  = new AntiElectronIDMVA();
   antiE_->Initialize("BDT", 
@@ -117,10 +121,17 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 
   edm::Handle<reco::PFTauCollection> PfTaus;
   evt.getByLabel(srcPFTaus_, PfTaus);
+  const reco::PFTauCollection* Pftaus = PfTaus.product();
+  if(debug_){
+    std::cout<<"num PfTaus : "<<Pftaus->size()<<std::endl;
+  }
 
-//   edm::Handle<pat::TauCollection> tausHandle;
-//   evt.getByLabel(tauTag_,tausHandle);
-
+  edm::Handle<pat::TauCollection> PatTaus;
+  evt.getByLabel(srcPatTaus_,PatTaus);
+  const pat::TauCollection* taus = PatTaus.product();
+  if(debug_){
+    std::cout<<"num PatTaus : "<<taus->size()<<std::endl;
+  }
   typedef edm::View<reco::Candidate> CandidateView;
 
   edm::Handle<CandidateView> GenElectrons;
@@ -299,6 +310,9 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 						     TMath::Sqrt(dPhi2)*TMath::Sqrt(GammadPt_)*PfTau->pt(),
 						     GammadPt_
 						     );
+
+
+
 //    double MVAValue(Float_t TauEta,  Float_t TauPt,
 // 		    Float_t TauSignalPFChargedCands, Float_t TauSignalPFGammaCands, 
 // 		    Float_t TauLeadPFChargedHadrMva, 
@@ -308,15 +322,39 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 // 		    );
 
     
-//     if(debug_){
-//       std::cout<<"TauLoop number : "<<NumPFTaus_<<std::endl;
+    if(debug_){
+      std::cout<<"PfTauLoop number : "<<NumPFTaus_<<std::endl;
 //       std::cout<<"  GammaEtaMom : "<<Tau_GammaEtaMom_Tab_[NumPFTaus_]<<std::endl;
 //       std::cout<<"  GammaPhiMom : "<<Tau_GammaPhiMom_Tab_[NumPFTaus_]<<std::endl;
 //       std::cout<<"  GammaPt : "<<sumPt<<std::endl;
 //       std::cout<<"  TauPt : "<<PfTau->pt()<<std::endl;
+//       std::cout<<"  TauEta : "<<PfTau->eta()<<std::endl;
 //       std::cout<<"  GammaEnFrac : "<<Tau_GammaEnFrac_Tab_[NumPFTaus_]<<std::endl;
-//     }
-
+    }
+    NumPatTaus_ = 0;
+    int countMatch = 0;
+    for (pat::TauCollection::const_iterator  PatTau = PatTaus->begin();
+	  PatTau != PatTaus->end(); ++PatTau ) {
+      if(deltaR(PfTau->eta(),PfTau->phi(),PatTau->eta(),PatTau->phi())<0.1){
+	countMatch++;
+	Tau_AntiELoose_Tab_[NumPFTaus_] = PatTau->tauID("againstElectronLoose");
+	Tau_AntiEMedium_Tab_[NumPFTaus_] = PatTau->tauID("againstElectronMedium");
+	Tau_AntiETight_Tab_[NumPFTaus_] = PatTau->tauID("againstElectronTight");
+	if(debug_){
+	  std::cout<<"===================>PAT MATCHED!!"<<std::endl;
+	  std::cout<<" PatTauLoop number : "<<NumPatTaus_<<std::endl;
+	  std::cout<<"  PfTau : "<<PfTau->pt()<<" "<<PfTau->eta()<<" "<<PfTau->phi()<<std::endl;
+	  std::cout<<"  PatTau : "<<PatTau->pt()<<" "<<PatTau->eta()<<" "<<PatTau->phi()<<std::endl;
+	  std::cout<<" PatTau AntiELoose : "<<PatTau->tauID("againstElectronLoose")<<std::endl;
+	  std::cout<<" PatTau AntiEMedium : "<<PatTau->tauID("againstElectronMedium")<<std::endl;
+	  std::cout<<" PatTau AntiETight : "<<PatTau->tauID("againstElectronTight")<<std::endl;
+	}
+	  if(debug_){
+	  }
+	
+      }
+      NumPatTaus_++ ;   
+    }
     NumPFTaus_++;
   }//Loop on PFTaus
 
@@ -325,10 +363,10 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
   ///////////////////////////////////////////////////////////////////////////
   for ( reco::GsfElectronCollection::const_iterator GsfElectron = GsfElectrons->begin();
 	GsfElectron != GsfElectrons->end(); ++GsfElectron ) {
-    if (debug_){
-      std::cout<<std::endl;
-      std::cout<<"GsfElectron number : "<<NumGsfEle_<<std::endl;
-    }
+//     if (debug_){
+//       std::cout<<std::endl;
+//       std::cout<<"GsfElectron number : "<<NumGsfEle_<<std::endl;
+//     }
 
     NumGenEle_ = 0;
     NumGenHad_ = 0;
@@ -345,15 +383,15 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     int NumPFTausTemp = 0;
     int MatchedTau = -99;
     float deltaRMin = 999;
-    if (debug_)std::cout<<"Total number of Taus : "<<NumPFTaus_<<std::endl;
+//     if (debug_)std::cout<<"Total number of Taus : "<<NumPFTaus_<<std::endl;
     for ( reco::PFTauCollection::const_iterator PfTau = PfTaus->begin();
 	  PfTau != PfTaus->end(); ++PfTau ) {
 
-      if(debug_){
-	std::cout<<" PfTau number:"<<NumPFTausTemp<<std::endl;
-	std::cout<<"  PfTau pt:"<<PfTau->pt()<<std::endl;
-	std::cout<<"  DeltaR GsfEle-PfTau :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),PfTau->eta(),PfTau->phi())<<std::endl;	
-      }
+//       if(debug_){
+// 	std::cout<<" PfTau number:"<<NumPFTausTemp<<std::endl;
+// 	std::cout<<"  PfTau pt:"<<PfTau->pt()<<std::endl;
+// 	std::cout<<"  DeltaR GsfEle-PfTau :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),PfTau->eta(),PfTau->phi())<<std::endl;	
+//       }
       if(deltaR(GsfElectron->eta(),GsfElectron->phi(),PfTau->eta(),PfTau->phi())<0.3 && deltaR(GsfElectron->eta(),GsfElectron->phi(),PfTau->eta(),PfTau->phi())<deltaRMin ){
 	Elec_PFTauMatch_ = 1;
 	MatchedTau = NumPFTausTemp;
@@ -362,10 +400,10 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       NumPFTausTemp++;
     }
     if(Elec_PFTauMatch_ == 0) continue;
-    if(debug_){
-      std::cout<<std::endl;
-      std::cout<<"======>PfTau matched is the number:"<<MatchedTau<<std::endl;
-    }
+//     if(debug_){
+//       std::cout<<std::endl;
+//       std::cout<<"======>PfTau matched is the number:"<<MatchedTau<<std::endl;
+//     }
 
     Tau_GsfEleMatch_            = Tau_GsfEleMatch_Tab_[MatchedTau];
     Tau_GenEleMatch_            = Tau_GenEleMatch_Tab_[MatchedTau];
@@ -387,63 +425,66 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_GammaEnFrac_            = Tau_GammaEnFrac_Tab_[MatchedTau];
     Tau_HadrMva_                = Tau_HadrMva_Tab_[MatchedTau]; 
     Tau_mvaAntiE_               = Tau_mvaAntiE_Tab_[MatchedTau]; 
+    Tau_AntiELoose_             = Tau_AntiELoose_Tab_[MatchedTau]; 
+    Tau_AntiEMedium_            = Tau_AntiEMedium_Tab_[MatchedTau]; 
+    Tau_AntiETight_             = Tau_AntiETight_Tab_[MatchedTau]; 
     
-    if(debug_){
-      std::cout<<std::endl;
-      std::cout<<"Tau variables :"<<std::endl;
-      std::cout<<"TauAbsEta :"<<Tau_AbsEta_<<std::endl;
-      std::cout<<"TauPt :"<<Tau_Pt_<<std::endl;
-      std::cout<<"TauHasGsf :"<<Tau_HasGsf_<<std::endl;
-      std::cout<<"TauEmFraction :"<<Tau_EmFraction_<<std::endl;
-      std::cout<<"TauNumChargedCands :"<<Tau_NumChargedCands_<<std::endl;
-      std::cout<<"TauNumGammaCands :"<<Tau_NumGammaCands_<<std::endl;      
-      std::cout<<"Tau_HadrHoP :"<<Tau_HadrHoP_<<std::endl;
-      std::cout<<"Tau_HadrEoP :"<<Tau_HadrEoP_<<std::endl;
-      std::cout<<"Tau_VisMass_ :"<<Tau_VisMass_<<std::endl;
-      std::cout<<"Tau_GammaEtaMom_ :"<<Tau_GammaEtaMom_<<std::endl;
-      std::cout<<"Tau_GammaPhiMom_ :"<<Tau_GammaPhiMom_<<std::endl;
-      std::cout<<"Tau_GammaEnFrac_ :"<<Tau_GammaEnFrac_<<std::endl;
-      std::cout<<"Tau_HadrMva_ :"<<Tau_HadrMva_<<std::endl;
-      std::cout<<"Tau_mvaAntiE_ :"<<Tau_mvaAntiE_<<std::endl;
-    }
+//     if(debug_){
+//       std::cout<<std::endl;
+//       std::cout<<"Tau variables :"<<std::endl;
+//       std::cout<<"TauAbsEta :"<<Tau_AbsEta_<<std::endl;
+//       std::cout<<"TauPt :"<<Tau_Pt_<<std::endl;
+//       std::cout<<"TauHasGsf :"<<Tau_HasGsf_<<std::endl;
+//       std::cout<<"TauEmFraction :"<<Tau_EmFraction_<<std::endl;
+//       std::cout<<"TauNumChargedCands :"<<Tau_NumChargedCands_<<std::endl;
+//       std::cout<<"TauNumGammaCands :"<<Tau_NumGammaCands_<<std::endl;      
+//       std::cout<<"Tau_HadrHoP :"<<Tau_HadrHoP_<<std::endl;
+//       std::cout<<"Tau_HadrEoP :"<<Tau_HadrEoP_<<std::endl;
+//       std::cout<<"Tau_VisMass_ :"<<Tau_VisMass_<<std::endl;
+//       std::cout<<"Tau_GammaEtaMom_ :"<<Tau_GammaEtaMom_<<std::endl;
+//       std::cout<<"Tau_GammaPhiMom_ :"<<Tau_GammaPhiMom_<<std::endl;
+//       std::cout<<"Tau_GammaEnFrac_ :"<<Tau_GammaEnFrac_<<std::endl;
+//       std::cout<<"Tau_HadrMva_ :"<<Tau_HadrMva_<<std::endl;
+//       std::cout<<"Tau_mvaAntiE_ :"<<Tau_mvaAntiE_<<std::endl;
+//     }
     /////////////////////////////////////Matchings  /////////////////////////////////////
-    if (debug_)std::cout<<"  Electron matchings :"<<std::endl;
+//     if (debug_)std::cout<<"  Electron matchings :"<<std::endl;
 
     for ( reco::CandidateView::const_iterator GenElectron = GenElectrons->begin();
 	  GenElectron != GenElectrons->end(); ++GenElectron ) {
-      if(debug_){
-	std::cout<<"  DeltaR GsfEle-GenEle :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl;
-      }
+//       if(debug_){
+// 	std::cout<<"  DeltaR GsfEle-GenEle :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<<std::endl;
+//       }
       NumGenEle_++;
       if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectron->eta(),GenElectron->phi())<0.3) Elec_GenEleMatch_ = 1;
     }
     for ( reco::CandidateView::const_iterator GenElectronFromZ = GenElectronsFromZ->begin();
 	  GenElectronFromZ != GenElectronsFromZ->end(); ++GenElectronFromZ ) {
-      if(debug_){
-	std::cout<<"  DeltaR GsfEle-GenEleFromZ :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectronFromZ->eta(),GenElectronFromZ->phi())<<std::endl;
-      }
+//       if(debug_){
+// 	std::cout<<"  DeltaR GsfEle-GenEleFromZ :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectronFromZ->eta(),GenElectronFromZ->phi())<<std::endl;
+//       }
       if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectronFromZ->eta(),GenElectronFromZ->phi())<0.3) Elec_GenEleFromZMatch_ = 1;
     }
     for ( reco::CandidateView::const_iterator GenElectronFromZTauTau = GenElectronsFromZTauTau->begin();
 	  GenElectronFromZTauTau != GenElectronsFromZTauTau->end(); ++GenElectronFromZTauTau ) {
-      if(debug_){
-	std::cout<<"  DeltaR GsfEle-GenEleFromZTauTau :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectronFromZTauTau->eta(),GenElectronFromZTauTau->phi())<<std::endl;
-      }
+//       if(debug_){
+// 	std::cout<<"  DeltaR GsfEle-GenEleFromZTauTau :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectronFromZTauTau->eta(),GenElectronFromZTauTau->phi())<<std::endl;
+//       }
       if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenElectronFromZTauTau->eta(),GenElectronFromZTauTau->phi())<0.3) Elec_GenEleFromZTauTauMatch_ = 1;
     }
     for ( reco::CandidateView::const_iterator GenTau = GenTaus->begin();
 	  GenTau != GenTaus->end(); ++GenTau ) {
-      if(debug_){
-	std::cout<<"  DeltaR GsfEle-GenTau :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenTau->eta(),GenTau->phi())<<std::endl;
-      }
+//       if(debug_){
+// 	std::cout<<"  DeltaR GsfEle-GenTau :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenTau->eta(),GenTau->phi())<<std::endl;
+//       }
       NumGenHad_++;
       if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenTau->eta(),GenTau->phi())<0.3)Elec_GenHadMatch_ = 1;
     }
     for ( reco::CandidateView::const_iterator GenJet = GenJets->begin();
 	  GenJet != GenJets->end(); ++GenJet ) {
-      if(debug_){
-	std::cout<<"  DeltaR GsfEle-GenJet :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenJet->eta(),GenJet->phi())<<std::endl;
-      }
+//       if(debug_){
+// 	std::cout<<"  DeltaR GsfEle-GenJet :"<<deltaR(GsfElectron->eta(),GsfElectron->phi(),GenJet->eta(),GenJet->phi())<<std::endl;
+//       }
       NumGenJet_++;
       if(deltaR(GsfElectron->eta(),GsfElectron->phi(),GenJet->eta(),GenJet->phi())<0.3)Elec_GenJetMatch_ = 1;
     }
@@ -473,7 +514,7 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       Elec_HasSC_ = 1;
       Elec_Ee_ = 0.;
       Elec_Egamma_ = 0.;
-      if (debug_)std::cout<<"SuperCluster accessed   "<<std::endl;
+//       if (debug_)std::cout<<"SuperCluster accessed   "<<std::endl;
       for (reco::CaloCluster_iterator pfCluster = pfSuperCluster->clustersBegin();
 	   pfCluster != pfSuperCluster->clustersEnd(); ++pfCluster ) {
 	float pfClusterEn = (*pfCluster)->energy();
@@ -489,8 +530,8 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
       
     }
 
-    if(debug_)std::cout<<"Elec_Ee :   "<<Elec_Ee_<<" Elec_Egamma :  "<<Elec_Egamma_<<std::endl;
-    if (debug_)std::cout<<"Elec_Pin :   "<<Elec_Pin_<<" Elec_Pout :  "<<Elec_Pout_<<std::endl;
+//     if(debug_)std::cout<<"Elec_Ee :   "<<Elec_Ee_<<" Elec_Egamma :  "<<Elec_Egamma_<<std::endl;
+//     if (debug_)std::cout<<"Elec_Pin :   "<<Elec_Pin_<<" Elec_Pout :  "<<Elec_Pout_<<std::endl;
     
     //Variables related to the CtfTrack
     Elec_HasKF_ = 0;

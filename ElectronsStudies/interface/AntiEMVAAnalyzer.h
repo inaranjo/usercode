@@ -60,6 +60,7 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   edm::InputTag srcGenElectronsFromZTauTau_;
   edm::InputTag srcGenTaus_;
   edm::InputTag srcGenJets_;
+  edm::InputTag srcPatTaus_;
   edm::InputTag srcPrimaryVertex_;
   bool debug_;
   
@@ -69,6 +70,7 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   int NumPV_;
   int NumGsfEle_;
   int NumPFTaus_;
+  int NumPatTaus_;
   int NumGenEle_;
   int NumGenHad_;
   int NumGenJet_;
@@ -96,6 +98,9 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   float Tau_GammaEnFrac_Tab_[50];
   float Tau_HadrMva_Tab_[50]; 
   float Tau_mvaAntiE_Tab_[50];
+  float Tau_AntiELoose_Tab_[50];
+  float Tau_AntiEMedium_Tab_[50];
+  float Tau_AntiETight_Tab_[50];
 
   int Tau_GsfEleMatch_;
   int Tau_GenEleMatch_;
@@ -117,6 +122,9 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   float Tau_GammaEnFrac_;
   float Tau_HadrMva_; 
   float Tau_mvaAntiE_;
+  float Tau_AntiELoose_;
+  float Tau_AntiEMedium_;
+  float Tau_AntiETight_;
 
   int Elec_GenEleMatch_;
   int Elec_GenEleFromZMatch_;
