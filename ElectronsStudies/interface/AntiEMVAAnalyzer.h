@@ -7,6 +7,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "Bianchi/Utilities/interface/AntiElectronIDMVA.h"
+#include "RecoTauTag/RecoTau/interface/AntiElectronIDMVA2.h"
 
 
 #include "TFile.h"
@@ -97,10 +98,11 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   float Tau_GammaPhiMom_Tab_[50];
   float Tau_GammaEnFrac_Tab_[50];
   float Tau_HadrMva_Tab_[50]; 
-  float Tau_mvaAntiE_Tab_[50];
+  float Tau_mvaAntiEValue_Tab_[50];
   float Tau_AntiELoose_Tab_[50];
   float Tau_AntiEMedium_Tab_[50];
   float Tau_AntiETight_Tab_[50];
+  float Tau_AntiEMVA_Tab_[50];
 
   int Tau_GsfEleMatch_;
   int Tau_GenEleMatch_;
@@ -121,10 +123,11 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
   float Tau_GammaPhiMom_;
   float Tau_GammaEnFrac_;
   float Tau_HadrMva_; 
-  float Tau_mvaAntiE_;
+  float Tau_mvaAntiEValue_;
   float Tau_AntiELoose_;
   float Tau_AntiEMedium_;
   float Tau_AntiETight_;
+  float Tau_AntiEMVA_;
 
   int Elec_GenEleMatch_;
   int Elec_GenEleFromZMatch_;
@@ -160,7 +163,14 @@ class AntiEMVAAnalyzer : public edm::EDAnalyzer
 
 
   AntiElectronIDMVA* antiE_;
+  edm::FileInPath inputFileName0;
+  edm::FileInPath inputFileName1;
+  edm::FileInPath inputFileName2;
+  edm::FileInPath inputFileName3;
+  edm::FileInPath inputFileName4;
+  edm::FileInPath inputFileName5;
 
+  AntiElectronIDMVA2* antiEIvo_;
 
 };//AntiEMVAAnalyzer
 

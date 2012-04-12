@@ -20,11 +20,15 @@ AntiEMVAAnalyzer::AntiEMVAAnalyzer(const edm::ParameterSet& cfg)
   srcGenTaus_  = cfg.getParameter<edm::InputTag>("srcGenTaus");
   srcGenJets_  = cfg.getParameter<edm::InputTag>("srcGenJets");
   srcPatTaus_  = cfg.getParameter<edm::InputTag>("srcPatTaus");
+  inputFileName0 = cfg.getParameter<edm::FileInPath>("inputFileName0");
+  inputFileName1 = cfg.getParameter<edm::FileInPath>("inputFileName1");
+  inputFileName2 = cfg.getParameter<edm::FileInPath>("inputFileName2");
+  inputFileName3 = cfg.getParameter<edm::FileInPath>("inputFileName3");
+  inputFileName4 = cfg.getParameter<edm::FileInPath>("inputFileName4");
+  inputFileName5 = cfg.getParameter<edm::FileInPath>("inputFileName5");
   debug_  = cfg.getParameter<bool>("debug");
 
 } 
-
-
 
 void AntiEMVAAnalyzer::beginJob()
 { 
@@ -93,20 +97,41 @@ void AntiEMVAAnalyzer::beginJob()
   tree_->Branch("Tau_GammaPhiMom",&Tau_GammaPhiMom_,"Tau_GammaPhiMom/F");
   tree_->Branch("Tau_GammaEnFrac",&Tau_GammaEnFrac_,"Tau_GammaEnFrac/F");
   tree_->Branch("Tau_HadrMva",&Tau_HadrMva_,"Tau_HadrMva/F");
-  tree_->Branch("Tau_mvaAntiE",&Tau_mvaAntiE_,"Tau_mvaAntiE/F");
+  tree_->Branch("Tau_mvaAntiEValue",&Tau_mvaAntiEValue_,"Tau_mvaAntiEValue/F");
   tree_->Branch("Tau_AntiELoose",&Tau_AntiELoose_,"Tau_AntiELoose/F");
   tree_->Branch("Tau_AntiEMedium",&Tau_AntiEMedium_,"Tau_AntiEMedium/F");
   tree_->Branch("Tau_AntiETight",&Tau_AntiETight_,"Tau_AntiETight/F");
+  tree_->Branch("Tau_AntiEMVA",&Tau_AntiEMVA_,"Tau_AntiEMVA/F");
 
   antiE_  = new AntiElectronIDMVA();
   antiE_->Initialize("BDT", 
-		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_X_0BL_BDT.weights.xml", 
-		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_1_1BL_BDT.weights.xml", 
-		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_0_1BL_BDT.weights.xml", 
-		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_X_0EC_BDT.weights.xml", 
-		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_1_1EC_BDT.weights.xml", 
-		    "../../../Bianchi/Utilities/data/antiE_v4/TMVAClassification_v2_0_1EC_BDT.weights.xml" );
-  
+		     inputFileName0.fullPath().data(),
+		     inputFileName1.fullPath().data(),
+		     inputFileName2.fullPath().data(),
+		     inputFileName3.fullPath().data(),
+		     inputFileName4.fullPath().data(),
+		     inputFileName5.fullPath().data());
+
+//   antiEIvo_  = new AntiElectronIDMVA2();
+//   std::string method = "BDT";
+//   std::string Name0 = "../test/Macros/weights/tmva/TMVAClassification_woG_Barrel_BDT.weights.xml";
+//   std::string Name1 = "../test/Macros/weights/tmva/TMVAClassification_wGwoGSF_Barrel_BDT.weights.xml";
+//   std::string Name2 = "../test/Macros/weights/tmva/TMVAClassification_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
+//   std::string Name3 = "../test/Macros/weights/tmva/TMVAClassification_wGwGSFwPFMVA_Barrel_BDT.weights.xml";
+//   std::string Name4 = "../test/Macros/weights/tmva/TMVAClassification_woG_Endcap_BDT.weights.xml";
+//   std::string Name5 = "../test/Macros/weights/tmva/TMVAClassification_wGwoGSF_Endcap_BDT.weights.xml";
+//   std::string Name6 = "../test/Macros/weights/tmva/TMVAClassification_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
+//   std::string Name7 = "../test/Macros/weights/tmva/TMVAClassification_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
+//   antiEIvo_->Initialize("BDT", 
+// 			Name0,
+// 			Name1,
+// 			Name2,
+// 			Name3,
+// 			Name4,
+// 			Name5,
+// 			Name6,
+// 			Name7
+// 			);
 }
 
 
@@ -296,7 +321,7 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_GammaEnFrac_Tab_[NumPFTaus_] = GammadPt_;
     Tau_VisMass_Tab_[NumPFTaus_] = PfTau->mass();
     Tau_HadrMva_Tab_[NumPFTaus_] = TMath::Max(PfTau->electronPreIDOutput(),float(-1.0));
-    Tau_mvaAntiE_Tab_[NumPFTaus_] = antiE_->MVAValue(PfTau->eta(),
+    Tau_mvaAntiEValue_Tab_[NumPFTaus_] = antiE_->MVAValue(PfTau->eta(),
 						     PfTau->pt(), 
 						     PfTau->signalPFChargedHadrCands().size(),
 						     PfTau->signalPFGammaCands().size(),
@@ -310,20 +335,9 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 						     TMath::Sqrt(dPhi2)*TMath::Sqrt(GammadPt_)*PfTau->pt(),
 						     GammadPt_
 						     );
-
-
-
-//    double MVAValue(Float_t TauEta,  Float_t TauPt,
-// 		    Float_t TauSignalPFChargedCands, Float_t TauSignalPFGammaCands, 
-// 		    Float_t TauLeadPFChargedHadrMva, 
-// 		    Float_t TauLeadPFChargedHadrHoP , Float_t TauLeadPFChargedHadrEoP, 
-// 		    Float_t TauHasGsf, Float_t TauVisMass,  Float_t TauEmFraction,
-// 		    Float_t GammaEtaMom, Float_t GammaPhiMom, Float_t GammaEnFrac
-// 		    );
-
     
     if(debug_){
-      std::cout<<"PfTauLoop number : "<<NumPFTaus_<<std::endl;
+//       std::cout<<"PfTauLoop number : "<<NumPFTaus_<<std::endl;
 //       std::cout<<"  GammaEtaMom : "<<Tau_GammaEtaMom_Tab_[NumPFTaus_]<<std::endl;
 //       std::cout<<"  GammaPhiMom : "<<Tau_GammaPhiMom_Tab_[NumPFTaus_]<<std::endl;
 //       std::cout<<"  GammaPt : "<<sumPt<<std::endl;
@@ -340,6 +354,8 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 	Tau_AntiELoose_Tab_[NumPFTaus_] = PatTau->tauID("againstElectronLoose");
 	Tau_AntiEMedium_Tab_[NumPFTaus_] = PatTau->tauID("againstElectronMedium");
 	Tau_AntiETight_Tab_[NumPFTaus_] = PatTau->tauID("againstElectronTight");
+	Tau_AntiEMVA_Tab_[NumPFTaus_] = PatTau->tauID("againstElectronMVA");
+
 	if(debug_){
 	  std::cout<<"===================>PAT MATCHED!!"<<std::endl;
 	  std::cout<<" PatTauLoop number : "<<NumPatTaus_<<std::endl;
@@ -348,6 +364,9 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 	  std::cout<<" PatTau AntiELoose : "<<PatTau->tauID("againstElectronLoose")<<std::endl;
 	  std::cout<<" PatTau AntiEMedium : "<<PatTau->tauID("againstElectronMedium")<<std::endl;
 	  std::cout<<" PatTau AntiETight : "<<PatTau->tauID("againstElectronTight")<<std::endl;
+	  std::cout<<" PatTau AntiEMVA : "<<PatTau->tauID("againstElectronMVA")<<std::endl;
+	  std::cout<<" PatTau DecayMode : "<<PatTau->tauID("decayModeFinding")<<std::endl;
+	  std::cout<<" PatTau CombIsoDB : "<<PatTau->tauID("byLooseCombinedIsolationDeltaBetaCorr")<<std::endl;
 	}
 	  if(debug_){
 	  }
@@ -372,7 +391,6 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     NumGenHad_ = 0;
     NumGenJet_ = 0;
 
-
     Elec_GenEleMatch_ = 0;
     Elec_GenEleFromZMatch_ = 0;
     Elec_GenEleFromZTauTauMatch_ = 0;
@@ -396,6 +414,9 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 	Elec_PFTauMatch_ = 1;
 	MatchedTau = NumPFTausTemp;
 	deltaRMin = deltaR(GsfElectron->eta(),GsfElectron->phi(),PfTau->eta(),PfTau->phi());
+// 	cout<<"IVO MVA : "<<endl;
+// // 	float mvaIvo = antiEIvo_->MVAValue(PfTau, GsfElectron);
+// // 	cout<<mvaIvo<<endl;
       }
       NumPFTausTemp++;
     }
@@ -424,11 +445,12 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
     Tau_GammaPhiMom_            = Tau_GammaPhiMom_Tab_[MatchedTau];
     Tau_GammaEnFrac_            = Tau_GammaEnFrac_Tab_[MatchedTau];
     Tau_HadrMva_                = Tau_HadrMva_Tab_[MatchedTau]; 
-    Tau_mvaAntiE_               = Tau_mvaAntiE_Tab_[MatchedTau]; 
+    Tau_mvaAntiEValue_               = Tau_mvaAntiEValue_Tab_[MatchedTau]; 
     Tau_AntiELoose_             = Tau_AntiELoose_Tab_[MatchedTau]; 
     Tau_AntiEMedium_            = Tau_AntiEMedium_Tab_[MatchedTau]; 
     Tau_AntiETight_             = Tau_AntiETight_Tab_[MatchedTau]; 
-    
+    Tau_AntiEMVA_               = Tau_AntiEMVA_Tab_[MatchedTau]; 
+
 //     if(debug_){
 //       std::cout<<std::endl;
 //       std::cout<<"Tau variables :"<<std::endl;
@@ -445,7 +467,8 @@ void AntiEMVAAnalyzer::analyze(const edm::Event& evt, const edm::EventSetup& es)
 //       std::cout<<"Tau_GammaPhiMom_ :"<<Tau_GammaPhiMom_<<std::endl;
 //       std::cout<<"Tau_GammaEnFrac_ :"<<Tau_GammaEnFrac_<<std::endl;
 //       std::cout<<"Tau_HadrMva_ :"<<Tau_HadrMva_<<std::endl;
-//       std::cout<<"Tau_mvaAntiE_ :"<<Tau_mvaAntiE_<<std::endl;
+//       std::cout<<"Tau_mvaAntiEValue_ :"<<Tau_mvaAntiEValue_<<std::endl;
+//       std::cout<<"Tau_AntiEMVA_ :"<<Tau_AntiEMVA_<<std::endl;
 //     }
     /////////////////////////////////////Matchings  /////////////////////////////////////
 //     if (debug_)std::cout<<"  Electron matchings :"<<std::endl;
