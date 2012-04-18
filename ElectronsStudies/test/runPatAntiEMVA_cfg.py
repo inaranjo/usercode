@@ -17,13 +17,17 @@ else:
     process.GlobalTag.globaltag = cms.string('GR_R_42_V19::All')
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.source.fileNames = cms.untracked.vstring(
-    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_85_2_Qjs.root'
-    )
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_84_2_gFP.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_85_2_Qjs.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_86_2_HBj.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_87_2_FzR.root',
+    '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_88_1_zDa.root'
+)
 
 
 
@@ -66,6 +70,7 @@ process.selectPrimaryVertex = cms.Sequence(
     * process.selectedPrimaryVertexHighestPtTrackSum
     )
 
+process.load("RecoTauTag/Configuration/RecoPFTauTag_cff")
 
 ################### pat specific ####################
 
@@ -92,8 +97,53 @@ switchToPFTauHPS(process,
                  pfTauLabelOld = 'shrinkingConePFTauProducer',
                  pfTauLabelNew = 'hpsPFTauProducer'
                  )
+process.load("RecoTauTag.RecoTau.PFRecoTauDiscriminationAgainstElectronMVA2_cfi")
 
+# Define decay mode prediscriminant
+requireDecayMode = cms.PSet(
+    BooleanOperator = cms.string("and"),
+    decayMode = cms.PSet(
+        Producer = cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding'),
+        cut = cms.double(0.5)
+        )    
+    )
+requireIso = cms.PSet(
+    BooleanOperator = cms.string("and"),
+    decayMode = cms.PSet(
+        Producer = cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding'),
+        cut = cms.double(0.5)
+        ),    
+    Isolation = cms.PSet(
+        Producer = cms.InputTag('hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr'),
+        cut = cms.double(0.5)
+        )
+    )
 
+process.pfRecoTauDiscriminationAgainstElectronMVA2.Prediscriminants = requireDecayMode.clone()
+#process.pfRecoTauDiscriminationAgainstElectronMVA2.Prediscriminants = requireIso.clone()
+process.pfRecoTauDiscriminationAgainstElectronMVA2.PFTauProducer = cms.InputTag("hpsPFTauProducer")
+
+process.makePatTaus.replace(process.patTaus,
+                            process.pfRecoTauDiscriminationAgainstElectronMVA2+process.patTaus)
+process.patTaus.tauIDSources= cms.PSet(
+    process.patTaus.tauIDSources,
+    cms.PSet(againstElectronMVA2 = cms.InputTag("pfRecoTauDiscriminationAgainstElectronMVA2") )
+    )
+
+process.selectedPatTaus.cut = "pt>20 && abs(eta)<2.3 && tauID('decayModeFinding')>0.5 && tauID('byLooseCombinedIsolationDeltaBetaCorr')>0.5"
+########################## PreSelection of reconstructed Taus ###############################
+process.load("RecoTauTag.TauTagTools.PFTauSelector_cfi")
+process.selectedTaus = process.pfTauSelector.clone()
+process.selectedTaus.src = cms.InputTag("hpsPFTauProducer")
+process.selectedTaus.cut = cms.string("pt>20 && abs(eta)<2.3")
+process.selectedTaus.discriminators = cms.VPSet(
+    cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByDecayModeFinding"),
+              selectionCut=cms.double(0.5) ),
+    cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr"),
+              selectionCut=cms.double(0.5))## ,
+##     cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByMediumElectronRejection"),
+##               selectionCut=cms.double(0.5) )
+    )
 ########################## Electrons and hadrons from Z ###############################
 process.load("PhysicsTools/JetMCAlgos/TauGenJets_cfi")
 process.load("TauAnalysis.GenSimTools.gen_decaysFromZs_cfi")
@@ -104,19 +154,6 @@ process.genElectronsPtGt10 =  cms.EDFilter("GenParticleSelector",
                                          stableOnly = cms.bool(False),
                                          filter = cms.bool(False)
                                          )
-
-########################## PreSelection of reconstructed Taus ###############################
-process.load("RecoTauTag.TauTagTools.PFTauSelector_cfi")
-process.selectedTaus = process.pfTauSelector.clone()
-process.selectedTaus.src = cms.InputTag("hpsPFTauProducer")
-process.selectedTaus.discriminators = cms.VPSet(
-    cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByDecayModeFinding"),
-              selectionCut=cms.double(0.5) ),
-    cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr"),
-              selectionCut=cms.double(0.5))## ,
-##     cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByMediumElectronRejection"),
-##               selectionCut=cms.double(0.5) )
-    )
 
 ########################## Cleaned GenJets ###############################
 process.genLeptonsPtGt10 =  cms.EDFilter("GenParticleSelector",
@@ -137,8 +174,63 @@ process.genJetsAntiOverlapWithLeptonsVeto = cms.EDFilter("GenJetAntiOverlapSelec
 
 ########################## analyzer ###############################
 
-process.AntiEMVAAnalyzer = cms.EDAnalyzer(
-    "AntiEMVAAnalyzer",
+## process.AntiEMVAAnalyzer2 = cms.EDAnalyzer(
+##     "AntiEMVAAnalyzer2",
+##     srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
+##     srcGsfElectrons = cms.InputTag("gsfElectrons"),
+##     srcPFTaus = cms.InputTag("selectedTaus"),
+##     srcGenElectrons = cms.InputTag("genElectronsPtGt10"),
+##     srcGenElectronsFromZ = cms.InputTag("genElectronsFromZs"),
+##     srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
+##     srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
+##     srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
+##     srcPatTaus = cms.InputTag("selectedPatTaus"),
+##     inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
+##     inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
+##     inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
+##     inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
+##     inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
+##     inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
+##     inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Endcap_BDT.weights.xml'),
+##     inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Endcap_BDT.weights.xml'),
+##     inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
+##     inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
+##     debug = cms.bool(True)
+##     )
+## process.AntiEMVAAnalyzer = cms.EDAnalyzer(
+##     "AntiEMVAAnalyzer",
+##     srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
+##     srcGsfElectrons = cms.InputTag("gsfElectrons"),
+##     srcPFTaus = cms.InputTag("selectedTaus"),
+##     srcGenElectrons = cms.InputTag("genElectronsPtGt10"),
+##     srcGenElectronsFromZ = cms.InputTag("genElectronsFromZs"),
+##     srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
+##     srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
+##     srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
+##     srcPatTaus = cms.InputTag("selectedPatTaus"),
+##     inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
+##     inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
+##     inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
+##     inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
+##     inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
+##     inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
+##     inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
+##     inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Endcap_BDT.weights.xml'),
+##     inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Endcap_BDT.weights.xml'),
+##     inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
+##     inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
+##     debug = cms.bool(True)
+##     )
+
+process.MatchingComputerAnalyzer = cms.EDAnalyzer(
+    "MatchingComputerAnalyzer",
     srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
     srcGsfElectrons = cms.InputTag("gsfElectrons"),
     srcPFTaus = cms.InputTag("selectedTaus"),
@@ -154,6 +246,7 @@ process.AntiEMVAAnalyzer = cms.EDAnalyzer(
 ########################## path ###############################
 
 process.run = cms.Sequence(
+    process.PFTau*
     process.selectPrimaryVertex*
     process.patDefaultSequence*
     process.tauGenJets*
@@ -161,7 +254,9 @@ process.run = cms.Sequence(
     process.selectedTaus*
     process.genElectronsPtGt10*
     process.genLeptonsPtGt10*process.genJetsAntiOverlapWithLeptonsVeto*
-    process.AntiEMVAAnalyzer
+##     process.AntiEMVAAnalyzer
+    process.MatchingComputerAnalyzer
+##     process.AntiEMVAAnalyzer2
     
     )
 
@@ -186,3 +281,5 @@ process.out.fileName = cms.untracked.string('patTuplesAntiEMVA.root')
 
 process.outpath = cms.EndPath()
 
+## processDumpFile = open('python.dump', 'w')
+## print >> processDumpFile, process.dumpPython()
