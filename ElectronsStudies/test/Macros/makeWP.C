@@ -1,11 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // makeRootFilesAntiEMVA 
 //
-// Macro creating signal and background rootFiles from the ouput tree of the AntiEMVA analyzer. 
-// Signal is when the branch for matching with a hadron from tau is 1.
-// Background is when the branch for matching with an electron is 1.
-// It also separates into 4 categories -> 4 different Rootfiles for Signal and the same for Bkg.
-//
+// Macro creating a rootfile with the branches corresponding to the different WP.
 // Authors: I.Naranjo
 //--------------------------------------------------------------------------------------------------
 #include "TTree.h"
@@ -34,22 +30,16 @@
 
 #define DEBUG false
 
-void makeRoot(string matching = "Elec",
-	      string category = "woG",
-	      string discriminator = ""
-	      )
+void makeWP(string data = "Pythia")
 {
-//   std::string inputFileName = Form("../AntiEMVA-AntiEMed.root",discriminator.data());
-//   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/testAntiEMVA_ZZTo2e2tau_7TeV-powheg-pythia6-iter1.root";
-   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
-//   std::string inputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL%s-iter3.root",discriminator.data());
+   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/testAntiEMVA_ZZTo2e2tau_7TeV-powheg-pythia6-iter1.root";
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
   if(inputFile->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
 
-  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_testAntiEMVA%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
+  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_makeWP-iter1_%s.root",data.data());
 
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
@@ -65,57 +55,22 @@ void makeRoot(string matching = "Elec",
 
   int t_Tau_GsfEleMatch_;
   int t_Tau_GenEleMatch_;
-  int t_Tau_GenEleFromZMatch_;
-  int t_Tau_GenEleFromZTauTauMatch_;
+
   int t_Tau_GenHadMatch_;
-  int t_Tau_GenJetMatch_;
   float t_Tau_AbsEta_;
   float t_Tau_Pt_;
-  float t_Tau_HasGsf_; 
-  float t_Tau_EmFraction_; 
-  float t_Tau_NumChargedCands_;
-  float t_Tau_NumGammaCands_; 
-  float t_Tau_HadrHoP_; 
-  float t_Tau_HadrEoP_; 
-  float t_Tau_VisMass_; 
-  float t_Tau_GammaEtaMom_;
-  float t_Tau_GammaPhiMom_;
-  float t_Tau_GammaEnFrac_;
-  float t_Tau_HadrMva_; 
-  float t_Tau_mvaAntiEValue_;
+  float t_Tau_Phi_;
+
   float t_Tau_AntiELoose_; 
   float t_Tau_AntiEMedium_; 
   float t_Tau_AntiETight_; 
   float t_Tau_AntiEMVA_; 
+  float t_Tau_AntiEMVA2_; 
+  float t_Tau_AntiEMVA2_WP75_; 
+  float t_Tau_AntiEMVA2_WP85_; 
+  float t_Tau_AntiEMVA2_WP95_; 
 
-  int t_Elec_GenEleMatch_;
-  int t_Elec_GenEleFromZMatch_;
-  int t_Elec_GenEleFromZTauTauMatch_;
-  int t_Elec_PFTauMatch_;
-  int t_Elec_GenHadMatch_;
-  int t_Elec_GenJetMatch_;
-  float t_Elec_AbsEta_;
-  float t_Elec_Pt_;
-  float t_Elec_PFMvaOutput_;
-  float t_Elec_Ee_;
-  float t_Elec_Egamma_;
-  float t_Elec_Pin_;
-  float t_Elec_Pout_;
-  float t_Elec_EtotOverPin_;
-  float t_Elec_EeOverPout_;
-  float t_Elec_EgammaOverPdif_;
-  int t_Elec_EarlyBrem_;
-  int t_Elec_LateBrem_;
-  float t_Elec_Logsihih_;
-  float t_Elec_DeltaEta_;
-  float t_Elec_HoHplusE_;
-  float t_Elec_Fbrem_;
-  float t_Elec_Chi2KF_;
-  float t_Elec_Chi2GSF_;
-  float t_Elec_NumHits_;
-  float t_Elec_GSFTrackResol_;
-  float t_Elec_GSFTracklnPt_;
-  float t_Elec_GSFTrackEta_;
+  
 
   //counters
   mytree->Branch("run",&t_run_,"run/l");
@@ -128,65 +83,25 @@ void makeRoot(string matching = "Elec",
   mytree->Branch("NumGenHad",&t_NumGenHad_,"NumGenHad/I");
   mytree->Branch("NumGenJet",&t_NumGenJet_,"NumGenEJet/I");
 
-  //GsfElectron variables
-  mytree->Branch("Elec_GenEleMatch",&t_Elec_GenEleMatch_,"Elec_GenEleMatch/I");
-  mytree->Branch("Elec_GenEleFromZMatch",&t_Elec_GenEleFromZMatch_,"Elec_GenEleFromZMatch/I");
-  mytree->Branch("Elec_GenEleFromZTauTauMatch",&t_Elec_GenEleFromZTauTauMatch_,"Elec_GenEleFromZTauTauMatch/I");
-  mytree->Branch("Elec_PFTauMatch",&t_Elec_PFTauMatch_,"Elec_PFTauMatch/I");
-  mytree->Branch("Elec_GenHadMatch",&t_Elec_GenHadMatch_,"Elec_GenHadMatch/I");
-  mytree->Branch("Elec_GenJetMatch",&t_Elec_GenJetMatch_,"Elec_GenJetMatch/I");
-  mytree->Branch("Elec_AbsEta",&t_Elec_AbsEta_,"Elec_AbsEta/F");
-  mytree->Branch("Elec_Pt",&t_Elec_Pt_,"Elec_Pt/F");
-  mytree->Branch("Elec_PFMvaOutput",&t_Elec_PFMvaOutput_,"Elec_PFMvaOutput/F");
-  mytree->Branch("Elec_Ee",&t_Elec_Ee_,"Elec_Ee/F");
-  mytree->Branch("Elec_Egamma",&t_Elec_Egamma_,"Elec_Egamma/F");
-  mytree->Branch("Elec_Pin",&t_Elec_Pin_,"Elec_Pin/F");
-  mytree->Branch("Elec_Pout",&t_Elec_Pout_,"Elec_Pout/F");
-  mytree->Branch("Elec_EtotOverPin",&t_Elec_EtotOverPin_,"Elec_EtotOverPin/F");
-  mytree->Branch("Elec_EeOverPout",&t_Elec_EeOverPout_,"Elec_EeOverPout/F");
-  mytree->Branch("Elec_EgammaOverPdif",&t_Elec_EgammaOverPdif_,"Elec_EgammaOverPdif/F");
-  mytree->Branch("Elec_EarlyBrem",&t_Elec_EarlyBrem_,"Elec_EarlyBrem/I");
-  mytree->Branch("Elec_LateBrem",&t_Elec_LateBrem_,"Elec_LateBrem/I");
-  mytree->Branch("Elec_Logsihih",&t_Elec_Logsihih_,"Elec_Logsihih/F");
-  mytree->Branch("Elec_DeltaEta",&t_Elec_DeltaEta_,"Elec_DeltaEta/F");
-  mytree->Branch("Elec_HoHplusE",&t_Elec_HoHplusE_,"Elec_HoHplusE/F");
-  mytree->Branch("Elec_Fbrem",&t_Elec_Fbrem_,"Elec_Fbrem/F");
-  mytree->Branch("Elec_Chi2KF",&t_Elec_Chi2KF_,"Elec_Chi2KF/F");
-  mytree->Branch("Elec_Chi2GSF",&t_Elec_Chi2GSF_,"Elec_Chi2GSF/F");
-  mytree->Branch("Elec_NumHits",&t_Elec_NumHits_,"Elec_NumHits/F");
-  mytree->Branch("Elec_GSFTrackResol",&t_Elec_GSFTrackResol_,"Elec_GSFTrackResol/F");
-  mytree->Branch("Elec_GSFTracklnPt",&t_Elec_GSFTracklnPt_,"Elec_GSFTracklnPt/F");
-  mytree->Branch("Elec_GSFTrackEta",&t_Elec_GSFTrackEta_,"Elec_GSFTrackEta/F");
+
   //PFTaus variables
   mytree->Branch("Tau_GsfEleMatch",&t_Tau_GsfEleMatch_,"Tau_GsfEleMatch/I");
   mytree->Branch("Tau_GenEleMatch",&t_Tau_GenEleMatch_,"Tau_GenEleMatch/I");
-  mytree->Branch("Tau_GenEleFromZMatch",&t_Tau_GenEleFromZMatch_,"Tau_GenEleFromZMatch/I");
-  mytree->Branch("Tau_GenEleFromZTauTauMatch",&t_Tau_GenEleFromZTauTauMatch_,"Tau_GenEleFromZTauTauMatch/I");
   mytree->Branch("Tau_GenHadMatch",&t_Tau_GenHadMatch_,"Tau_GenHadMatch/I");
-  mytree->Branch("Tau_GenJetMatch",&t_Tau_GenJetMatch_,"Tau_GenJetMatch/I");
   mytree->Branch("Tau_AbsEta",&t_Tau_AbsEta_,"Tau_AbsEta/F");
   mytree->Branch("Tau_Pt",&t_Tau_Pt_,"Tau_Pt/F");
-  mytree->Branch("Tau_HasGsf",&t_Tau_HasGsf_,"Tau_HasGsf/F");
-  mytree->Branch("Tau_EmFraction",&t_Tau_EmFraction_,"Tau_EmFraction/F");
-  mytree->Branch("Tau_NumChargedCands",&t_Tau_NumChargedCands_,"Tau_NumChargedCands/F");
-  mytree->Branch("Tau_NumGammaCands",&t_Tau_NumGammaCands_,"Tau_NumGammaCands/F");
-  mytree->Branch("Tau_HadrHoP",&t_Tau_HadrHoP_,"Tau_HadrHoP/F");
-  mytree->Branch("Tau_HadrEoP",&t_Tau_HadrEoP_,"Tau_HadrEoP/F");
-  mytree->Branch("Tau_VisMass",&t_Tau_VisMass_,"Tau_VisMass/F");
-  mytree->Branch("Tau_GammaEtaMom",&t_Tau_GammaEtaMom_,"Tau_GammaEtaMom/F");
-  mytree->Branch("Tau_GammaPhiMom",&t_Tau_GammaPhiMom_,"Tau_GammaPhiMom/F");
-  mytree->Branch("Tau_GammaEnFrac",&t_Tau_GammaEnFrac_,"Tau_GammaEnFrac/F");
-  mytree->Branch("Tau_HadrMva",&t_Tau_HadrMva_,"Tau_HadrMva/F");
-
-  mytree->Branch("Tau_mvaAntiEValue",&t_Tau_mvaAntiEValue_,"Tau_mvaAntiEValue/F");
+  mytree->Branch("Tau_Phi",&t_Tau_Phi_,"Tau_Phi/F");
   mytree->Branch("Tau_AntiELoose",&t_Tau_AntiELoose_,"Tau_AntiELoose/F");
   mytree->Branch("Tau_AntiEMedium",&t_Tau_AntiEMedium_,"Tau_AntiEMedium/F");
   mytree->Branch("Tau_AntiETight",&t_Tau_AntiETight_,"Tau_AntiETight/F");
   mytree->Branch("Tau_AntiEMVA",&t_Tau_AntiEMVA_,"Tau_AntiEMVA/F");
+  mytree->Branch("Tau_AntiEMVA2",&t_Tau_AntiEMVA2_,"Tau_AntiEMVA2/F");
+  mytree->Branch("Tau_AntiEMVA2_WP75",&t_Tau_AntiEMVA2_WP75_,"Tau_AntiEMVA2_WP75/F");
+  mytree->Branch("Tau_AntiEMVA2_WP85",&t_Tau_AntiEMVA2_WP85_,"Tau_AntiEMVA2_WP85/F");
+  mytree->Branch("Tau_AntiEMVA2_WP95",&t_Tau_AntiEMVA2_WP95_,"Tau_AntiEMVA2_WP95/F");
 
 
   TTree* inputTree = (TTree*)inputFile->Get("AntiEMVAAnalyzer2/tree");
-//   TTree* inputTree = (TTree*)inputFile->Get("AntiEMVAAnalyzer/tree");
   int nEntries = inputTree->GetEntries();
 
   ULong64_t run,event,lumi;
@@ -205,6 +120,7 @@ void makeRoot(string matching = "Elec",
   int Tau_GenJetMatch;
   float Tau_AbsEta;
   float Tau_Pt;
+  float Tau_Phi;
   float Tau_HasGsf; 
   float Tau_EmFraction; 
   float Tau_NumChargedCands;
@@ -222,6 +138,7 @@ void makeRoot(string matching = "Elec",
   float Tau_AntiEMedium; 
   float Tau_AntiETight; 
   float Tau_AntiEMVA; 
+  float Tau_AntiEMVA2; 
 
   int Elec_GenEleMatch;
   int Elec_GenEleFromZMatch;
@@ -270,6 +187,7 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchAddress("Tau_GenJetMatch", &Tau_GenJetMatch );
   inputTree->SetBranchAddress("Tau_AbsEta", &Tau_AbsEta );
   inputTree->SetBranchAddress("Tau_Pt", &Tau_Pt );
+  inputTree->SetBranchAddress("Tau_Phi", &Tau_Phi );
   inputTree->SetBranchAddress("Tau_HasGsf", &Tau_HasGsf ); 
   inputTree->SetBranchAddress("Tau_EmFraction", &Tau_EmFraction ); 
   inputTree->SetBranchAddress("Tau_NumChargedCands", &Tau_NumChargedCands );
@@ -287,11 +205,12 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchAddress("Tau_AntiEMedium", &Tau_AntiEMedium ); 
   inputTree->SetBranchAddress("Tau_AntiETight", &Tau_AntiETight ); 
   inputTree->SetBranchAddress("Tau_AntiEMVA", &Tau_AntiEMVA ); 
+  inputTree->SetBranchAddress("Tau_AntiEMVA2", &Tau_AntiEMVA2 ); 
 
   inputTree->SetBranchAddress("Elec_GenEleMatch", &Elec_GenEleMatch );
   inputTree->SetBranchAddress("Elec_GenEleFromZMatch", &Elec_GenEleFromZMatch);
   inputTree->SetBranchAddress("Elec_GenEleFromZTauTauMatch", &Elec_GenEleFromZTauTauMatch );
-  inputTree->SetBranchAddress("Elec_PFTauMatch", &Elec_PFTauMatch );
+//   inputTree->SetBranchAddress("Elec_PFTauMatch", &Elec_PFTauMatch );
   inputTree->SetBranchAddress("Elec_GenHadMatch", &Elec_GenHadMatch );
   inputTree->SetBranchAddress("Elec_GenJetMatch", &Elec_GenJetMatch );
   inputTree->SetBranchAddress("Elec_AbsEta", &Elec_AbsEta );
@@ -335,6 +254,7 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchStatus("Tau_GenJetMatch", 1);
   inputTree->SetBranchStatus("Tau_AbsEta", 1);
   inputTree->SetBranchStatus("Tau_Pt", 1);
+  inputTree->SetBranchStatus("Tau_Phi", 1);
   inputTree->SetBranchStatus("Tau_HasGsf", 1); 
   inputTree->SetBranchStatus("Tau_EmFraction", 1); 
   inputTree->SetBranchStatus("Tau_NumChargedCands", 1);
@@ -352,11 +272,12 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchStatus("Tau_AntiEMedium", 1); 
   inputTree->SetBranchStatus("Tau_AntiETight", 1); 
   inputTree->SetBranchStatus("Tau_AntiEMVA", 1); 
+  inputTree->SetBranchStatus("Tau_AntiEMVA2", 1); 
 
   inputTree->SetBranchStatus("Elec_GenEleMatch", 1);
   inputTree->SetBranchStatus("Elec_GenEleFromZMatch", 1);
   inputTree->SetBranchStatus("Elec_GenEleFromZTauTauMatch", 1);
-  inputTree->SetBranchStatus("Elec_PFTauMatch", 1);
+//   inputTree->SetBranchStatus("Elec_PFTauMatch", 1);
   inputTree->SetBranchStatus("Elec_GenHadMatch", 1);
   inputTree->SetBranchStatus("Elec_GenJetMatch", 1);
   inputTree->SetBranchStatus("Elec_AbsEta", 1);
@@ -390,52 +311,113 @@ void makeRoot(string matching = "Elec",
     inputTree->GetEntry(iEntry);
 
 
-    if(matching == "Elec" && (Tau_GenEleMatch!=1 || Elec_GenEleMatch!=1)) continue;
-    if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
+//     if(matching == "Elec" && (Tau_GenEleMatch!=1 || Elec_GenEleMatch!=1)) continue;
+//     if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
 
-    //No discriminator applied
-    if(discriminator == "" && category == "woG"){
-      if(Tau_NumGammaCands>0) continue;
-    }
-    if(discriminator == "" && category == "NoEleMatch"){
-      if(Tau_GsfEleMatch>0.5) continue;
-    }
-    if(discriminator == "" && category == "wGwoGSF"){
-      if (Tau_NumGammaCands<1)continue;
-      if (Tau_HasGsf>0.5) continue;
-    }
-    if(discriminator == "" && category == "wGwGSFwoPFMVA"){
-      if(Tau_NumGammaCands<1)continue;
-      if( Tau_HasGsf<0.5)continue;
-      if (Elec_PFMvaOutput>-0.1)continue;
-    }
-    if(discriminator == "" && category == "wGwGSFwPFMVA"){
-      if (Tau_NumGammaCands<1)continue;
-      if (Tau_HasGsf<0.5)continue;
-      if (Elec_PFMvaOutput<=-0.1)continue;
-    }
 
-    //With AntiEMedium
-    if(discriminator == "-AntiEMed" ){
-      if(Tau_AntiEMedium<0.5) continue;
-    }
-    if(discriminator == "-AntiEMed" && category == "NoEleMatch"){
-      if(Tau_GsfEleMatch>0.5) continue;
-    }
-    if(discriminator == "-AntiEMed" && category == "woG" ){
-      if(Tau_NumGammaCands>0) continue;
-    }
-    if(discriminator == "-AntiEMed" && category == "wGwoGSF"){
-      if(Tau_NumGammaCands<1)continue;
-      if(Tau_HasGsf>0.5 && Elec_PFMvaOutput<=-0.1) continue;//merging with category 4 
-    }
-    if(discriminator == "-AntiEMed" && category == "wGwGSFwoPFMVA"){
-      if(Tau_NumGammaCands<1)continue;
-      if(Tau_HasGsf<0.5)continue;
-      if(Elec_PFMvaOutput>-0.1)continue;
-    }
+    if (Elec_Pt<10) continue;
 
+    t_Tau_AntiEMVA2_WP75_ = 1;
+    t_Tau_AntiEMVA2_WP85_ = 1;
+    t_Tau_AntiEMVA2_WP95_ = 1;
+    if (Tau_NumChargedCands == 1){
+    double mvaCut75 = 999.;
+    double mvaCut85 = 999.;
+    double mvaCut95 = 999.;
+      if(Tau_GsfEleMatch<0.5){//NoEleMatch
+	if (Tau_AbsEta<1.5){//Barrel
+// 	 mvaCut75 = -0.126102;
+// 	 mvaCut85 = -0.0727222;
+// 	 mvaCut95 = -0.101727;
+	 mvaCut75 = -0.0351292;
+	 mvaCut85 = -0.0835313;
+	 mvaCut95 = -0.083524;
+	}
+	else {//Endcap
+// 	 mvaCut75 = -0.0177012;
+// 	 mvaCut85 = -0.084118;
+// 	 mvaCut95 = -0.169389 ;
+	 mvaCut75 = -0.0356601;
+	 mvaCut85 = -0.128549;
+	 mvaCut95 = -0.172681;
+	}
+      }
+      else{//match TauEle
+	if (Tau_AbsEta<1.5){//Barrel
+	  if(Tau_NumGammaCands == 0){//woG
+// 	    mvaCut75 = -0.0458154;
+// 	    mvaCut85 = -0.072778;
+// 	    mvaCut95 = -0.130411;
+	    mvaCut75 = 0.00125865;
+	    mvaCut85 = -0.0814948;
+	    mvaCut95 = -0.124782;
+	  }
+	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf<0.5){//wGwoGSF
+// 	    mvaCut75 = -0.137043;
+// 	    mvaCut85 = -0.137213;
+// 	    mvaCut95 = -0.110745 ;
+	    mvaCut75 = -0.206314;
+	    mvaCut85 = -0.166072;
+	    mvaCut95 = -0.124145;
+	  }
+	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput <-0.1){//wGwGSFwoPFMVA
+// 	    mvaCut75 = 0.0332071;
+// 	    mvaCut85 = -0.0948499;
+// 	    mvaCut95 = -0.11647 ;
+	    mvaCut75 = -0.157582;
+	    mvaCut85 = -0.141405;
+	    mvaCut95 = -0.179366;
+	  }
+	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput >-0.1){//wGwGSFwPFMVA
+// 	    mvaCut75 = -0.0448832;
+// 	    mvaCut85 = -0.0600284;
+// 	    mvaCut95 = -0.134414 ;
+	    mvaCut75 = 0.373828;
+	    mvaCut85 = -0.064168;
+	    mvaCut95 = -0.0979345;
+	  }
+	}
+	else{//Endcap
+	  if(Tau_NumGammaCands == 0){//woG
+// 	    mvaCut75 = 0.189192;
+// 	    mvaCut85 = 0.0648186;
+// 	    mvaCut95 = -0.140327 ;
+	    mvaCut75 = -0.0628364;
+	    mvaCut85 = 0.0461575;
+	    mvaCut95 = -0.150082;
+	  }
+	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf<0.5){//wGwoGSF
+// 	    mvaCut75 = -0.0444424;
+// 	    mvaCut85 = -0.0804441;
+// 	    mvaCut95 = -0.102089 ;
+	    mvaCut75 = 0.443144;
+	    mvaCut85 = -0.0466969;
+	    mvaCut95 = -0.119345;
+	  }
+	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput <-0.1){//wGwGSFwoPFMVA
+// 	    mvaCut75 = -0.0938333;
+// 	    mvaCut85 = -0.0227585;
+// 	    mvaCut95 = -0.14057 ;
+	    mvaCut75 = -0.138559;
+	    mvaCut85 = 0.00619836;
+	    mvaCut95 = -0.126053;
+	  }
+	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput >-0.1){//wGwGSFwPFMVA
+// 	    mvaCut75 = 0.144127;
+// 	    mvaCut85 = -0.116097;
+// 	    mvaCut95 = -0.0975809 ;
+	    mvaCut75 = 0.00279379;
+	    mvaCut85 = 0.208963;
+	    mvaCut95 = -0.0852086;
+	  }
+	}
+      }
     
+    t_Tau_AntiEMVA2_WP75_ = (Tau_AntiEMVA2 > mvaCut75);
+    t_Tau_AntiEMVA2_WP85_ = (Tau_AntiEMVA2 > mvaCut85);
+    t_Tau_AntiEMVA2_WP95_ = (Tau_AntiEMVA2 > mvaCut95);
+    }
+ 
 
     t_run_ = run;
     t_event_ = event;
@@ -449,59 +431,16 @@ void makeRoot(string matching = "Elec",
 
     t_Tau_GsfEleMatch_ = Tau_GsfEleMatch ;
     t_Tau_GenEleMatch_ = Tau_GenEleMatch ;
-    t_Tau_GenEleFromZMatch_ = Tau_GenEleFromZMatch ;
-    t_Tau_GenEleFromZTauTauMatch_ = Tau_GenEleFromZTauTauMatch ;
     t_Tau_GenHadMatch_ = Tau_GenHadMatch ;
-    t_Tau_GenJetMatch_ = Tau_GenJetMatch ;
     t_Tau_AbsEta_ = Tau_AbsEta ;
     t_Tau_Pt_ = Tau_Pt ;
-    t_Tau_HasGsf_ = Tau_HasGsf ; 
-    t_Tau_EmFraction_ = Tau_EmFraction ; 
-    t_Tau_NumChargedCands_ = Tau_NumChargedCands ;
-    t_Tau_NumGammaCands_ = Tau_NumGammaCands ; 
-    t_Tau_HadrHoP_ = Tau_HadrHoP ; 
-    t_Tau_HadrEoP_ = Tau_HadrEoP ; 
-    t_Tau_VisMass_ = Tau_VisMass ; 
-    t_Tau_GammaEtaMom_ = Tau_GammaEtaMom ;
-    t_Tau_GammaPhiMom_ = Tau_GammaPhiMom ;
-    t_Tau_GammaEnFrac_ = Tau_GammaEnFrac ;
-    t_Tau_HadrMva_ = Tau_HadrMva ; 
+    t_Tau_Phi_ = Tau_Phi ; 
 
-    t_Tau_mvaAntiEValue_ = Tau_mvaAntiEValue ; 
     t_Tau_AntiELoose_ = Tau_AntiELoose ; 
     t_Tau_AntiEMedium_ = Tau_AntiEMedium ; 
     t_Tau_AntiETight_ = Tau_AntiETight ; 
     t_Tau_AntiEMVA_ = Tau_AntiEMVA ; 
     
-    t_Elec_GenEleMatch_ = Elec_GenEleMatch ;
-    t_Elec_GenEleFromZMatch_ = Elec_GenEleFromZMatch;
-    t_Elec_GenEleFromZTauTauMatch_ = Elec_GenEleFromZTauTauMatch ;
-    t_Elec_PFTauMatch_ = Elec_PFTauMatch ;
-    t_Elec_GenHadMatch_ = Elec_GenHadMatch ;
-    t_Elec_GenJetMatch_ = Elec_GenJetMatch ;
-    t_Elec_AbsEta_ = Elec_AbsEta ;
-    t_Elec_Pt_ = Elec_Pt ;
-    t_Elec_PFMvaOutput_ = Elec_PFMvaOutput ;
-    t_Elec_Ee_ = Elec_Ee ;
-    t_Elec_Egamma_ = Elec_Egamma ;
-    t_Elec_Pin_ = Elec_Pin ;
-    t_Elec_Pout_ = Elec_Pout ;
-    t_Elec_EtotOverPin_ = Elec_EtotOverPin ;
-    t_Elec_EeOverPout_ = Elec_EeOverPout ;
-    t_Elec_EgammaOverPdif_ = Elec_EgammaOverPdif ;
-    t_Elec_EarlyBrem_ = Elec_EarlyBrem ;
-    t_Elec_LateBrem_ = Elec_LateBrem ;
-    t_Elec_Logsihih_ = Elec_Logsihih ;
-    t_Elec_DeltaEta_ = Elec_DeltaEta ;
-    t_Elec_HoHplusE_ = Elec_HoHplusE ;
-    t_Elec_Fbrem_ = Elec_Fbrem ;
-    t_Elec_Chi2KF_ = Elec_Chi2KF ;
-    t_Elec_Chi2GSF_ = Elec_Chi2GSF ;
-    t_Elec_NumHits_ = Elec_NumHits ;
-    t_Elec_GSFTrackResol_ = Elec_GSFTrackResol ;
-    t_Elec_GSFTracklnPt_ = Elec_GSFTracklnPt ;
-    t_Elec_GSFTrackEta_ = Elec_GSFTrackEta ;
-
     if(DEBUG){
       cout<<endl;
       cout<<" run : "<<t_run_<<endl;
@@ -516,57 +455,15 @@ void makeRoot(string matching = "Elec",
       
       cout<<" Tau_GsfEleMatch :"<<t_Tau_GsfEleMatch_<<endl;
       cout<<" Tau_GenEleMatch :"<<t_Tau_GenEleMatch_<<endl;
-      cout<<" Tau_GenEleFromZMatch :"<<t_Tau_GenEleFromZMatch_<<endl;
-      cout<<" Tau_GenEleFromZTauTauMatch :"<<t_Tau_GenEleFromZTauTauMatch_<<endl;
       cout<<" Tau_GenHadMatch :"<<t_Tau_GenHadMatch_<<endl;
-      cout<<" Tau_GenJetMatch :"<<t_Tau_GenJetMatch_<<endl;
       cout<<" Tau_AbsEta :"<<t_Tau_AbsEta_<<endl;
       cout<<" Tau_Pt : "<<t_Tau_Pt_<<endl;
-      cout<<" Tau_HasGsf :"<<t_Tau_HasGsf_<<endl; 
-      cout<<" Tau_EmFraction :"<<t_Tau_EmFraction_<<endl; 
-      cout<<" Tau_NumChargedCands :"<<t_Tau_NumChargedCands_<<endl;
-      cout<<" Tau_NumGammaCands :"<<t_Tau_NumGammaCands_<<endl; 
-      cout<<" Tau_HadrHoP :"<<t_Tau_HadrHoP_<<endl; 
-      cout<<" Tau_HadrEoP :"<<t_Tau_HadrEoP_<<endl; 
-      cout<<" Tau_VisMass :"<<t_Tau_VisMass_<<endl; 
-      cout<<" Tau_GammaEtaMom :"<<t_Tau_GammaEtaMom_<<endl;
-      cout<<" Tau_GammaPhiMom :"<<t_Tau_GammaPhiMom_<<endl;
-      cout<<" Tau_GammaEnFrac :"<<t_Tau_GammaEnFrac_<<endl;
-      cout<<" Tau_HadrMva :"<<t_Tau_HadrMva_<<endl; 
-      cout<<" Tau_mvaAntiEValue :"<<t_Tau_mvaAntiEValue_<<endl; 
+ 
       cout<<" Tau_AntiELoose :"<<t_Tau_AntiELoose_<<endl; 
       cout<<" Tau_AntiEMedium :"<<t_Tau_AntiEMedium_<<endl; 
       cout<<" Tau_AntiETight :"<<t_Tau_AntiETight_<<endl; 
       cout<<" Tau_AntiEMVA :"<<t_Tau_AntiEMVA_<<endl; 
     
-      cout<<" Elec_GenEleMatch :"<<t_Elec_GenEleMatch_<<endl;
-      cout<<" Elec_GenEleFromZMatch :"<<t_Elec_GenEleFromZMatch_<<endl;
-      cout<<" Elec_GenEleFromZTauTauMatch :"<<t_Elec_GenEleFromZTauTauMatch_<<endl;
-      cout<<" Elec_PFTauMatch :"<<t_Elec_PFTauMatch_<<endl;
-      cout<<" Elec_GenHadMatch :"<<t_Elec_GenHadMatch_<<endl;
-      cout<<" Elec_GenJetMatch :"<<t_Elec_GenJetMatch_<<endl;
-      cout<<" Elec_AbsEta :"<<t_Elec_AbsEta_<<endl;
-      cout<<" Elec_Pt :"<<t_Elec_Pt_<<endl;
-      cout<<" Elec_PFMvaOutput : "<<t_Elec_PFMvaOutput_<<endl;
-      cout<<" Elec_Ee :"<<t_Elec_Ee_<<endl;
-      cout<<" Elec_Egamma :"<<t_Elec_Egamma_<<endl;
-      cout<<" Elec_Pin :"<<t_Elec_Pin_<<endl;
-      cout<<" Elec_Pout : "<<t_Elec_Pout_<<endl;
-      cout<<" Elec_EtotOverPin :"<<t_Elec_EtotOverPin_<<endl;
-      cout<<" Elec_EeOverPout : "<<t_Elec_EeOverPout_<<endl;
-      cout<<" Elec_EgammaOverPdif :"<<t_Elec_EgammaOverPdif_<<endl;
-      cout<<" Elec_EarlyBrem :"<<t_Elec_EarlyBrem_ <<endl;
-      cout<<" Elec_LateBrem :"<<t_Elec_LateBrem_<<endl;
-      cout<<" Elec_Logsihih :"<<t_Elec_Logsihih_<<endl;
-      cout<<" Elec_DeltaEta :"<<t_Elec_DeltaEta_<<endl;
-      cout<<" Elec_HoHplusE :"<<t_Elec_HoHplusE_<<endl;
-      cout<<" Elec_Fbrem :"<<t_Elec_Fbrem_<<endl;
-      cout<<" Elec_Chi2KF :"<<t_Elec_Chi2KF_<<endl;
-      cout<<" Elec_Chi2GSF :"<<t_Elec_Chi2GSF_<<endl;
-      cout<<" Elec_NumHits :"<<t_Elec_NumHits_<<endl;
-      cout<<" Elec_GSFTrackResol :"<<t_Elec_GSFTrackResol_<<endl;
-      cout<<" Elec_GSFTracklnPt : "<<t_Elec_GSFTracklnPt_<<endl;
-      cout<<" Elec_GSFTrackEta :"<<t_Elec_GSFTrackEta_<<endl;
     }
 
     mytree->Fill();
@@ -582,35 +479,4 @@ void makeRoot(string matching = "Elec",
 
 
 
-void makeAll(){
 
-  makeRoot("Elec","All","");
-  makeRoot("Tau","All","");
-  makeRoot("Elec","NoEleMatch","");
-  makeRoot("Tau","NoEleMatch","");
-  makeRoot("Elec","woG","");
-  makeRoot("Tau","woG","");
-  makeRoot("Elec","wGwoGSF","");
-  makeRoot("Tau","wGwoGSF","");
-  makeRoot("Elec","wGwGSFwoPFMVA","");
-  makeRoot("Tau","wGwGSFwoPFMVA","");
-  makeRoot("Elec","wGwGSFwPFMVA","");
-  makeRoot("Tau","wGwGSFwPFMVA","");
-
- 
-//   makeRoot("Elec","All","-AntiEMed");
-//   makeRoot("Tau","All","-AntiEMed");
-//   makeRoot("Elec","NoEleMatch","-AntiEMed");
-//   makeRoot("Tau","NoEleMatch","-AntiEMed");
-//   makeRoot("Elec","woG","-AntiEMed");
-//   makeRoot("Tau","woG","-AntiEMed");
-//   makeRoot("Elec","wGwoGSF","-AntiEMed");
-//   makeRoot("Tau","wGwoGSF","-AntiEMed");
-//   makeRoot("Elec","wGwGSFwoPFMVA","-AntiEMed");
-//   makeRoot("Tau","wGwGSFwoPFMVA","-AntiEMed");
-
-
-//   makeRoot("Elec","wGwGSFwPFMVA","-AntiEMed");
-//   makeRoot("Tau","wGwGSFwPFMVA","-AntiEMed");
-
-}

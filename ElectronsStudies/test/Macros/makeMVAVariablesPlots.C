@@ -268,9 +268,6 @@ void makeMVAVariablesPlots()
   plotLabels["hGammaPhiMom"]             = "GammaPhiMom";
   plotLabels["hGammaEnFrac"]             = "GammaEnFrac";
 
-
-//   plotLabels["histogramLeg2X"]  = "X2";
-
   std::map<std::string, std::string> xAxisTitles;
   xAxisTitles["hNumPV"]          = "NumPV" ;
   xAxisTitles["hElecAbsEta"]     = "GsfElectron |#eta|" ;

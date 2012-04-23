@@ -1,6 +1,4 @@
 //--------------------------------------------------------------------------------------------------
-//  
-//
 // computeDiscriminator
 //
 // Macro computing the probability to pass AntiEMedium discriminator, and probability to be in each category
@@ -40,6 +38,7 @@ void computeDiscriminator1(string discr = "")
   std::vector<std::string> categories;
   if (discr == ""){
     categories.push_back(std::string("All"));
+    categories.push_back(std::string("NoEleMatch"));
     categories.push_back(std::string("woG"));
     categories.push_back(std::string("wGwoGSF"));
     categories.push_back(std::string("wGwGSFwoPFMVA"));
@@ -47,6 +46,7 @@ void computeDiscriminator1(string discr = "")
   }
   if (discr == "-AntiEMed"){
     categories.push_back(std::string("All"));
+    categories.push_back(std::string("NoEleMatch"));
     categories.push_back(std::string("woG"));
     categories.push_back(std::string("wGwoGSF"));
     categories.push_back(std::string("wGwGSFwoPFMVA"));
@@ -179,6 +179,7 @@ void computeDiscriminator2(string discr = "")
   std::vector<std::string> categories;
   if (discr == ""){
     categories.push_back(std::string("All"));
+    categories.push_back(std::string("NoEleMatch"));
     categories.push_back(std::string("woG"));
     categories.push_back(std::string("wGwoGSF"));
     categories.push_back(std::string("wGwGSFwoPFMVA"));
@@ -186,6 +187,7 @@ void computeDiscriminator2(string discr = "")
   }
   if (discr == "-AntiEMed"){
     categories.push_back(std::string("All"));
+    categories.push_back(std::string("NoEleMatch"));
     categories.push_back(std::string("woG"));
     categories.push_back(std::string("wGwoGSF"));
     categories.push_back(std::string("wGwGSFwoPFMVA"));
@@ -256,7 +258,7 @@ void computeDiscriminator2(string discr = "")
   ////////////////Probability of different categories//////////////
   cout<<endl;
   cout<<"Calculating efficiencies to be in a given category..."<<endl; 
-  cout<<" No discriminator required :"<<endl; 
+  cout<<Form(" discriminator required : %s",discr.data())<<endl; 
   int i = 0;
   for ( std::vector<std::string>::const_iterator category = categories.begin();
 	category != categories.end(); ++category ) {

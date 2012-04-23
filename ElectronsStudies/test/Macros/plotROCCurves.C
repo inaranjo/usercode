@@ -1,6 +1,4 @@
 //--------------------------------------------------------------------------------------------------
-//  
-//
 // PlotROCCurves
 //
 // Macro plotting efficiencies and ROC Curves for the AntiElectron MVA
@@ -420,12 +418,14 @@ void plotROCForCategories(string Region = "Barrel",
 {
   std::vector<std::string> categories;
   if (discr == ""){
+    categories.push_back(std::string("NoEleMatch"));
     categories.push_back(std::string("woG"));
     categories.push_back(std::string("wGwoGSF"));
     categories.push_back(std::string("wGwGSFwoPFMVA"));
     categories.push_back(std::string("wGwGSFwPFMVA"));
   }
   if (discr == "-AntiEMed"){
+    categories.push_back(std::string("NoEleMatch"));
     categories.push_back(std::string("woG"));
     categories.push_back(std::string("wGwoGSF"));
     categories.push_back(std::string("wGwGSFwoPFMVA"));
@@ -459,7 +459,7 @@ void plotROCForCategories(string Region = "Barrel",
   leg->SetTextSize(0.03);
   leg->SetHeader(Form("%s",Region.data()));
 
-  std::string inFileName0 = Form("./tmva/tmvaRoot/TMVA%s_%s_%s.root",discr.data(),categories[0].data(),Region.data());
+  std::string inFileName0 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[0].data(),Region.data());
   cout<<"opening file : "<<inFileName0<<endl;
   TFile* inFile0 = new TFile (inFileName0.data(),"READ");
   if(inFile0->IsZombie()){
@@ -471,7 +471,7 @@ void plotROCForCategories(string Region = "Barrel",
   hROC0->SetLineWidth(2);
   hROC0->SetTitle("");
 
-  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVA%s_%s_%s.root",discr.data(),categories[1].data(),Region.data());
+  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[1].data(),Region.data());
   cout<<"opening file : "<<inFileName1<<endl;
   TFile* inFile1 = new TFile (inFileName1.data(),"READ");
   if(inFile1->IsZombie()){
@@ -483,7 +483,7 @@ void plotROCForCategories(string Region = "Barrel",
   hROC1->SetLineWidth(2);
   hROC1->SetTitle("");
 
-  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVA%s_%s_%s.root",discr.data(),categories[2].data(),Region.data());
+  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[2].data(),Region.data());
   cout<<"opening file : "<<inFileName2<<endl;
   TFile* inFile2 = new TFile (inFileName2.data(),"READ");
   if(inFile2->IsZombie()){
@@ -495,8 +495,7 @@ void plotROCForCategories(string Region = "Barrel",
   hROC2->SetLineWidth(2);
   hROC2->SetTitle("");
 
-  std::string inFileName3 = Form("./tmva/tmvaRoot/TMVA%s_%s_%s.root",discr.data(),categories[2].data(),Region.data());
-  if (discr == "")inFileName3 = Form("./tmva/tmvaRoot/TMVA%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
+ std::string inFileName3 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
   cout<<"opening file : "<<inFileName3<<endl;
   TFile* inFile3 = new TFile (inFileName3.data(),"READ");
   if(inFile3->IsZombie()){
@@ -504,22 +503,37 @@ void plotROCForCategories(string Region = "Barrel",
     return;
   }
   TH1F* hROC3 = (TH1F*)inFile3->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
-  hROC3->SetLineColor(kGreen);
+  hROC3->SetLineColor(kMagenta);
   hROC3->SetLineWidth(2);
   hROC3->SetTitle("");
+
+  std::string inFileName4 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
+  if (discr == "")inFileName4 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[4].data(),Region.data());
+  cout<<"opening file : "<<inFileName3<<endl;
+  TFile* inFile4 = new TFile (inFileName4.data(),"READ");
+  if(inFile4->IsZombie()){
+    cout << "No such file!" << endl;
+    return;
+  }
+  TH1F* hROC4 = (TH1F*)inFile4->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+  hROC4->SetLineColor(kGreen);
+  hROC4->SetLineWidth(2);
+  hROC4->SetTitle("");
 
   hROC0->Draw();
   hROC1->Draw("same");
   hROC2->Draw("same");
-  if(discr == "")hROC3->Draw("same");
+  hROC3->Draw("same");
+  if(discr == "")hROC4->Draw("same");
 
   leg->AddEntry(hROC0,"Category 1");
   leg->AddEntry(hROC1,"Category 2");
   leg->AddEntry(hROC2,"Category 3");
-  if(discr == "")leg->AddEntry(hROC3,"Category 4");
+  leg->AddEntry(hROC3,"Category 4");
+  if(discr == "")leg->AddEntry(hROC4,"Category 5");
   leg->Draw();
 
-  string outputName = Form("plots/plotROCCurves_AllCategories%s_%s",discr.data(),Region.data());
+  string outputName = Form("plots/plotROCCurves_AllCategories_v3%s_%s",discr.data(),Region.data());
   c1->Print(std::string(outputName).append(".png").data());
   c1->Print(std::string(outputName).append(".pdf").data());
 
@@ -569,56 +583,6 @@ void plotFinalROC(
   leg->SetFillColor(10);
   leg->SetTextSize(0.03);
   //leg->SetHeader("#splitline{CMS Preliminary}{ #sqrt{s}=7 TeV}");
-
-  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVAOptimization%s.root",discrs[0].data());
-  cout<<"opening file : "<<inFileName1<<endl;
-  TFile* inFile1 = new TFile (inFileName1.data(),"READ");
-  if(inFile1->IsZombie()){
-    cout << "No such file!" << endl;
-    return;
-  }
-  TH1F* hROC1 = (TH1F*)inFile1->Get("Method_Cuts/Cuts/MVA_Cuts_rejBvsS");
-  hROC1->SetLineColor(kBlue);
-  hROC1->SetLineWidth(2);
-  hROC1->SetTitle("");
-  TAxis* xAxis = hROC1->GetXaxis();
-  xAxis->SetTitle("Signal Efficiency");
-  xAxis->SetTitleOffset(1.15);
-  xAxis->SetRangeUser(0.4,1.0);
-  TAxis* yAxis = hROC1->GetYaxis();
-  yAxis->SetTitle("Background Rejection");
-  yAxis->SetTitleOffset(1.30);
-  yAxis->SetRangeUser(0.3,1.0);
-
-
-  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVAOptimization%s.root",discrs[1].data());
-  cout<<"opening file : "<<inFileName2<<endl;
-  TFile* inFile2 = new TFile (inFileName2.data(),"READ");
-  if(inFile2->IsZombie()){
-    cout << "No such file!" << endl;
-    return;
-  }
-  //Second ROC Curve weighted by the efficiency to pass AntiEMedium discriminator
-  TH1F* hSigEff = (TH1F*)inFile2->Get("Method_Cuts/Cuts/MVA_Cuts_effS");
-  TH1F* hBkgEff = (TH1F*)inFile2->Get("Method_Cuts/Cuts/MVA_Cuts_effB");
-  float EffAntiESig = 0.742067;
-  float EffAntiEBkg = 0.0908936;
-  hSigEff->Scale(EffAntiESig);
-  hBkgEff->Scale(EffAntiEBkg);
-//   hSigEff->Draw();
-//   hBkgEff->Draw("same");
-  int nBins = hSigEff->GetSize();
-//   TH1F* hROC2 = (TH1F*)inFile2->Get("Method_Cuts/Cuts/MVA_Cuts_rejBvsS");
-  TGraph* hROC2 = new TGraph (nBins-2);
-  hROC2->SetLineColor(kRed);
-  hROC2->SetFillColor(0);
-  hROC2->SetLineWidth(2);
-  hROC2->SetTitle("");
-
-  for(int k=1;k<nBins-1;k++){
-    hROC2->SetPoint(k,hSigEff->GetBinContent(k),1-hBkgEff->GetBinContent(k));
-  }
-
   //Put Markers for Loose, Medium and Tight AntiElectron discriminators
   float nSig;
   float nSigDiscr;
@@ -686,6 +650,61 @@ void plotFinalROC(
   TMarker* MarkAntiETight = new TMarker (EffSigAntiETight, 1-EffBkgAntiETight,21);
   TMarker* MarkAntiEMVA = new TMarker (EffSigAntiEMVA, 1-EffBkgAntiEMVA,25);
 
+
+  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVAOptimization_v3%s.root",discrs[0].data());
+  cout<<"opening file : "<<inFileName1<<endl;
+  TFile* inFile1 = new TFile (inFileName1.data(),"READ");
+  if(inFile1->IsZombie()){
+    cout << "No such file!" << endl;
+    return;
+  }
+  TH1F* hROC1 = (TH1F*)inFile1->Get("Method_Cuts/Cuts/MVA_Cuts_rejBvsS");
+  hROC1->SetLineColor(kBlue);
+  hROC1->SetLineWidth(2);
+  hROC1->SetTitle("");
+  TAxis* xAxis = hROC1->GetXaxis();
+  xAxis->SetTitle("Signal Efficiency");
+  xAxis->SetTitleOffset(1.15);
+  xAxis->SetRangeUser(0.4,1.0);
+  TAxis* yAxis = hROC1->GetYaxis();
+  yAxis->SetTitle("Background Rejection");
+  yAxis->SetTitleOffset(1.30);
+  yAxis->SetRangeUser(0.3,1.0);
+
+
+  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVAOptimization_v3%s.root",discrs[1].data());
+  cout<<"opening file : "<<inFileName2<<endl;
+  TFile* inFile2 = new TFile (inFileName2.data(),"READ");
+  if(inFile2->IsZombie()){
+    cout << "No such file!" << endl;
+    return;
+  }
+  //Second ROC Curve weighted by the efficiency to pass AntiEMedium discriminator
+  TH1F* hSigEff = (TH1F*)inFile2->Get("Method_Cuts/Cuts/MVA_Cuts_effS");
+  TH1F* hBkgEff = (TH1F*)inFile2->Get("Method_Cuts/Cuts/MVA_Cuts_effB");
+  //float EffAntiESig = EffSigAntiEMed;//0.742067;
+  //float EffAntiEBkg = EffBkgAntiEMed;//0.0908936;
+  hSigEff->Scale(EffSigAntiEMed);
+  hBkgEff->Scale(EffBkgAntiEMed);
+//   hSigEff->Draw();
+//   hBkgEff->Draw("same");
+  int nBins = hSigEff->GetSize();
+//   TH1F* hROC2 = (TH1F*)inFile2->Get("Method_Cuts/Cuts/MVA_Cuts_rejBvsS");
+  TGraph* hROC2 = new TGraph (nBins-2);
+  hROC2->SetLineColor(kRed);
+  hROC2->SetFillColor(0);
+  hROC2->SetLineWidth(2);
+  hROC2->SetTitle("");
+
+  for(int k=0;k<nBins-2;k++){
+    cout<<"k "<<k<<endl;
+    cout<<" X "<<hSigEff->GetBinContent(k)<<endl;
+    cout<<" Y "<<1-hBkgEff->GetBinContent(k)<<endl;
+    hROC2->SetPoint(k,hSigEff->GetBinContent(k),1-hBkgEff->GetBinContent(k));
+  }
+//   hROC2->SetPoint(nBins-2,EffSigAntiEMed,1-EffBkgAntiEMed);
+
+  hROC1->Smooth();
   hROC1->Draw();
   hROC2->Draw("same");
   MarkAntiELoose->Draw("same");
@@ -696,8 +715,8 @@ void plotFinalROC(
   leg->AddEntry(MarkAntiELoose,"AntiELoose");
   leg->AddEntry(MarkAntiEMedium,"AntiEMedium");
   leg->AddEntry(MarkAntiETight,"AntiETight");
-  leg->AddEntry(MarkAntiEMVA,"AntiEMVA");
-  leg->AddEntry(hROC1,"No discr");
+  leg->AddEntry(MarkAntiEMVA,"Old AntiEMVA");
+  leg->AddEntry(hROC1,"New AntiEMVA");
   leg->AddEntry(hROC2,"AntiEMed discr");
   leg->Draw();
 

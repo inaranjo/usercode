@@ -99,7 +99,7 @@ switchToPFTauHPS(process,
                  )
 process.load("RecoTauTag.RecoTau.PFRecoTauDiscriminationAgainstElectronMVA2_cfi")
 
-# Define decay mode prediscriminant
+##Define decay mode prediscriminant
 requireDecayMode = cms.PSet(
     BooleanOperator = cms.string("and"),
     decayMode = cms.PSet(
@@ -107,7 +107,7 @@ requireDecayMode = cms.PSet(
         cut = cms.double(0.5)
         )    
     )
-requireIso = cms.PSet(
+requireDecayModeAndIso = cms.PSet(
     BooleanOperator = cms.string("and"),
     decayMode = cms.PSet(
         Producer = cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding'),
@@ -120,7 +120,7 @@ requireIso = cms.PSet(
     )
 
 process.pfRecoTauDiscriminationAgainstElectronMVA2.Prediscriminants = requireDecayMode.clone()
-#process.pfRecoTauDiscriminationAgainstElectronMVA2.Prediscriminants = requireIso.clone()
+## process.pfRecoTauDiscriminationAgainstElectronMVA2.Prediscriminants = requireDecayModeAndIso.clone()
 process.pfRecoTauDiscriminationAgainstElectronMVA2.PFTauProducer = cms.InputTag("hpsPFTauProducer")
 
 process.makePatTaus.replace(process.patTaus,
@@ -172,25 +172,25 @@ process.genJetsAntiOverlapWithLeptonsVeto = cms.EDFilter("GenJetAntiOverlapSelec
 
 
 
-########################## analyzer ###############################
+########################## analyzers ###############################
 
-## process.AntiEMVAAnalyzer2 = cms.EDAnalyzer(
-##     "AntiEMVAAnalyzer2",
-##     srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
-##     srcGsfElectrons = cms.InputTag("gsfElectrons"),
-##     srcPFTaus = cms.InputTag("selectedTaus"),
-##     srcGenElectrons = cms.InputTag("genElectronsPtGt10"),
-##     srcGenElectronsFromZ = cms.InputTag("genElectronsFromZs"),
-##     srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
-##     srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
-##     srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
-##     srcPatTaus = cms.InputTag("selectedPatTaus"),
-##     inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
-##     inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
-##     inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
-##     inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
-##     inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
-##     inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
+process.AntiEMVAAnalyzer2 = cms.EDAnalyzer(
+    "AntiEMVAAnalyzer2",
+    srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
+    srcGsfElectrons = cms.InputTag("gsfElectrons"),
+    srcPFTaus = cms.InputTag("selectedTaus"),
+    srcGenElectrons = cms.InputTag("genElectronsPtGt10"),
+    srcGenElectronsFromZ = cms.InputTag("genElectronsFromZs"),
+    srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
+    srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
+    srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
+    srcPatTaus = cms.InputTag("selectedPatTaus"),
+    inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
+    inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
+    inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
+    inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
+    inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
+    inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
 ##     inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Barrel_BDT.weights.xml'),
 ##     inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Barrel_BDT.weights.xml'),
 ##     inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
@@ -199,25 +199,45 @@ process.genJetsAntiOverlapWithLeptonsVeto = cms.EDFilter("GenJetAntiOverlapSelec
 ##     inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Endcap_BDT.weights.xml'),
 ##     inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
 ##     inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
-##     debug = cms.bool(True)
-##     )
-## process.AntiEMVAAnalyzer = cms.EDAnalyzer(
-##     "AntiEMVAAnalyzer",
-##     srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
-##     srcGsfElectrons = cms.InputTag("gsfElectrons"),
-##     srcPFTaus = cms.InputTag("selectedTaus"),
-##     srcGenElectrons = cms.InputTag("genElectronsPtGt10"),
-##     srcGenElectronsFromZ = cms.InputTag("genElectronsFromZs"),
-##     srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
-##     srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
-##     srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
-##     srcPatTaus = cms.InputTag("selectedPatTaus"),
-##     inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
-##     inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
-##     inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
-##     inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
-##     inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
-##     inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
+    inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Barrel_BDT.weights.xml'),
+    inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Barrel_BDT.weights.xml'),
+    inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Barrel_BDT.weights.xml'),
+    inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
+    inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
+    inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Endcap_BDT.weights.xml'),
+    inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Endcap_BDT.weights.xml'),
+    inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Endcap_BDT.weights.xml'),
+    inputFileNameIvo8 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
+    inputFileNameIvo9 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
+    debug = cms.bool(True)
+    )
+process.AntiEMVAAnalyzer = cms.EDAnalyzer(
+    "AntiEMVAAnalyzer",
+    srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
+    srcGsfElectrons = cms.InputTag("gsfElectrons"),
+    srcPFTaus = cms.InputTag("selectedTaus"),
+    srcGenElectrons = cms.InputTag("genElectronsPtGt10"),
+    srcGenElectronsFromZ = cms.InputTag("genElectronsFromZs"),
+    srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
+    srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
+    srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
+    srcPatTaus = cms.InputTag("selectedPatTaus"),
+    inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
+    inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
+    inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
+    inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
+    inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
+    inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
+    inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Barrel_BDT.weights.xml'),
+    inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Barrel_BDT.weights.xml'),
+    inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Barrel_BDT.weights.xml'),
+    inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
+    inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
+    inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Endcap_BDT.weights.xml'),
+    inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Endcap_BDT.weights.xml'),
+    inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Endcap_BDT.weights.xml'),
+    inputFileNameIvo8 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
+    inputFileNameIvo9 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
 ##     inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Barrel_BDT.weights.xml'),
 ##     inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Barrel_BDT.weights.xml'),
 ##     inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
@@ -226,8 +246,8 @@ process.genJetsAntiOverlapWithLeptonsVeto = cms.EDFilter("GenJetAntiOverlapSelec
 ##     inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Endcap_BDT.weights.xml'),
 ##     inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
 ##     inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
-##     debug = cms.bool(True)
-##     )
+    debug = cms.bool(True)
+    )
 
 process.MatchingComputerAnalyzer = cms.EDAnalyzer(
     "MatchingComputerAnalyzer",
@@ -254,8 +274,8 @@ process.run = cms.Sequence(
     process.selectedTaus*
     process.genElectronsPtGt10*
     process.genLeptonsPtGt10*process.genJetsAntiOverlapWithLeptonsVeto*
-##     process.AntiEMVAAnalyzer
-    process.MatchingComputerAnalyzer
+    process.AntiEMVAAnalyzer
+##     process.MatchingComputerAnalyzer
 ##     process.AntiEMVAAnalyzer2
     
     )
