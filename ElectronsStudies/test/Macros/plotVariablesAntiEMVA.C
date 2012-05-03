@@ -81,14 +81,16 @@ void plotVariable(string variable = "Elec_Fbrem",
   gStyle->SetTitleStyle(0);
   gStyle->SetTitleOffset(1.3,"y");
 
-  TLegend* leg = new TLegend(0.55,0.42,0.85,0.85,NULL,"brNDC");
+  TLegend* leg = new TLegend(0.6,0.75,0.8,0.88,NULL,"brNDC");
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->SetFillColor(10);
   leg->SetTextSize(0.03);
   //leg->SetHeader("#splitline{CMS Preliminary}{ #sqrt{s}=7 TeV}");
 
-  std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
+//   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
+//   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_AntiEMVATrees-DYJetsToLL-madgraph-PUS6.root";
+  std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_V4.root";
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
   if(inputFile->IsZombie()){
     cout << "No such file!" << endl;
@@ -105,29 +107,37 @@ void plotVariable(string variable = "Elec_Fbrem",
   for ( std::vector<std::string>::const_iterator matching = matchings.begin();
 	matching  != matchings.end(); ++matching ) {
 
-  TCut PUSelection(Form("NumPV>%i && NumPV<%i",numPVMin,numPVMax));
-  TCut ElecPtSelection (Form("Elec_Pt>%0f && Elec_Pt<%0f",PtMin,PtMax));
-  TCut TauPtSelection (Form("Tau_Pt>%0f && Tau_Pt<%0f",PtMin,PtMax));
-  TCut ElecAbsEtaSelection (Form("Elec_AbsEta>%0f && Elec_AbsEta<%0f",AbsEtaMin,AbsEtaMax));
-  TCut TauAbsEtaSelection (Form("Tau_AbsEta>%0f && Tau_AbsEta<%0f",AbsEtaMin,AbsEtaMax));
-  TCut ElecMatchSelection (Form("Elec_%s",matching->data()));
-//   TCut ElecMatchSelection (Form("Elec_PFTauMatch && Elec_%s",matching->data()));
-  TCut TauMatchSelection (Form("Tau_%s",matching->data()));
-  TCut CategorySelection = "";
-  if(discriminator == ""){
-    if (category == "NoEleMatch") CategorySelection = "Tau_GsfEleMatch<0.5"; 
-    if (category == "woG") CategorySelection = "Tau_NumGammaCands<0.5"; 
-    if (category == "wGwoGSF") CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf<0.5";
-    if (category == "wGwGSFwoPFMVA")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput<-0.1";
-    if (category == "wGwGSFwPFMVA")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput>-0.1";
-  }
 
-  if(discriminator == "-AntiEMed"){
-    if (category == "NoEleMatch") CategorySelection = "Tau_GsfEleMatch<0.5"; 
-    if (category == "woG") CategorySelection = "Tau_NumGammaCands<0.5"; 
-    if (category == "wGwoGSF") CategorySelection = "Tau_NumGammaCands>0.5 && (Tau_HasGsf<0.5 || (Tau_HasGsf>0.5 && Elec_PFMvaOutput>-0.1))";
-    if (category == "wGwGSFwoPFMVA")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput<-0.1";
-  }
+    TCut PUSelection(Form("NumPV>%i && NumPV<%i",numPVMin,numPVMax));
+    TCut ElecPtSelection (Form("Elec_Pt>%0f && Elec_Pt<%0f",PtMin,PtMax));
+    TCut TauPtSelection (Form("Tau_Pt>%0f && Tau_Pt<%0f",PtMin,PtMax));
+    TCut ElecAbsEtaSelection (Form("Elec_AbsEta>%0f && Elec_AbsEta<%0f",AbsEtaMin,AbsEtaMax));
+    TCut TauAbsEtaSelection = "";
+    if(Region == "Barrel"){
+      TauAbsEtaSelection = "Tau_Eta>-1.479 && Tau_Eta<1.479";
+    }
+    if(Region == "Endcap"){
+      TauAbsEtaSelection = "(Tau_Eta>1.479 && Tau_Eta<3.0) || (Tau_Eta>-3.0 && Tau_Eta<-1.479)";
+    }
+    //   TCut TauAbsEtaSelection (Form("Tau_AbsEta>%0f && Tau_AbsEta<%0f",AbsEtaMin,AbsEtaMax));
+    TCut ElecMatchSelection (Form("Elec_%s == 1",matching->data()));
+    //   TCut ElecMatchSelection (Form("Elec_PFTauMatch && Elec_%s",matching->data()));
+    TCut TauMatchSelection (Form("Tau_%s",matching->data()));
+    TCut CategorySelection = "";
+    if(discriminator == ""){
+      if (category == "NoEleMatch") CategorySelection = "Tau_GsfEleMatch<0.5"; 
+      if (category == "woG") CategorySelection = "Tau_NumGammaCands<0.5"; 
+      if (category == "wGwoGSF") CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf<0.5";
+      if (category == "wGwGSFwoPFMVA")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput<-0.1";
+      if (category == "wGwGSFwPFMVA")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput>-0.1";
+    }
+
+    if(discriminator == "-AntiEMed"){
+      if (category == "NoEleMatch") CategorySelection = "Tau_GsfEleMatch<0.5"; 
+      if (category == "woG") CategorySelection = "Tau_NumGammaCands<0.5"; 
+      if (category == "wGwoGSF") CategorySelection = "Tau_NumGammaCands>0.5 && (Tau_HasGsf<0.5 || (Tau_HasGsf>0.5 && Elec_PFMvaOutput>-0.1))";
+      if (category == "wGwGSFwoPFMVA")CategorySelection = "Tau_NumGammaCands>0.5 && Tau_HasGsf>0.5 && Elec_PFMvaOutput<-0.1";
+    }
 
   TCut ElecSelection = CategorySelection && PUSelection && ElecPtSelection && ElecAbsEtaSelection && ElecMatchSelection ;
   TCut TauSelection = CategorySelection && PUSelection && TauPtSelection && TauAbsEtaSelection && TauMatchSelection ;
@@ -156,14 +166,13 @@ void plotVariable(string variable = "Elec_Fbrem",
   cout<<"Variable plotted : "<<variable<<endl;
   cout<<"Matching applied : "<<matching->data()<<endl;
   cout<<"  Total number of Candidates : "<<hVariable->GetEntries()<<endl;
-  
   inputTree->Draw(Form("%s>>hVariable",variable.data()),Selection);
   cout<<"  Number of Cantidates after selection: "<<hVariable->GetEntries()<<endl;
-  
   hVariable->Scale(1./hVariable->Integral());
   leg->AddEntry(hVariable,Form("%s",matching->data()));
 
   histograms.push_back(hVariable);
+  c1->Clear();
   }
 //   double yMin = +1.e+6;
 //   double yMax = -1.e+6;
@@ -212,11 +221,11 @@ void plotVariable(string variable = "Elec_Fbrem",
     histogram->Draw(drawOption.data());
     leg->Draw();
 
-
   }//loop matchings
-  string outputName = Form("plots/%s/plotVariablesAntiEMVA_v3_%s_%s_%s",category.Data(),category.Data(),variable.data(),Region.Data());
+  string outputName = Form("plots/plotVariablesAntiEMVA/%s/plotVariablesAntiEMVA_v4_%s_%s_%s",category.Data(),category.Data(),variable.data(),Region.Data());
   c1->Print(std::string(outputName).append(".png").data());
   c1->Print(std::string(outputName).append(".pdf").data());
+
 }
 
 
@@ -226,11 +235,11 @@ void plotAllVariables(){
 
   std::vector<std::string> categories;
   categories.push_back(std::string("All"));
-//   categories.push_back(std::string("NoEleMatch"));
-//   categories.push_back(std::string("woG"));
-//   categories.push_back(std::string("wGwoGSF"));
-//   categories.push_back(std::string("wGwGSFwoPFMVA"));
-//   categories.push_back(std::string("wGwGSFwPFMVA"));
+  categories.push_back(std::string("NoEleMatch"));
+  categories.push_back(std::string("woG"));
+  categories.push_back(std::string("wGwoGSF"));
+  categories.push_back(std::string("wGwGSFwoPFMVA"));
+  categories.push_back(std::string("wGwGSFwPFMVA"));
 //   categories.push_back(std::string("All"));
 //   categories.push_back(std::string("TauNoGammas"));
 //   categories.push_back(std::string("TauHasGammasNoGsfTrack"));
@@ -238,40 +247,43 @@ void plotAllVariables(){
 //   categories.push_back(std::string("TauHasGammasHasGsfTrackPFmvaOver01"));
 
   std::vector<std::string> variables;
-//   variables.push_back(std::string("Elec_EeOverPout"));
-//   variables.push_back(std::string("Elec_EgammaOverPdif"));
-//   variables.push_back(std::string("Elec_EtotOverPin"));
-//   variables.push_back(std::string("Elec_PFMvaOutput"));
-//   variables.push_back(std::string("Elec_Logsihih"));
-//   variables.push_back(std::string("Elec_DeltaEta"));
-//   variables.push_back(std::string("Elec_HoHplusE"));
-//   variables.push_back(std::string("Elec_GSFTrackResol"));
-//   variables.push_back(std::string("Elec_GSFTracklnPt"));
-//   variables.push_back(std::string("Elec_GSFTrackEta"));
+  variables.push_back(std::string("Elec_EeOverPout"));
+  variables.push_back(std::string("Elec_EgammaOverPdif"));
+  variables.push_back(std::string("Elec_EtotOverPin"));
+  variables.push_back(std::string("Elec_PFMvaOutput"));
+  variables.push_back(std::string("Elec_Logsihih"));
+  variables.push_back(std::string("Elec_DeltaEta"));
+  variables.push_back(std::string("Elec_HoHplusE"));
+  variables.push_back(std::string("Elec_GSFTrackResol"));
+  variables.push_back(std::string("Elec_GSFTracklnPt"));
+  variables.push_back(std::string("Elec_GSFTrackEta"));
 //   variables.push_back(std::string("Tau_AbsEta"));
-//   variables.push_back(std::string("Tau_EmFraction"));
-//   variables.push_back(std::string("Tau_HasGsf"));
-//   variables.push_back(std::string("Tau_HadrEoP"));
-//   variables.push_back(std::string("Tau_HadrHoP"));
-//   variables.push_back(std::string("Tau_NumChargedCands"));
-//   variables.push_back(std::string("Tau_NumGammaCands"));
-//   variables.push_back(std::string("Tau_HadrMva")); 
-//   variables.push_back(std::string("Tau_GammaEnFrac"));
-//   variables.push_back(std::string("Tau_GammaEtaMom")); 
-//   variables.push_back(std::string("Tau_GammaPhiMom")); 
+  variables.push_back(std::string("Tau_Eta"));
+  variables.push_back(std::string("Tau_EtaAtEcalEntrance"));
+  variables.push_back(std::string("Tau_EmFraction"));
+  variables.push_back(std::string("Tau_HasGsf"));
+  variables.push_back(std::string("Tau_HadrEoP"));
+  variables.push_back(std::string("Tau_HadrHoP"));
+  variables.push_back(std::string("Tau_NumChargedCands"));
+  variables.push_back(std::string("Tau_NumGammaCands"));
+  variables.push_back(std::string("Tau_HadrMva")); 
+  variables.push_back(std::string("Tau_GammaEnFrac"));
+  variables.push_back(std::string("Tau_GammaEtaMom")); 
+  variables.push_back(std::string("Tau_GammaPhiMom")); 
 
-//   variables.push_back(std::string("Tau_Pt"));
-//   variables.push_back(std::string("Tau_VisMass"));
-//   variables.push_back(std::string("Elec_AbsEta"));
-//   variables.push_back(std::string("Elec_Pt"));
-//   variables.push_back(std::string("Elec_Fbrem"));
-//   variables.push_back(std::string("Elec_Chi2KF"));
-//   variables.push_back(std::string("Elec_Chi2GSF"));
-//   variables.push_back(std::string("Elec_EarlyBrem"));
-//   variables.push_back(std::string("Elec_LateBrem"));
-//   variables.push_back(std::string("Elec_NumHits"));
+  variables.push_back(std::string("Tau_Pt"));
+  variables.push_back(std::string("Tau_LeadHadronPt"));
+  variables.push_back(std::string("Tau_VisMass"));
+  variables.push_back(std::string("Elec_AbsEta"));
+  variables.push_back(std::string("Elec_Pt"));
+  variables.push_back(std::string("Elec_Fbrem"));
+  variables.push_back(std::string("Elec_Chi2KF"));
+  variables.push_back(std::string("Elec_Chi2GSF"));
+  variables.push_back(std::string("Elec_EarlyBrem"));
+  variables.push_back(std::string("Elec_LateBrem"));
+  variables.push_back(std::string("Elec_NumHits"));
 
-  variables.push_back(std::string("Tau_GsfEleMatch"));
+//   variables.push_back(std::string("Tau_GsfEleMatch"));
 
 
   std::map<std::string, std::string> xAxisTitles;
@@ -285,6 +297,8 @@ void plotAllVariables(){
   xAxisTitles["Elec_EtotOverPin"]    = "E_{tot}/P_{in}";
   xAxisTitles["Elec_NumHits"]        = "NHits";
   xAxisTitles["Tau_AbsEta"]          = "|#eta|(#tau)";
+  xAxisTitles["Tau_Eta"]             = "#eta(#tau)";
+  xAxisTitles["Tau_EtaAtEcalEntrance"]= "#eta(#tau at ECAL)";
   xAxisTitles["Tau_GammaEnFrac"]     = "GammaEnFrac(#tau)";
   xAxisTitles["Tau_EmFraction"]      = "EmFraction(#tau)";
   xAxisTitles["Tau_HasGsf"]          = "TauHasGsf";
@@ -293,8 +307,8 @@ void plotAllVariables(){
   xAxisTitles["Tau_NumChargedCands"] = "TauNumChargedHadrCands";
   xAxisTitles["Tau_NumGammaCands"]   = "TauNumGammaCands";
   xAxisTitles["Tau_VisMass"]         = "VisMass(#tau)";
-  xAxisTitles["Tau_GammaEtaMom"]         = "VisMass(#tau)";
-  xAxisTitles["Tau_GammaPhiMom"]         = "VisMass(#tau)";
+  xAxisTitles["Tau_GammaEtaMom"]     = "Gamma #Delta#eta RMS(#tau)";
+  xAxisTitles["Tau_GammaPhiMom"]     = "Gamma #Delta#phi RMS(#tau)";
 
   xAxisTitles["Elec_Pt"]             = "P_{T}(e)" ;
   xAxisTitles["Elec_PFMvaOutput"]    = "PFmva(e)" ;
@@ -306,6 +320,7 @@ void plotAllVariables(){
   xAxisTitles["Elec_GSFTracklnPt"]   = "lnP_{T}(GSFTr)" ;
   xAxisTitles["Elec_GSFTrackEta"]    = "#eta(GSFTr)" ;
   xAxisTitles["Tau_Pt"]              = "P_{T}(#tau)";
+  xAxisTitles["Tau_LeadHadronPt"]    = "P_{T}(Lead hadron #tau)";
   xAxisTitles["Tau_HadrMva"]         = "HadrMva(#tau)"; 
 
 
@@ -320,6 +335,8 @@ void plotAllVariables(){
   xMinValues["Elec_EtotOverPin"]        = 0.;
   xMinValues["Elec_NumHits"]            = 0.;
   xMinValues["Tau_AbsEta"]              = 0.;
+  xMinValues["Tau_Eta"]                 = -3.;
+  xMinValues["Tau_EtaAtEcalEntrance"]   = -3.;
   xMinValues["Tau_GammaEnFrac"]         = 0.;
   xMinValues["Tau_EmFraction"]          = 0.;
   xMinValues["Tau_HasGsf"]              = 0.;
@@ -341,6 +358,7 @@ void plotAllVariables(){
   xMinValues["Elec_GSFTracklnPt"]       = 0.;
   xMinValues["Elec_GSFTrackEta"]        = -3.;
   xMinValues["Tau_Pt"]                  = 10.;
+  xMinValues["Tau_LeadHadronPt"]        = 10.;
   xMinValues["Tau_HadrMva"]             = -1.; 
 
 
@@ -355,6 +373,8 @@ void plotAllVariables(){
   xMaxValues["Elec_EtotOverPin"]        = 4;
   xMaxValues["Elec_NumHits"]            = 30;
   xMaxValues["Tau_AbsEta"]              = 3;
+  xMaxValues["Tau_Eta"]                 = 3;
+  xMaxValues["Tau_EtaAtEcalEntrance"]   = 3;
   xMaxValues["Tau_GammaEnFrac"]         = 1;
   xMaxValues["Tau_EmFraction"]          = 1;
   xMaxValues["Tau_HasGsf"]              = 2;
@@ -375,7 +395,8 @@ void plotAllVariables(){
   xMaxValues["Elec_GSFTrackResol"]      = 1.;
   xMaxValues["Elec_GSFTracklnPt"]       = 15.;
   xMaxValues["Elec_GSFTrackEta"]        = 3.;
-  xMaxValues["Tau_Pt"]                  = 80.;
+  xMaxValues["Tau_Pt"]                  = 150.;
+  xMaxValues["Tau_LeadHadronPt"]        = 150.;
   xMaxValues["Tau_HadrMva"]             = 1.; 
 
 
@@ -390,6 +411,8 @@ void plotAllVariables(){
   nBins["Elec_EtotOverPin"]        = 100;
   nBins["Elec_NumHits"]            = 30;
   nBins["Tau_AbsEta"]              = 100;
+  nBins["Tau_Eta"]                 = 100;
+  nBins["Tau_EtaAtEcalEntrance"]   = 100;
   nBins["Tau_GammaEnFrac"]         = 20;
   nBins["Tau_EmFraction"]          = 100;
   nBins["Tau_HasGsf"]              = 2;
@@ -411,6 +434,7 @@ void plotAllVariables(){
   nBins["Elec_GSFTracklnPt"]       = 100.;
   nBins["Elec_GSFTrackEta"]        = 100.;
   nBins["Tau_Pt"]                  = 100.;
+  nBins["Tau_LeadHadronPt"]        = 100.;
   nBins["Tau_HadrMva"]             = 50.;
 
  
@@ -418,8 +442,8 @@ void plotAllVariables(){
 	category != categories.end(); ++category ) {
     for ( std::vector<std::string>::const_iterator variable = variables.begin();
 	  variable!= variables.end(); ++variable ) {
-      plotVariable(variable->data(), category->data(), xAxisTitles[*variable].data(),"a.u.",xMinValues[*variable], xMaxValues[*variable], nBins[*variable], 0, 50, 10, 60,"Barrel" );
-      plotVariable(variable->data(), category->data(), xAxisTitles[*variable].data(),"a.u.",xMinValues[*variable], xMaxValues[*variable], nBins[*variable], 0, 50, 10, 60,"Endcap" );
+      plotVariable(variable->data(), category->data(), xAxisTitles[*variable].data(),"a.u.",xMinValues[*variable], xMaxValues[*variable], nBins[*variable], 0, 50, 15, 150,"Barrel" );
+      plotVariable(variable->data(), category->data(), xAxisTitles[*variable].data(),"a.u.",xMinValues[*variable], xMaxValues[*variable], nBins[*variable], 0, 50, 15, 150,"Endcap" );
     }
   }
 }

@@ -21,14 +21,16 @@ void MVAOutput(string discriminator = "",
 	       string Type = "Signal"
 	       )
 {
-  std::string inputFileName ="/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
+//   std::string inputFileName ="/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
+  std::string inputFileName ="/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_V4.root";
 //   std::string inputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL%s-iter3.root",discriminator.data());
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
   if(inputFile->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
-  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA_v3%s_%s.root",discriminator.data(),Type.data());
+  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA-EtaAtEcal_v4%s_%s.root",discriminator.data(),Type.data());
+//   std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA_v4%s_%s.root",discriminator.data(),Type.data());
   
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
@@ -89,6 +91,8 @@ void MVAOutput(string discriminator = "",
   int Tau_GenHadMatch;
   int Tau_GenJetMatch;
   float Tau_AbsEta;
+  float Tau_Eta;
+  float Tau_EtaAtEcalEntrance;
   float Tau_Pt;
   float Tau_HasGsf; 
   float Tau_EmFraction; 
@@ -148,7 +152,9 @@ void MVAOutput(string discriminator = "",
   inputTree->SetBranchAddress("Tau_GenEleFromZTauTauMatch", &Tau_GenEleFromZTauTauMatch );
   inputTree->SetBranchAddress("Tau_GenHadMatch", &Tau_GenHadMatch );
   inputTree->SetBranchAddress("Tau_GenJetMatch", &Tau_GenJetMatch );
-  inputTree->SetBranchAddress("Tau_AbsEta", &Tau_AbsEta );
+//   inputTree->SetBranchAddress("Tau_AbsEta", &Tau_AbsEta );
+  inputTree->SetBranchAddress("Tau_EtaAtEcalEntrance", &Tau_EtaAtEcalEntrance );
+//   inputTree->SetBranchAddress("Tau_Eta", &Tau_Eta );
   inputTree->SetBranchAddress("Tau_Pt", &Tau_Pt );
   inputTree->SetBranchAddress("Tau_HasGsf", &Tau_HasGsf ); 
   inputTree->SetBranchAddress("Tau_EmFraction", &Tau_EmFraction ); 
@@ -196,32 +202,45 @@ void MVAOutput(string discriminator = "",
 
 
 
-  string WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v3_NoEleMatch_Barrel_BDT.weights.xml";
-  string WeightwoG_BL = "tmva/weights/TMVAClassification_v3_woG_Barrel_BDT.weights.xml";
-  string WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v3_wGwoGSF_Barrel_BDT.weights.xml";
-  string WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v3_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
-  string WeightwGwGSFwPFMVA_BL = "tmva/weights/TMVAClassification_v3_wGwGSFwPFMVA_Barrel_BDT.weights.xml";
-  string WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v3_NoEleMatch_Endcap_BDT.weights.xml";
-  string WeightwoG_EC = "tmva/weights/TMVAClassification_v3_woG_Endcap_BDT.weights.xml";
-  string WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v3_wGwoGSF_Endcap_BDT.weights.xml";
-  string WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v3_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
-  string WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification_v3_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
+//   string WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v4_NoEleMatch_Barrel_BDT.weights.xml";
+//   string WeightwoG_BL = "tmva/weights/TMVAClassification_v4_woG_Barrel_BDT.weights.xml";
+//   string WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v4_wGwoGSF_Barrel_BDT.weights.xml";
+//   string WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v4_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
+//   string WeightwGwGSFwPFMVA_BL = "tmva/weights/TMVAClassification_v4_wGwGSFwPFMVA_Barrel_BDT.weights.xml";
+//   string WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v4_NoEleMatch_Endcap_BDT.weights.xml";
+//   string WeightwoG_EC = "tmva/weights/TMVAClassification_v4_woG_Endcap_BDT.weights.xml";
+//   string WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v4_wGwoGSF_Endcap_BDT.weights.xml";
+//   string WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v4_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
+//   string WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification_v4_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
+  
+  string WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_NoEleMatch_Barrel_BDT.weights.xml";
+  string WeightwoG_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_woG_Barrel_BDT.weights.xml";
+  string WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwoGSF_Barrel_BDT.weights.xml";
+  string WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
+  string WeightwGwGSFwPFMVA_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwPFMVA_Barrel_BDT.weights.xml";
+  string WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_NoEleMatch_Endcap_BDT.weights.xml";
+  string WeightwoG_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_woG_Endcap_BDT.weights.xml";
+  string WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwoGSF_Endcap_BDT.weights.xml";
+  string WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
+  string WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
   
   if (discriminator.find("-AntiEMed")!=std::string::npos){
-    WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v3-AntiEMed_NoEleMatch_Barrel_BDT.weights.xml";
-    WeightwoG_BL = "tmva/weights/TMVAClassification_v3-AntiEMed_woG_Barrel_BDT.weights.xml";
-    WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v3-AntiEMed_wGwoGSF_Barrel_BDT.weights.xml";
-    WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v3-AntiEMed_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
+    WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v4-AntiEMed_NoEleMatch_Barrel_BDT.weights.xml";
+    WeightwoG_BL = "tmva/weights/TMVAClassification_v4-AntiEMed_woG_Barrel_BDT.weights.xml";
+    WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v4-AntiEMed_wGwoGSF_Barrel_BDT.weights.xml";
+    WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v4-AntiEMed_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
 //     WeightwGwGSFwPFMVA_BL = "tmva/weights/TMVAClassification-AntiEMed_wGwGSFwPFMVA_Barrel_BDT.weights.xml";
-    WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v3-AntiEMed_NoEleMatch_Endcap_BDT.weights.xml";
-    WeightwoG_EC = "tmva/weights/TMVAClassification_v3-AntiEMed_woG_Endcap_BDT.weights.xml";
-    WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v3-AntiEMed_wGwoGSF_Endcap_BDT.weights.xml";
-    WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v3-AntiEMed_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
+    WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v4-AntiEMed_NoEleMatch_Endcap_BDT.weights.xml";
+    WeightwoG_EC = "tmva/weights/TMVAClassification_v4-AntiEMed_woG_Endcap_BDT.weights.xml";
+    WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v4-AntiEMed_wGwoGSF_Endcap_BDT.weights.xml";
+    WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v4-AntiEMed_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
 //     WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification-AntiEMed_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
   }
   
   TMVA::Reader *readerNoEleMatch_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
-  readerNoEleMatch_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//for v4  readerNoEleMatch_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerNoEleMatch_BL->AddVariable("Tau_Eta",&Tau_Eta);
+  readerNoEleMatch_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerNoEleMatch_BL->AddVariable("Tau_Pt",&Tau_Pt);
   // forv3readerNoEleMatch_BL->AddVariable("Tau_HasGsf",&Tau_HasGsf);
   readerNoEleMatch_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
@@ -248,7 +267,9 @@ void MVAOutput(string discriminator = "",
   readerwoG_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwoG_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwoG_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwoG_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//for v4  readerwoG_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwoG_BL->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwoG_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwoG_BL->AddVariable("Tau_Pt",&Tau_Pt);
  //for v3   readerwoG_BL->AddVariable("Tau_HasGsf",&Tau_HasGsf);
   readerwoG_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
@@ -272,7 +293,9 @@ void MVAOutput(string discriminator = "",
   readerwGwoGSF_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwGwoGSF_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwGwoGSF_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwGwoGSF_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+ //for v4 readerwGwoGSF_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwGwoGSF_BL->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwGwoGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwGwoGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
   readerwGwoGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
   readerwGwoGSF_BL->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
@@ -295,7 +318,9 @@ void MVAOutput(string discriminator = "",
   readerwGwGSFwoPFMVA_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwGwGSFwoPFMVA_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwGwGSFwoPFMVA_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwGwGSFwoPFMVA_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+ //for v4  readerwGwGSFwoPFMVA_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwGwGSFwoPFMVA_BL->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwGwGSFwoPFMVA_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwGwGSFwoPFMVA_BL->AddVariable("Tau_Pt",&Tau_Pt);
   readerwGwGSFwoPFMVA_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
   readerwGwGSFwoPFMVA_BL->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
@@ -320,7 +345,9 @@ void MVAOutput(string discriminator = "",
   readerwGwGSFwPFMVA_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwGwGSFwPFMVA_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwGwGSFwPFMVA_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwGwGSFwPFMVA_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+ //for v4  readerwGwGSFwPFMVA_BL->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwGwGSFwPFMVA_BL->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwGwGSFwPFMVA_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwGwGSFwPFMVA_BL->AddVariable("Tau_Pt",&Tau_Pt);
   readerwGwGSFwPFMVA_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
   readerwGwGSFwPFMVA_BL->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
@@ -336,7 +363,9 @@ void MVAOutput(string discriminator = "",
   ////////////////////////
 
   TMVA::Reader *readerNoEleMatch_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
-  readerNoEleMatch_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+ //for v4  readerNoEleMatch_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerNoEleMatch_EC->AddVariable("Tau_Eta",&Tau_Eta);
+  readerNoEleMatch_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerNoEleMatch_EC->AddVariable("Tau_Pt",&Tau_Pt);
   // forv3readerNoEleMatch_EC->AddVariable("Tau_HasGsf",&Tau_HasGsf);
   readerNoEleMatch_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
@@ -363,7 +392,9 @@ void MVAOutput(string discriminator = "",
   readerwoG_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwoG_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwoG_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwoG_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+  //for v4 readerwoG_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwoG_EC->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwoG_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwoG_EC->AddVariable("Tau_Pt",&Tau_Pt);
  //for v3   readerwoG_EC->AddVariable("Tau_HasGsf",&Tau_HasGsf);
   readerwoG_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
@@ -387,7 +418,9 @@ void MVAOutput(string discriminator = "",
   readerwGwoGSF_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwGwoGSF_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwGwoGSF_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwGwoGSF_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+  //for v4  readerwGwoGSF_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwGwoGSF_EC->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwGwoGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwGwoGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
   readerwGwoGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
   readerwGwoGSF_EC->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
@@ -410,7 +443,9 @@ void MVAOutput(string discriminator = "",
   readerwGwGSFwoPFMVA_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwGwGSFwoPFMVA_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwGwGSFwoPFMVA_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwGwGSFwoPFMVA_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+  //for v4   readerwGwGSFwoPFMVA_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwGwGSFwoPFMVA_EC->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwGwGSFwoPFMVA_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwGwGSFwoPFMVA_EC->AddVariable("Tau_Pt",&Tau_Pt);
   readerwGwGSFwoPFMVA_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
   readerwGwGSFwoPFMVA_EC->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
@@ -435,7 +470,9 @@ void MVAOutput(string discriminator = "",
   readerwGwGSFwPFMVA_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
   readerwGwGSFwPFMVA_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
   readerwGwGSFwPFMVA_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
-  readerwGwGSFwPFMVA_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+   //for v4  readerwGwGSFwPFMVA_EC->AddVariable("Tau_AbsEta",&Tau_AbsEta);
+//   readerwGwGSFwPFMVA_EC->AddVariable("Tau_Eta",&Tau_Eta);
+  readerwGwGSFwPFMVA_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
   readerwGwGSFwPFMVA_EC->AddVariable("Tau_Pt",&Tau_Pt);
   readerwGwGSFwPFMVA_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
   readerwGwGSFwPFMVA_EC->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
@@ -452,7 +489,7 @@ void MVAOutput(string discriminator = "",
   cout<< "Number of entries : "<<nEntries<<endl;
 
   for (int iEntry = 0; iEntry<nEntries ; iEntry++){
-    if(iEntry%10000==0) cout << iEntry << endl;
+    if(iEntry%100000==0) cout << iEntry << endl;
     inputTree->GetEntry(iEntry);
 
     t_NoEleMatch_Barrel = 1;
@@ -475,6 +512,8 @@ void MVAOutput(string discriminator = "",
     t_Tau_GenEleMatch = Tau_GenEleMatch;
     t_Tau_GenHadMatch = Tau_GenHadMatch;
 
+//     Tau_AbsEta = TMath::Abs(Tau_Eta);
+    Tau_AbsEta = TMath::Abs(Tau_EtaAtEcalEntrance);
     if(Elec_AbsEta < 1.479 && Tau_AbsEta<1.479){
       if(Tau_GsfEleMatch<0.5) t_NoEleMatch_Barrel = readerNoEleMatch_BL->EvaluateMVA("BDT");
       else if(Tau_NumGammaCands==0) t_woG_Barrel = readerwoG_BL->EvaluateMVA("BDT");
@@ -505,6 +544,6 @@ void MVAOutput(string discriminator = "",
 void getAllMVAOutput(){
   MVAOutput("","Signal");
   MVAOutput("","Backgrd");
-  MVAOutput("-AntiEMed","Signal");
-  MVAOutput("-AntiEMed","Backgrd");
+//   MVAOutput("-AntiEMed","Signal");
+//   MVAOutput("-AntiEMed","Backgrd");
 }

@@ -39,9 +39,10 @@ void makeRoot(string matching = "Elec",
 	      string discriminator = ""
 	      )
 {
+   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_V4.root";
 //   std::string inputFileName = Form("../AntiEMVA-AntiEMed.root",discriminator.data());
 //   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/testAntiEMVA_ZZTo2e2tau_7TeV-powheg-pythia6-iter1.root";
-   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
+//    std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
 //   std::string inputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL%s-iter3.root",discriminator.data());
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
   if(inputFile->IsZombie()){
@@ -49,7 +50,8 @@ void makeRoot(string matching = "Elec",
     return;
   }
 
-  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_testAntiEMVA%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
+//   std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_testAntiEMVA%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
+  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
 
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
@@ -69,8 +71,11 @@ void makeRoot(string matching = "Elec",
   int t_Tau_GenEleFromZTauTauMatch_;
   int t_Tau_GenHadMatch_;
   int t_Tau_GenJetMatch_;
-  float t_Tau_AbsEta_;
+//   float t_Tau_AbsEta_;
+  float t_Tau_Eta_;
+  float t_Tau_EtaAtEcalEntrance_;
   float t_Tau_Pt_;
+  float t_Tau_LeadHadronPt_;
   float t_Tau_HasGsf_; 
   float t_Tau_EmFraction_; 
   float t_Tau_NumChargedCands_;
@@ -91,7 +96,7 @@ void makeRoot(string matching = "Elec",
   int t_Elec_GenEleMatch_;
   int t_Elec_GenEleFromZMatch_;
   int t_Elec_GenEleFromZTauTauMatch_;
-  int t_Elec_PFTauMatch_;
+//   int t_Elec_PFTauMatch_;
   int t_Elec_GenHadMatch_;
   int t_Elec_GenJetMatch_;
   float t_Elec_AbsEta_;
@@ -132,7 +137,7 @@ void makeRoot(string matching = "Elec",
   mytree->Branch("Elec_GenEleMatch",&t_Elec_GenEleMatch_,"Elec_GenEleMatch/I");
   mytree->Branch("Elec_GenEleFromZMatch",&t_Elec_GenEleFromZMatch_,"Elec_GenEleFromZMatch/I");
   mytree->Branch("Elec_GenEleFromZTauTauMatch",&t_Elec_GenEleFromZTauTauMatch_,"Elec_GenEleFromZTauTauMatch/I");
-  mytree->Branch("Elec_PFTauMatch",&t_Elec_PFTauMatch_,"Elec_PFTauMatch/I");
+//   mytree->Branch("Elec_PFTauMatch",&t_Elec_PFTauMatch_,"Elec_PFTauMatch/I");
   mytree->Branch("Elec_GenHadMatch",&t_Elec_GenHadMatch_,"Elec_GenHadMatch/I");
   mytree->Branch("Elec_GenJetMatch",&t_Elec_GenJetMatch_,"Elec_GenJetMatch/I");
   mytree->Branch("Elec_AbsEta",&t_Elec_AbsEta_,"Elec_AbsEta/F");
@@ -164,8 +169,11 @@ void makeRoot(string matching = "Elec",
   mytree->Branch("Tau_GenEleFromZTauTauMatch",&t_Tau_GenEleFromZTauTauMatch_,"Tau_GenEleFromZTauTauMatch/I");
   mytree->Branch("Tau_GenHadMatch",&t_Tau_GenHadMatch_,"Tau_GenHadMatch/I");
   mytree->Branch("Tau_GenJetMatch",&t_Tau_GenJetMatch_,"Tau_GenJetMatch/I");
-  mytree->Branch("Tau_AbsEta",&t_Tau_AbsEta_,"Tau_AbsEta/F");
+//   mytree->Branch("Tau_AbsEta",&t_Tau_AbsEta_,"Tau_AbsEta/F");
+  mytree->Branch("Tau_Eta",&t_Tau_Eta_,"Tau_Eta/F");
+  mytree->Branch("Tau_EtaAtEcalEntrance",&t_Tau_EtaAtEcalEntrance_,"Tau_EtaAtEcalEntrance/F");
   mytree->Branch("Tau_Pt",&t_Tau_Pt_,"Tau_Pt/F");
+  mytree->Branch("Tau_LeadHadronPt",&t_Tau_LeadHadronPt_,"Tau_LeadHadronPt/F");
   mytree->Branch("Tau_HasGsf",&t_Tau_HasGsf_,"Tau_HasGsf/F");
   mytree->Branch("Tau_EmFraction",&t_Tau_EmFraction_,"Tau_EmFraction/F");
   mytree->Branch("Tau_NumChargedCands",&t_Tau_NumChargedCands_,"Tau_NumChargedCands/F");
@@ -203,8 +211,11 @@ void makeRoot(string matching = "Elec",
   int Tau_GenEleFromZTauTauMatch;
   int Tau_GenHadMatch;
   int Tau_GenJetMatch;
-  float Tau_AbsEta;
+//   float Tau_AbsEta;
+  float Tau_Eta;
+  float Tau_EtaAtEcalEntrance;
   float Tau_Pt;
+  float Tau_LeadHadronPt;
   float Tau_HasGsf; 
   float Tau_EmFraction; 
   float Tau_NumChargedCands;
@@ -226,7 +237,7 @@ void makeRoot(string matching = "Elec",
   int Elec_GenEleMatch;
   int Elec_GenEleFromZMatch;
   int Elec_GenEleFromZTauTauMatch;
-  int Elec_PFTauMatch;
+//   int Elec_PFTauMatch;
   int Elec_GenHadMatch;
   int Elec_GenJetMatch;
   float Elec_AbsEta;
@@ -268,8 +279,11 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchAddress("Tau_GenEleFromZTauTauMatch", &Tau_GenEleFromZTauTauMatch );
   inputTree->SetBranchAddress("Tau_GenHadMatch", &Tau_GenHadMatch );
   inputTree->SetBranchAddress("Tau_GenJetMatch", &Tau_GenJetMatch );
-  inputTree->SetBranchAddress("Tau_AbsEta", &Tau_AbsEta );
+//   inputTree->SetBranchAddress("Tau_AbsEta", &Tau_AbsEta );
+  inputTree->SetBranchAddress("Tau_Eta", &Tau_Eta );
+  inputTree->SetBranchAddress("Tau_EtaAtEcalEntrance", &Tau_EtaAtEcalEntrance );
   inputTree->SetBranchAddress("Tau_Pt", &Tau_Pt );
+  inputTree->SetBranchAddress("Tau_LeadHadronPt", &Tau_LeadHadronPt );
   inputTree->SetBranchAddress("Tau_HasGsf", &Tau_HasGsf ); 
   inputTree->SetBranchAddress("Tau_EmFraction", &Tau_EmFraction ); 
   inputTree->SetBranchAddress("Tau_NumChargedCands", &Tau_NumChargedCands );
@@ -291,7 +305,7 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchAddress("Elec_GenEleMatch", &Elec_GenEleMatch );
   inputTree->SetBranchAddress("Elec_GenEleFromZMatch", &Elec_GenEleFromZMatch);
   inputTree->SetBranchAddress("Elec_GenEleFromZTauTauMatch", &Elec_GenEleFromZTauTauMatch );
-  inputTree->SetBranchAddress("Elec_PFTauMatch", &Elec_PFTauMatch );
+//   inputTree->SetBranchAddress("Elec_PFTauMatch", &Elec_PFTauMatch );
   inputTree->SetBranchAddress("Elec_GenHadMatch", &Elec_GenHadMatch );
   inputTree->SetBranchAddress("Elec_GenJetMatch", &Elec_GenJetMatch );
   inputTree->SetBranchAddress("Elec_AbsEta", &Elec_AbsEta );
@@ -333,8 +347,11 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchStatus("Tau_GenEleFromZTauTauMatch", 1);
   inputTree->SetBranchStatus("Tau_GenHadMatch", 1);
   inputTree->SetBranchStatus("Tau_GenJetMatch", 1);
-  inputTree->SetBranchStatus("Tau_AbsEta", 1);
+//   inputTree->SetBranchStatus("Tau_AbsEta", 1);
+  inputTree->SetBranchStatus("Tau_Eta", 1);
+  inputTree->SetBranchStatus("Tau_EtaAtEcalEntrance", 1);
   inputTree->SetBranchStatus("Tau_Pt", 1);
+  inputTree->SetBranchStatus("Tau_LeadHadronPt", 1);
   inputTree->SetBranchStatus("Tau_HasGsf", 1); 
   inputTree->SetBranchStatus("Tau_EmFraction", 1); 
   inputTree->SetBranchStatus("Tau_NumChargedCands", 1);
@@ -356,7 +373,7 @@ void makeRoot(string matching = "Elec",
   inputTree->SetBranchStatus("Elec_GenEleMatch", 1);
   inputTree->SetBranchStatus("Elec_GenEleFromZMatch", 1);
   inputTree->SetBranchStatus("Elec_GenEleFromZTauTauMatch", 1);
-  inputTree->SetBranchStatus("Elec_PFTauMatch", 1);
+//   inputTree->SetBranchStatus("Elec_PFTauMatch", 1);
   inputTree->SetBranchStatus("Elec_GenHadMatch", 1);
   inputTree->SetBranchStatus("Elec_GenJetMatch", 1);
   inputTree->SetBranchStatus("Elec_AbsEta", 1);
@@ -385,7 +402,7 @@ void makeRoot(string matching = "Elec",
   cout<< "Number of entries : "<<nEntries<<endl;
 
   for (int iEntry = 0; iEntry<nEntries ; iEntry++){
-    if(iEntry%10000==0) cout << iEntry << endl;
+    if(iEntry%100000==0) cout << iEntry << endl;
 
     inputTree->GetEntry(iEntry);
 
@@ -394,22 +411,26 @@ void makeRoot(string matching = "Elec",
     if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
 
     //No discriminator applied
-    if(discriminator == "" && category == "woG"){
-      if(Tau_NumGammaCands>0) continue;
-    }
     if(discriminator == "" && category == "NoEleMatch"){
       if(Tau_GsfEleMatch>0.5) continue;
     }
+    if(discriminator == "" && category == "woG"){
+      if(Tau_GsfEleMatch<0.5) continue;
+      if(Tau_NumGammaCands>0) continue;
+    }
     if(discriminator == "" && category == "wGwoGSF"){
+      if(Tau_GsfEleMatch<0.5) continue;
       if (Tau_NumGammaCands<1)continue;
       if (Tau_HasGsf>0.5) continue;
     }
     if(discriminator == "" && category == "wGwGSFwoPFMVA"){
+      if(Tau_GsfEleMatch<0.5) continue;
       if(Tau_NumGammaCands<1)continue;
       if( Tau_HasGsf<0.5)continue;
       if (Elec_PFMvaOutput>-0.1)continue;
     }
     if(discriminator == "" && category == "wGwGSFwPFMVA"){
+      if(Tau_GsfEleMatch<0.5) continue;
       if (Tau_NumGammaCands<1)continue;
       if (Tau_HasGsf<0.5)continue;
       if (Elec_PFMvaOutput<=-0.1)continue;
@@ -423,13 +444,16 @@ void makeRoot(string matching = "Elec",
       if(Tau_GsfEleMatch>0.5) continue;
     }
     if(discriminator == "-AntiEMed" && category == "woG" ){
-      if(Tau_NumGammaCands>0) continue;
+      if(Tau_GsfEleMatch<0.5) continue;
+     if(Tau_NumGammaCands>0) continue;
     }
     if(discriminator == "-AntiEMed" && category == "wGwoGSF"){
+      if(Tau_GsfEleMatch<0.5) continue;
       if(Tau_NumGammaCands<1)continue;
       if(Tau_HasGsf>0.5 && Elec_PFMvaOutput<=-0.1) continue;//merging with category 4 
     }
     if(discriminator == "-AntiEMed" && category == "wGwGSFwoPFMVA"){
+      if(Tau_GsfEleMatch<0.5) continue;
       if(Tau_NumGammaCands<1)continue;
       if(Tau_HasGsf<0.5)continue;
       if(Elec_PFMvaOutput>-0.1)continue;
@@ -453,8 +477,11 @@ void makeRoot(string matching = "Elec",
     t_Tau_GenEleFromZTauTauMatch_ = Tau_GenEleFromZTauTauMatch ;
     t_Tau_GenHadMatch_ = Tau_GenHadMatch ;
     t_Tau_GenJetMatch_ = Tau_GenJetMatch ;
-    t_Tau_AbsEta_ = Tau_AbsEta ;
+//     t_Tau_AbsEta_ = Tau_AbsEta ;
+    t_Tau_Eta_ = Tau_Eta ;
+    t_Tau_EtaAtEcalEntrance_ = Tau_EtaAtEcalEntrance ;
     t_Tau_Pt_ = Tau_Pt ;
+    t_Tau_LeadHadronPt_ = Tau_LeadHadronPt ;
     t_Tau_HasGsf_ = Tau_HasGsf ; 
     t_Tau_EmFraction_ = Tau_EmFraction ; 
     t_Tau_NumChargedCands_ = Tau_NumChargedCands ;
@@ -476,7 +503,7 @@ void makeRoot(string matching = "Elec",
     t_Elec_GenEleMatch_ = Elec_GenEleMatch ;
     t_Elec_GenEleFromZMatch_ = Elec_GenEleFromZMatch;
     t_Elec_GenEleFromZTauTauMatch_ = Elec_GenEleFromZTauTauMatch ;
-    t_Elec_PFTauMatch_ = Elec_PFTauMatch ;
+//     t_Elec_PFTauMatch_ = Elec_PFTauMatch ;
     t_Elec_GenHadMatch_ = Elec_GenHadMatch ;
     t_Elec_GenJetMatch_ = Elec_GenJetMatch ;
     t_Elec_AbsEta_ = Elec_AbsEta ;
@@ -520,8 +547,11 @@ void makeRoot(string matching = "Elec",
       cout<<" Tau_GenEleFromZTauTauMatch :"<<t_Tau_GenEleFromZTauTauMatch_<<endl;
       cout<<" Tau_GenHadMatch :"<<t_Tau_GenHadMatch_<<endl;
       cout<<" Tau_GenJetMatch :"<<t_Tau_GenJetMatch_<<endl;
-      cout<<" Tau_AbsEta :"<<t_Tau_AbsEta_<<endl;
+//       cout<<" Tau_AbsEta :"<<t_Tau_AbsEta_<<endl;
+      cout<<" Tau_Eta :"<<t_Tau_Eta_<<endl;
+      cout<<" Tau_EtaAtEcalEntrance :"<<t_Tau_EtaAtEcalEntrance_<<endl;
       cout<<" Tau_Pt : "<<t_Tau_Pt_<<endl;
+      cout<<" Tau_LeadHadronPt : "<<t_Tau_LeadHadronPt_<<endl;
       cout<<" Tau_HasGsf :"<<t_Tau_HasGsf_<<endl; 
       cout<<" Tau_EmFraction :"<<t_Tau_EmFraction_<<endl; 
       cout<<" Tau_NumChargedCands :"<<t_Tau_NumChargedCands_<<endl;
@@ -542,7 +572,7 @@ void makeRoot(string matching = "Elec",
       cout<<" Elec_GenEleMatch :"<<t_Elec_GenEleMatch_<<endl;
       cout<<" Elec_GenEleFromZMatch :"<<t_Elec_GenEleFromZMatch_<<endl;
       cout<<" Elec_GenEleFromZTauTauMatch :"<<t_Elec_GenEleFromZTauTauMatch_<<endl;
-      cout<<" Elec_PFTauMatch :"<<t_Elec_PFTauMatch_<<endl;
+//       cout<<" Elec_PFTauMatch :"<<t_Elec_PFTauMatch_<<endl;
       cout<<" Elec_GenHadMatch :"<<t_Elec_GenHadMatch_<<endl;
       cout<<" Elec_GenJetMatch :"<<t_Elec_GenJetMatch_<<endl;
       cout<<" Elec_AbsEta :"<<t_Elec_AbsEta_<<endl;

@@ -459,7 +459,7 @@ void plotROCForCategories(string Region = "Barrel",
   leg->SetTextSize(0.03);
   leg->SetHeader(Form("%s",Region.data()));
 
-  std::string inFileName0 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[0].data(),Region.data());
+  std::string inFileName0 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[0].data(),Region.data());
   cout<<"opening file : "<<inFileName0<<endl;
   TFile* inFile0 = new TFile (inFileName0.data(),"READ");
   if(inFile0->IsZombie()){
@@ -471,7 +471,7 @@ void plotROCForCategories(string Region = "Barrel",
   hROC0->SetLineWidth(2);
   hROC0->SetTitle("");
 
-  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[1].data(),Region.data());
+  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[1].data(),Region.data());
   cout<<"opening file : "<<inFileName1<<endl;
   TFile* inFile1 = new TFile (inFileName1.data(),"READ");
   if(inFile1->IsZombie()){
@@ -483,7 +483,7 @@ void plotROCForCategories(string Region = "Barrel",
   hROC1->SetLineWidth(2);
   hROC1->SetTitle("");
 
-  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[2].data(),Region.data());
+  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[2].data(),Region.data());
   cout<<"opening file : "<<inFileName2<<endl;
   TFile* inFile2 = new TFile (inFileName2.data(),"READ");
   if(inFile2->IsZombie()){
@@ -495,7 +495,7 @@ void plotROCForCategories(string Region = "Barrel",
   hROC2->SetLineWidth(2);
   hROC2->SetTitle("");
 
- std::string inFileName3 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
+ std::string inFileName3 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
   cout<<"opening file : "<<inFileName3<<endl;
   TFile* inFile3 = new TFile (inFileName3.data(),"READ");
   if(inFile3->IsZombie()){
@@ -507,8 +507,8 @@ void plotROCForCategories(string Region = "Barrel",
   hROC3->SetLineWidth(2);
   hROC3->SetTitle("");
 
-  std::string inFileName4 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
-  if (discr == "")inFileName4 = Form("./tmva/tmvaRoot/TMVA_v3%s_%s_%s.root",discr.data(),categories[4].data(),Region.data());
+  std::string inFileName4 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
+  if (discr == "")inFileName4 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[4].data(),Region.data());
   cout<<"opening file : "<<inFileName3<<endl;
   TFile* inFile4 = new TFile (inFileName4.data(),"READ");
   if(inFile4->IsZombie()){
@@ -533,7 +533,7 @@ void plotROCForCategories(string Region = "Barrel",
   if(discr == "")leg->AddEntry(hROC4,"Category 5");
   leg->Draw();
 
-  string outputName = Form("plots/plotROCCurves_AllCategories_v3%s_%s",discr.data(),Region.data());
+  string outputName = Form("plots/plotROCCurves_AllCategories_v4_EtaAtEcal%s_%s",discr.data(),Region.data());
   c1->Print(std::string(outputName).append(".png").data());
   c1->Print(std::string(outputName).append(".pdf").data());
 
@@ -543,8 +543,8 @@ void plotAllROCForCategories()
 {
   plotROCForCategories("Barrel","");
   plotROCForCategories("Endcap","");
-  plotROCForCategories("Barrel","-AntiEMed");
-  plotROCForCategories("Endcap","-AntiEMed");
+//   plotROCForCategories("Barrel","-AntiEMed");
+//   plotROCForCategories("Endcap","-AntiEMed");
 }
 
 
@@ -651,7 +651,7 @@ void plotFinalROC(
   TMarker* MarkAntiEMVA = new TMarker (EffSigAntiEMVA, 1-EffBkgAntiEMVA,25);
 
 
-  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVAOptimization_v3%s.root",discrs[0].data());
+  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVAOptimization_v4%s.root",discrs[0].data());
   cout<<"opening file : "<<inFileName1<<endl;
   TFile* inFile1 = new TFile (inFileName1.data(),"READ");
   if(inFile1->IsZombie()){
@@ -671,8 +671,8 @@ void plotFinalROC(
   yAxis->SetTitleOffset(1.30);
   yAxis->SetRangeUser(0.3,1.0);
 
-
-  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVAOptimization_v3%s.root",discrs[1].data());
+  /*
+  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVAOptimization_v4%s.root",discrs[1].data());
   cout<<"opening file : "<<inFileName2<<endl;
   TFile* inFile2 = new TFile (inFileName2.data(),"READ");
   if(inFile2->IsZombie()){
@@ -704,9 +704,12 @@ void plotFinalROC(
   }
 //   hROC2->SetPoint(nBins-2,EffSigAntiEMed,1-EffBkgAntiEMed);
 
+
+  */
+
   hROC1->Smooth();
   hROC1->Draw();
-  hROC2->Draw("same");
+//   hROC2->Draw("same");
   MarkAntiELoose->Draw("same");
   MarkAntiEMedium->Draw("same");
   MarkAntiETight->Draw("same");
@@ -717,7 +720,7 @@ void plotFinalROC(
   leg->AddEntry(MarkAntiETight,"AntiETight");
   leg->AddEntry(MarkAntiEMVA,"Old AntiEMVA");
   leg->AddEntry(hROC1,"New AntiEMVA");
-  leg->AddEntry(hROC2,"AntiEMed discr");
+//   leg->AddEntry(hROC2,"AntiEMed discr");
   leg->Draw();
 
   string outputName = "plots/plotROCCurves_FinalROC";

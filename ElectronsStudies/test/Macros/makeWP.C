@@ -30,16 +30,17 @@
 
 #define DEBUG false
 
-void makeWP(string data = "Pythia")
+void makeWP(string data = "DYJetsToLL")
 {
-   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/testAntiEMVA_ZZTo2e2tau_7TeV-powheg-pythia6-iter1.root";
+//    std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/testAntiEMVA_ZZTo2e2tau_7TeV-powheg-pythia6-iter1.root";
+   std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_AntiEMVATrees-DYJetsToLL-madgraph-PUS6.root";
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
   if(inputFile->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
 
-  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_makeWP-iter1_%s.root",data.data());
+  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_makeWP_%s.root",data.data());
 
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
@@ -58,7 +59,9 @@ void makeWP(string data = "Pythia")
 
   int t_Tau_GenHadMatch_;
   float t_Tau_AbsEta_;
+  float t_Tau_AbsEtaAtEcalEntrance_;
   float t_Tau_Pt_;
+  float t_Tau_LeadHadronPt_;
   float t_Tau_Phi_;
 
   float t_Tau_AntiELoose_; 
@@ -70,7 +73,11 @@ void makeWP(string data = "Pythia")
   float t_Tau_AntiEMVA2_WP85_; 
   float t_Tau_AntiEMVA2_WP95_; 
 
-  
+  float t_NoEleMatch_;
+  float t_woG_;
+  float t_wGwoGSF_;
+  float t_wGwGSFwoPFMVA_;
+  float t_wGwGSFwPFMVA_;
 
   //counters
   mytree->Branch("run",&t_run_,"run/l");
@@ -89,7 +96,9 @@ void makeWP(string data = "Pythia")
   mytree->Branch("Tau_GenEleMatch",&t_Tau_GenEleMatch_,"Tau_GenEleMatch/I");
   mytree->Branch("Tau_GenHadMatch",&t_Tau_GenHadMatch_,"Tau_GenHadMatch/I");
   mytree->Branch("Tau_AbsEta",&t_Tau_AbsEta_,"Tau_AbsEta/F");
+  mytree->Branch("Tau_AbsEta",&t_Tau_AbsEtaAtEcalEntrance_,"Tau_AbsEtaAtEcalEntrance/F");
   mytree->Branch("Tau_Pt",&t_Tau_Pt_,"Tau_Pt/F");
+  mytree->Branch("Tau_LeadHadronPt",&t_Tau_LeadHadronPt_,"Tau_LeadHadronPt/F");
   mytree->Branch("Tau_Phi",&t_Tau_Phi_,"Tau_Phi/F");
   mytree->Branch("Tau_AntiELoose",&t_Tau_AntiELoose_,"Tau_AntiELoose/F");
   mytree->Branch("Tau_AntiEMedium",&t_Tau_AntiEMedium_,"Tau_AntiEMedium/F");
@@ -99,6 +108,16 @@ void makeWP(string data = "Pythia")
   mytree->Branch("Tau_AntiEMVA2_WP75",&t_Tau_AntiEMVA2_WP75_,"Tau_AntiEMVA2_WP75/F");
   mytree->Branch("Tau_AntiEMVA2_WP85",&t_Tau_AntiEMVA2_WP85_,"Tau_AntiEMVA2_WP85/F");
   mytree->Branch("Tau_AntiEMVA2_WP95",&t_Tau_AntiEMVA2_WP95_,"Tau_AntiEMVA2_WP95/F");
+
+  //Categories
+  mytree->Branch("NoEleMatch",&t_NoEleMatch_,"NoEleMatch/F");
+  mytree->Branch("woG",&t_woG_,"woG/F");
+  mytree->Branch("wGwoGSF",&t_wGwoGSF_,"wGwoGSF/F");
+  mytree->Branch("wGwGSFwoPFMVA",&t_wGwGSFwoPFMVA_,"wGwGSFwoPFMVA/F");
+  mytree->Branch("wGwGSFwPFMVA",&t_wGwGSFwPFMVA_,"wGwGSFwPFMVA/F");
+
+
+
 
 
   TTree* inputTree = (TTree*)inputFile->Get("AntiEMVAAnalyzer2/tree");
@@ -119,7 +138,10 @@ void makeWP(string data = "Pythia")
   int Tau_GenHadMatch;
   int Tau_GenJetMatch;
   float Tau_AbsEta;
+  float Tau_Eta;
+  float Tau_EtaAtEcalEntrance;
   float Tau_Pt;
+  float Tau_LeadHadronPt;
   float Tau_Phi;
   float Tau_HasGsf; 
   float Tau_EmFraction; 
@@ -143,7 +165,7 @@ void makeWP(string data = "Pythia")
   int Elec_GenEleMatch;
   int Elec_GenEleFromZMatch;
   int Elec_GenEleFromZTauTauMatch;
-  int Elec_PFTauMatch;
+//   int Elec_PFTauMatch;
   int Elec_GenHadMatch;
   int Elec_GenJetMatch;
   float Elec_AbsEta;
@@ -185,8 +207,11 @@ void makeWP(string data = "Pythia")
   inputTree->SetBranchAddress("Tau_GenEleFromZTauTauMatch", &Tau_GenEleFromZTauTauMatch );
   inputTree->SetBranchAddress("Tau_GenHadMatch", &Tau_GenHadMatch );
   inputTree->SetBranchAddress("Tau_GenJetMatch", &Tau_GenJetMatch );
-  inputTree->SetBranchAddress("Tau_AbsEta", &Tau_AbsEta );
+//   inputTree->SetBranchAddress("Tau_AbsEta", &Tau_AbsEta );
+  inputTree->SetBranchAddress("Tau_Eta", &Tau_Eta );
+  inputTree->SetBranchAddress("Tau_EtaAtEcalEntrance", &Tau_EtaAtEcalEntrance );
   inputTree->SetBranchAddress("Tau_Pt", &Tau_Pt );
+  inputTree->SetBranchAddress("Tau_LeadHadronPt", &Tau_LeadHadronPt );
   inputTree->SetBranchAddress("Tau_Phi", &Tau_Phi );
   inputTree->SetBranchAddress("Tau_HasGsf", &Tau_HasGsf ); 
   inputTree->SetBranchAddress("Tau_EmFraction", &Tau_EmFraction ); 
@@ -252,8 +277,11 @@ void makeWP(string data = "Pythia")
   inputTree->SetBranchStatus("Tau_GenEleFromZTauTauMatch", 1);
   inputTree->SetBranchStatus("Tau_GenHadMatch", 1);
   inputTree->SetBranchStatus("Tau_GenJetMatch", 1);
-  inputTree->SetBranchStatus("Tau_AbsEta", 1);
+//   inputTree->SetBranchStatus("Tau_AbsEta", 1);
+  inputTree->SetBranchStatus("Tau_Eta", 1);
+  inputTree->SetBranchStatus("Tau_EtaAtEcalEntrance", 1);
   inputTree->SetBranchStatus("Tau_Pt", 1);
+  inputTree->SetBranchStatus("Tau_LeadHadronPt", 1);
   inputTree->SetBranchStatus("Tau_Phi", 1);
   inputTree->SetBranchStatus("Tau_HasGsf", 1); 
   inputTree->SetBranchStatus("Tau_EmFraction", 1); 
@@ -309,11 +337,14 @@ void makeWP(string data = "Pythia")
     if(iEntry%10000==0) cout << iEntry << endl;
 
     inputTree->GetEntry(iEntry);
+    
+    Tau_AbsEta = TMath::Abs(Tau_Eta);
 
-
-//     if(matching == "Elec" && (Tau_GenEleMatch!=1 || Elec_GenEleMatch!=1)) continue;
-//     if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
-
+    t_NoEleMatch_ = 0;
+    t_woG_ = 0;
+    t_wGwoGSF_ = 0;
+    t_wGwGSFwoPFMVA_ = 0;
+    t_wGwGSFwPFMVA_ = 0;
 
     if (Elec_Pt<10) continue;
 
@@ -325,90 +356,99 @@ void makeWP(string data = "Pythia")
     double mvaCut85 = 999.;
     double mvaCut95 = 999.;
       if(Tau_GsfEleMatch<0.5){//NoEleMatch
+	t_NoEleMatch_ = 1;
 	if (Tau_AbsEta<1.5){//Barrel
-// 	 mvaCut75 = -0.126102;
-// 	 mvaCut85 = -0.0727222;
-// 	 mvaCut95 = -0.101727;
-	 mvaCut75 = -0.0351292;
-	 mvaCut85 = -0.0835313;
-	 mvaCut95 = -0.083524;
+	 mvaCut75 = -0.126102;
+	 mvaCut85 = -0.0727222;
+	 mvaCut95 = -0.101727;
+// 	 mvaCut75 = -0.0351292;
+// 	 mvaCut85 = -0.0835313;
+// 	 mvaCut95 = -0.083524;
 	}
 	else {//Endcap
-// 	 mvaCut75 = -0.0177012;
-// 	 mvaCut85 = -0.084118;
-// 	 mvaCut95 = -0.169389 ;
-	 mvaCut75 = -0.0356601;
-	 mvaCut85 = -0.128549;
-	 mvaCut95 = -0.172681;
+	 mvaCut75 = -0.0177012;
+	 mvaCut85 = -0.084118;
+	 mvaCut95 = -0.169389 ;
+// 	 mvaCut75 = -0.0356601;
+// 	 mvaCut85 = -0.128549;
+// 	 mvaCut95 = -0.172681;
 	}
       }
       else{//match TauEle
 	if (Tau_AbsEta<1.5){//Barrel
 	  if(Tau_NumGammaCands == 0){//woG
-// 	    mvaCut75 = -0.0458154;
-// 	    mvaCut85 = -0.072778;
-// 	    mvaCut95 = -0.130411;
-	    mvaCut75 = 0.00125865;
-	    mvaCut85 = -0.0814948;
-	    mvaCut95 = -0.124782;
+	    t_woG_ = 1;
+	    mvaCut75 = -0.0458154;
+	    mvaCut85 = -0.072778;
+	    mvaCut95 = -0.130411;
+// 	    mvaCut75 = 0.00125865;
+// 	    mvaCut85 = -0.0814948;
+// 	    mvaCut95 = -0.124782;
 	  }
 	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf<0.5){//wGwoGSF
-// 	    mvaCut75 = -0.137043;
-// 	    mvaCut85 = -0.137213;
-// 	    mvaCut95 = -0.110745 ;
-	    mvaCut75 = -0.206314;
-	    mvaCut85 = -0.166072;
-	    mvaCut95 = -0.124145;
+	    t_wGwoGSF_ = 1;
+	    mvaCut75 = -0.137043;
+	    mvaCut85 = -0.137213;
+	    mvaCut95 = -0.110745 ;
+// 	    mvaCut75 = -0.206314;
+// 	    mvaCut85 = -0.166072;
+// 	    mvaCut95 = -0.124145;
 	  }
 	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput <-0.1){//wGwGSFwoPFMVA
-// 	    mvaCut75 = 0.0332071;
-// 	    mvaCut85 = -0.0948499;
-// 	    mvaCut95 = -0.11647 ;
-	    mvaCut75 = -0.157582;
-	    mvaCut85 = -0.141405;
-	    mvaCut95 = -0.179366;
+	    t_wGwGSFwoPFMVA_ = 1;
+	    mvaCut75 = 0.0332071;
+	    mvaCut85 = -0.0948499;
+	    mvaCut95 = -0.11647 ;
+// 	    mvaCut75 = -0.157582;
+// 	    mvaCut85 = -0.141405;
+// 	    mvaCut95 = -0.179366;
 	  }
 	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput >-0.1){//wGwGSFwPFMVA
-// 	    mvaCut75 = -0.0448832;
-// 	    mvaCut85 = -0.0600284;
-// 	    mvaCut95 = -0.134414 ;
-	    mvaCut75 = 0.373828;
-	    mvaCut85 = -0.064168;
-	    mvaCut95 = -0.0979345;
+	    t_wGwGSFwPFMVA_ = 1;
+	    mvaCut75 = -0.0448832;
+	    mvaCut85 = -0.0600284;
+	    mvaCut95 = -0.134414 ;
+// 	    mvaCut75 = 0.373828;
+// 	    mvaCut85 = -0.064168;
+// 	    mvaCut95 = -0.0979345;
 	  }
 	}
 	else{//Endcap
 	  if(Tau_NumGammaCands == 0){//woG
-// 	    mvaCut75 = 0.189192;
-// 	    mvaCut85 = 0.0648186;
-// 	    mvaCut95 = -0.140327 ;
-	    mvaCut75 = -0.0628364;
-	    mvaCut85 = 0.0461575;
-	    mvaCut95 = -0.150082;
+	    t_woG_ = 1;
+	    mvaCut75 = 0.189192;
+	    mvaCut85 = 0.0648186;
+	    mvaCut95 = -0.140327 ;
+// 	    mvaCut75 = -0.0628364;
+// 	    mvaCut85 = 0.0461575;
+// 	    mvaCut95 = -0.150082;
 	  }
 	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf<0.5){//wGwoGSF
-// 	    mvaCut75 = -0.0444424;
-// 	    mvaCut85 = -0.0804441;
-// 	    mvaCut95 = -0.102089 ;
-	    mvaCut75 = 0.443144;
-	    mvaCut85 = -0.0466969;
-	    mvaCut95 = -0.119345;
+	    t_wGwoGSF_ = 1;
+	    mvaCut75 = -0.0444424;
+	    mvaCut85 = -0.0804441;
+	    mvaCut95 = -0.102089 ;
+// 	    mvaCut75 = 0.443144;
+// 	    mvaCut85 = -0.0466969;
+// 	    mvaCut95 = -0.119345;
 	  }
 	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput <-0.1){//wGwGSFwoPFMVA
-// 	    mvaCut75 = -0.0938333;
-// 	    mvaCut85 = -0.0227585;
-// 	    mvaCut95 = -0.14057 ;
-	    mvaCut75 = -0.138559;
-	    mvaCut85 = 0.00619836;
-	    mvaCut95 = -0.126053;
+	    t_wGwGSFwoPFMVA_ = 1;
+	    mvaCut75 = -0.0938333;
+	    mvaCut85 = -0.0227585;
+	    mvaCut95 = -0.14057 ;
+// 	    mvaCut75 = -0.138559;
+// 	    mvaCut85 = 0.00619836;
+// 	    mvaCut95 = -0.126053;
 	  }
 	  else if(Tau_NumGammaCands >= 1 && Tau_HasGsf>0.5 && Elec_PFMvaOutput >-0.1){//wGwGSFwPFMVA
-// 	    mvaCut75 = 0.144127;
-// 	    mvaCut85 = -0.116097;
-// 	    mvaCut95 = -0.0975809 ;
-	    mvaCut75 = 0.00279379;
-	    mvaCut85 = 0.208963;
-	    mvaCut95 = -0.0852086;
+	    t_wGwGSFwPFMVA_ = 1;
+	    mvaCut75 = 0.144127;
+	    mvaCut85 = -0.116097;
+	    mvaCut95 = -0.0975809 ;
+// 	    mvaCut75 = 0.00279379;
+// 	    mvaCut85 = 0.208963;
+// 	    mvaCut95 = -0.0852086;
 	  }
 	}
       }
@@ -432,14 +472,17 @@ void makeWP(string data = "Pythia")
     t_Tau_GsfEleMatch_ = Tau_GsfEleMatch ;
     t_Tau_GenEleMatch_ = Tau_GenEleMatch ;
     t_Tau_GenHadMatch_ = Tau_GenHadMatch ;
-    t_Tau_AbsEta_ = Tau_AbsEta ;
+    t_Tau_AbsEta_ = TMath::Abs(Tau_Eta) ;
+    t_Tau_AbsEtaAtEcalEntrance_ = TMath::Abs(Tau_EtaAtEcalEntrance) ;
     t_Tau_Pt_ = Tau_Pt ;
+    t_Tau_LeadHadronPt_ = Tau_LeadHadronPt ;
     t_Tau_Phi_ = Tau_Phi ; 
 
     t_Tau_AntiELoose_ = Tau_AntiELoose ; 
     t_Tau_AntiEMedium_ = Tau_AntiEMedium ; 
     t_Tau_AntiETight_ = Tau_AntiETight ; 
     t_Tau_AntiEMVA_ = Tau_AntiEMVA ; 
+    t_Tau_AntiEMVA2_ = Tau_AntiEMVA2 ; 
     
     if(DEBUG){
       cout<<endl;
