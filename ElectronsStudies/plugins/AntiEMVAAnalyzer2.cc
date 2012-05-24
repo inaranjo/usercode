@@ -7,7 +7,8 @@
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+#include "DataFormats/GeometryVector/interface/VectorUtil.h"
 
 AntiEMVAAnalyzer2::AntiEMVAAnalyzer2(const edm::ParameterSet& cfg)
 { 
@@ -99,9 +100,6 @@ void AntiEMVAAnalyzer2::beginJob()
   tree_->Branch("Tau_AntiETight",&Tau_AntiETight_,"Tau_AntiETight/F");
   tree_->Branch("Tau_AntiEMVA",&Tau_AntiEMVA_,"Tau_AntiEMVA/F");
   tree_->Branch("Tau_MatchElePassVeto",&Tau_MatchElePassVeto_,"Tau_MatchElePassVeto/F");
-
-
-
 }
 
 
@@ -355,19 +353,60 @@ void AntiEMVAAnalyzer2::analyze(const edm::Event& evt, const edm::EventSetup& es
       }
       NumPatTaus_++ ;   
     }
+    
+    //Tau is matched to a gsfElectron passing CutsVeto for SecondElectronVeto
+    bool matchElectronCutsVeto = false;
+    float matchElectronCutsVetoFloat = 0;
+    for ( reco::GsfElectronCollection::const_iterator GsfElectron = GsfElectrons->begin();
+	  GsfElectron != GsfElectrons->end(); ++GsfElectron ) {
+      const reco::Track *el_track = (const reco::Track*)((GsfElectron)->gsfTrack().get());  
+      const reco::HitPattern& p_inner = el_track->trackerExpectedHitsInner(); 
+      float nHits = p_inner.numberOfHits();
+      float dPhi  = fabs(GsfElectron->deltaPhiSuperClusterTrackAtVtx());
+      float dEta  = fabs(GsfElectron->deltaEtaSuperClusterTrackAtVtx());
+      float sihih = GsfElectron->sigmaIetaIeta();
+      float HoE   = GsfElectron->hadronicOverEm();
+      if(debug_){
+	std::cout<<"GsfElectron nHits: "<<nHits<<std::endl;
+	std::cout<<"GsfElectron dPhi: "<<dPhi<<std::endl;
+	std::cout<<"GsfElectron dEta: "<<dEta<<std::endl;
+	std::cout<<"GsfElectron sihih: "<<sihih<<std::endl;
+	std::cout<<"GsfElectron HoE: "<<HoE<<std::endl;
+      }
+      bool ElectronPassCutsVeto = false;
+      if((nHits<=999) &&
+	 ((fabs(GsfElectron->eta())<1.5) &&
+	  (sihih < 0.010) &&
+	  (dPhi < 0.80) &&
+	  (dEta < 0.007) &&
+	  (HoE < 0.15)) ||
+	 ((fabs(GsfElectron->eta())>1.5) && (fabs(GsfElectron->eta())<2.3) &&
+	  (sihih < 0.030) &&
+	  (dPhi < 0.70) &&
+	  (dEta < 0.010) &&
+	  (HoE < 999))
+	 ) ElectronPassCutsVeto = true ;
+      if ((deltaR(PfTau->eta(),PfTau->phi(),GsfElectron->eta(),GsfElectron->phi())<0.3) && ElectronPassCutsVeto){
+	matchElectronCutsVeto = true;
+      } 
+    }//Loop on GsfElectrons
+    if(matchElectronCutsVeto)matchElectronCutsVetoFloat = 1;
+    Tau_MatchElePassVeto_ = matchElectronCutsVetoFloat;
+    
+    
     NumPFTaus_++;
 
+    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////GsfElectron variables//////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    for ( reco::GsfElectronCollection::const_iterator GsfElectron = GsfElectrons->begin();
+	  GsfElectron != GsfElectrons->end(); ++GsfElectron ) {
+      if (debug_){
+	//       std::cout<<std::endl;
+	//       std::cout<<"GsfElectron number : "<<NumGsfEle_<<std::endl;
+      }
+      if(deltaR(PfTau->eta(),PfTau->phi(),GsfElectron->eta(),GsfElectron->phi())<0.3)Tau_GsfEleMatch_ = 1;
 
-  ///////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////GsfElectron variables//////////////////////
-  ///////////////////////////////////////////////////////////////////////////
-  for ( reco::GsfElectronCollection::const_iterator GsfElectron = GsfElectrons->begin();
-	GsfElectron != GsfElectrons->end(); ++GsfElectron ) {
-    if (debug_){
-//       std::cout<<std::endl;
-//       std::cout<<"GsfElectron number : "<<NumGsfEle_<<std::endl;
-    }
-    if(deltaR(PfTau->eta(),PfTau->phi(),GsfElectron->eta(),GsfElectron->phi())<0.3)Tau_GsfEleMatch_ = 1;
 
     NumGenEle_ = 0;
     NumGenHad_ = 0;
