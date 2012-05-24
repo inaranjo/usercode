@@ -85,8 +85,11 @@ class AntiEMVAAnalyzer2 : public edm::EDAnalyzer
   int Tau_GenEleFromZTauTauMatch_;
   int Tau_GenHadMatch_;
   int Tau_GenJetMatch_;
-  float Tau_AbsEta_;
+  float Tau_Eta_;
+  float Tau_EtaAtEcalEntrance_;
   float Tau_Pt_;
+  float Tau_LeadHadronPt_;
+  float Tau_Phi_;
   float Tau_HasGsf_; 
   float Tau_EmFraction_; 
   float Tau_NumChargedCands_;
@@ -103,11 +106,11 @@ class AntiEMVAAnalyzer2 : public edm::EDAnalyzer
   float Tau_AntiEMedium_;
   float Tau_AntiETight_;
   float Tau_AntiEMVA_;
+  float Tau_MatchElePassVeto_;
 
   int Elec_GenEleMatch_;
   int Elec_GenEleFromZMatch_;
   int Elec_GenEleFromZTauTauMatch_;
-/*   int Elec_PFTauMatch_; */
   int Elec_GenHadMatch_;
   int Elec_GenJetMatch_;
   float Elec_AbsEta_;
@@ -136,23 +139,6 @@ class AntiEMVAAnalyzer2 : public edm::EDAnalyzer
   float Elec_GSFTracklnPt_;
   float Elec_GSFTrackEta_;
 
-
-  AntiElectronIDMVA* antiE_;
-  edm::FileInPath inputFileName0;
-  edm::FileInPath inputFileName1;
-  edm::FileInPath inputFileName2;
-  edm::FileInPath inputFileName3;
-  edm::FileInPath inputFileName4;
-  edm::FileInPath inputFileName5;
-  edm::FileInPath inputFileNameIvo0;
-  edm::FileInPath inputFileNameIvo1;
-  edm::FileInPath inputFileNameIvo2;
-  edm::FileInPath inputFileNameIvo3;
-  edm::FileInPath inputFileNameIvo4;
-  edm::FileInPath inputFileNameIvo5;
-  edm::FileInPath inputFileNameIvo6;
-  edm::FileInPath inputFileNameIvo7;
-  AntiElectronIDMVA2* antiEIvo_;
 
 };//AntiEMVAAnalyzer2
 

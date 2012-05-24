@@ -11,15 +11,16 @@ from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 
 if runOnMC:
-    process.GlobalTag.globaltag = cms.string('START42_V13::All')
+    process.GlobalTag.globaltag = cms.string('START42_V14B::All')
+##     process.GlobalTag.globaltag = cms.string('START42_V13::All')
 
 else:
     process.GlobalTag.globaltag = cms.string('GR_R_42_V19::All')
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.source.fileNames = cms.untracked.vstring(
     '/store/user/akalinow/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/424_eletau_Fall11_v1/e8b4f85021cdba9640c984da9bbc3fb3/tautauSkimmAOD_84_2_gFP.root',
@@ -130,12 +131,12 @@ process.patTaus.tauIDSources= cms.PSet(
     cms.PSet(againstElectronMVA2 = cms.InputTag("pfRecoTauDiscriminationAgainstElectronMVA2") )
     )
 
-process.selectedPatTaus.cut = "pt>20 && abs(eta)<2.3 && tauID('decayModeFinding')>0.5 && tauID('byLooseCombinedIsolationDeltaBetaCorr')>0.5"
+process.selectedPatTaus.cut = "pt>15 && abs(eta)<2.3 && tauID('decayModeFinding')>0.5 && tauID('byLooseCombinedIsolationDeltaBetaCorr')>0.5"
 ########################## PreSelection of reconstructed Taus ###############################
 process.load("RecoTauTag.TauTagTools.PFTauSelector_cfi")
 process.selectedTaus = process.pfTauSelector.clone()
 process.selectedTaus.src = cms.InputTag("hpsPFTauProducer")
-process.selectedTaus.cut = cms.string("pt>20 && abs(eta)<2.3")
+process.selectedTaus.cut = cms.string("pt>15 && abs(eta)<2.3")
 process.selectedTaus.discriminators = cms.VPSet(
     cms.PSet( discriminator=cms.InputTag("hpsPFTauDiscriminationByDecayModeFinding"),
               selectionCut=cms.double(0.5) ),
@@ -185,69 +186,9 @@ process.AntiEMVAAnalyzer2 = cms.EDAnalyzer(
     srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
     srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
     srcPatTaus = cms.InputTag("selectedPatTaus"),
-    inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
-    inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
-    inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
-    inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
-    inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
-    inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
-##     inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Endcap_BDT.weights.xml'),
-##     inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Endcap_BDT.weights.xml'),
-##     inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
-##     inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
-    inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Barrel_BDT.weights.xml'),
-    inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Barrel_BDT.weights.xml'),
-    inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Barrel_BDT.weights.xml'),
-    inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
-    inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
-    inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Endcap_BDT.weights.xml'),
-    inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Endcap_BDT.weights.xml'),
-    inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Endcap_BDT.weights.xml'),
-    inputFileNameIvo8 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
-    inputFileNameIvo9 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
-    debug = cms.bool(True)
+    debug = cms.bool(False)
     )
-process.AntiEMVAAnalyzer = cms.EDAnalyzer(
-    "AntiEMVAAnalyzer",
-    srcPrimaryVertex = cms.InputTag("selectedPrimaryVertexPosition"),
-    srcGsfElectrons = cms.InputTag("gsfElectrons"),
-    srcPFTaus = cms.InputTag("selectedTaus"),
-    srcGenElectrons = cms.InputTag("genElectronsPtGt10"),
-    srcGenElectronsFromZ = cms.InputTag("genElectronsFromZs"),
-    srcGenElectronsFromZTauTau = cms.InputTag("genElectronsFromZtautauDecays"),
-    srcGenTaus = cms.InputTag("genHadronsFromZtautauDecays"),
-    srcGenJets = cms.InputTag("genJetsAntiOverlapWithLeptonsVeto"),
-    srcPatTaus = cms.InputTag("selectedPatTaus"),
-    inputFileName0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0BL_BDT.weights.xml'),
-    inputFileName1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1BL_BDT.weights.xml'),
-    inputFileName2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1BL_BDT.weights.xml'),
-    inputFileName3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_X_0EC_BDT.weights.xml'),
-    inputFileName4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_1_1EC_BDT.weights.xml'),
-    inputFileName5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_0_1EC_BDT.weights.xml'),
-    inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Barrel_BDT.weights.xml'),
-    inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Barrel_BDT.weights.xml'),
-    inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Barrel_BDT.weights.xml'),
-    inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
-    inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
-    inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_NoEleMatch_Endcap_BDT.weights.xml'),
-    inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_woG_Endcap_BDT.weights.xml'),
-    inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwoGSF_Endcap_BDT.weights.xml'),
-    inputFileNameIvo8 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
-    inputFileNameIvo9 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v3_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
-##     inputFileNameIvo0 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo1 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo2 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo3 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Barrel_BDT.weights.xml'),
-##     inputFileNameIvo4 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_woG_Endcap_BDT.weights.xml'),
-##     inputFileNameIvo5 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwoGSF_Endcap_BDT.weights.xml'),
-##     inputFileNameIvo6 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwoPFMVA_Endcap_BDT.weights.xml'),
-##     inputFileNameIvo7 = cms.FileInPath('RecoTauTag/RecoTau/data/TMVAClassification_v2_wGwGSFwPFMVA_Endcap_BDT.weights.xml'),
-    debug = cms.bool(True)
-    )
+
 
 process.MatchingComputerAnalyzer = cms.EDAnalyzer(
     "MatchingComputerAnalyzer",
@@ -274,9 +215,7 @@ process.run = cms.Sequence(
     process.selectedTaus*
     process.genElectronsPtGt10*
     process.genLeptonsPtGt10*process.genJetsAntiOverlapWithLeptonsVeto*
-    process.AntiEMVAAnalyzer
-##     process.MatchingComputerAnalyzer
-##     process.AntiEMVAAnalyzer2
+    process.AntiEMVAAnalyzer2
     
     )
 
