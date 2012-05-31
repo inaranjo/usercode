@@ -459,63 +459,68 @@ void plotROCForCategories(string Region = "Barrel",
   leg->SetTextSize(0.03);
   leg->SetHeader(Form("%s",Region.data()));
 
-  std::string inFileName0 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[0].data(),Region.data());
+  std::string inFileName0 = Form("./tmva/tmvaRoot/TMVA_v5%s_%s_%s.root",discr.data(),categories[0].data(),Region.data());
   cout<<"opening file : "<<inFileName0<<endl;
   TFile* inFile0 = new TFile (inFileName0.data(),"READ");
   if(inFile0->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
-  TH1F* hROC0 = (TH1F*)inFile0->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+//   TH1F* hROC0 = (TH1F*)inFile0->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+  TH1F* hROC0 = (TH1F*)inFile0->Get("Method_BDT/BDTG/MVA_BDTG_rejBvsS");
   hROC0->SetLineColor(kBlue);
   hROC0->SetLineWidth(2);
   hROC0->SetTitle("");
 
-  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[1].data(),Region.data());
+  std::string inFileName1 = Form("./tmva/tmvaRoot/TMVA_v5%s_%s_%s.root",discr.data(),categories[1].data(),Region.data());
   cout<<"opening file : "<<inFileName1<<endl;
   TFile* inFile1 = new TFile (inFileName1.data(),"READ");
   if(inFile1->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
-  TH1F* hROC1 = (TH1F*)inFile1->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+//   TH1F* hROC1 = (TH1F*)inFile1->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+  TH1F* hROC1 = (TH1F*)inFile1->Get("Method_BDT/BDTG/MVA_BDTG_rejBvsS");
   hROC1->SetLineColor(kRed);
   hROC1->SetLineWidth(2);
   hROC1->SetTitle("");
 
-  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[2].data(),Region.data());
+  std::string inFileName2 = Form("./tmva/tmvaRoot/TMVA_v5%s_%s_%s.root",discr.data(),categories[2].data(),Region.data());
   cout<<"opening file : "<<inFileName2<<endl;
   TFile* inFile2 = new TFile (inFileName2.data(),"READ");
   if(inFile2->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
-  TH1F* hROC2 = (TH1F*)inFile2->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+//   TH1F* hROC2 = (TH1F*)inFile2->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+  TH1F* hROC2 = (TH1F*)inFile2->Get("Method_BDT/BDTG/MVA_BDTG_rejBvsS");
   hROC2->SetLineColor(kBlack);
   hROC2->SetLineWidth(2);
   hROC2->SetTitle("");
 
- std::string inFileName3 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
+ std::string inFileName3 = Form("./tmva/tmvaRoot/TMVA_v5%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
   cout<<"opening file : "<<inFileName3<<endl;
   TFile* inFile3 = new TFile (inFileName3.data(),"READ");
   if(inFile3->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
-  TH1F* hROC3 = (TH1F*)inFile3->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+//   TH1F* hROC3 = (TH1F*)inFile3->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+  TH1F* hROC3 = (TH1F*)inFile3->Get("Method_BDT/BDTG/MVA_BDTG_rejBvsS");
   hROC3->SetLineColor(kMagenta);
   hROC3->SetLineWidth(2);
   hROC3->SetTitle("");
 
-  std::string inFileName4 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
-  if (discr == "")inFileName4 = Form("./tmva/tmvaRoot/TMVA_v4_EtaAtEcal%s_%s_%s.root",discr.data(),categories[4].data(),Region.data());
+  std::string inFileName4 = Form("./tmva/tmvaRoot/TMVA_v5%s_%s_%s.root",discr.data(),categories[3].data(),Region.data());
+  if (discr == "")inFileName4 = Form("./tmva/tmvaRoot/TMVA_v5%s_%s_%s.root",discr.data(),categories[4].data(),Region.data());
   cout<<"opening file : "<<inFileName3<<endl;
   TFile* inFile4 = new TFile (inFileName4.data(),"READ");
   if(inFile4->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
-  TH1F* hROC4 = (TH1F*)inFile4->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+//   TH1F* hROC4 = (TH1F*)inFile4->Get("Method_BDT/BDT/MVA_BDT_rejBvsS");
+  TH1F* hROC4 = (TH1F*)inFile4->Get("Method_BDT/BDTG/MVA_BDTG_rejBvsS");
   hROC4->SetLineColor(kGreen);
   hROC4->SetLineWidth(2);
   hROC4->SetTitle("");
@@ -533,7 +538,7 @@ void plotROCForCategories(string Region = "Barrel",
   if(discr == "")leg->AddEntry(hROC4,"Category 5");
   leg->Draw();
 
-  string outputName = Form("plots/plotROCCurves_AllCategories_v4_EtaAtEcal%s_%s",discr.data(),Region.data());
+  string outputName = Form("plots/plotROCCurves_AllCategories_v5%s_%s",discr.data(),Region.data());
   c1->Print(std::string(outputName).append(".png").data());
   c1->Print(std::string(outputName).append(".pdf").data());
 

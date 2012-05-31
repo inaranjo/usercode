@@ -137,12 +137,12 @@ void plotMVAOutput(string Discr_ = "",
   leg->SetFillColor(10);
   leg->SetTextSize(0.03);
 
-  TFile *fSignal = new TFile(Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA_v4%s_Signal.root",Discr_.data()),"READ"); 
+  TFile *fSignal = new TFile(Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA-v5%s_Signal.root",Discr_.data()),"READ"); 
   if(fSignal->IsZombie()){
     cout << "No such file!" << endl;
     return;
   }
-  TFile *fBackgrd = new TFile(Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA_v4%s_Backgrd.root",Discr_.data()),"READ"); 
+  TFile *fBackgrd = new TFile(Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA-v5%s_Backgrd.root",Discr_.data()),"READ"); 
   if(fBackgrd->IsZombie()){
     cout << "No such file!" << endl;
     return;
@@ -185,7 +185,7 @@ void plotMVAOutput(string Discr_ = "",
     leg->SetHeader(Form("#splitline{CMS Preliminary}{#splitline{#sqrt{s}=7 TeV}{%s %s}}",Region.data(),category->data()));
     leg->Draw();
 
-    string outputName2 = Form("plots/plotMVAOutput_v4%s_%s_%s",Discr_.data(),category->data(),Region.data());
+    string outputName2 = Form("plots/plotMVAOutput_v5%s_%s_%s",Discr_.data(),category->data(),Region.data());
     c1->Print(std::string(outputName2).append(".png").data());
     c1->Print(std::string(outputName2).append(".pdf").data());
   }

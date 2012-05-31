@@ -36,7 +36,8 @@
 
 void makeRoot(string matching = "Elec",
 	      string category = "woG",
-	      string discriminator = ""
+	      string discriminator = "",
+	      string Region = "Barrel"
 	      )
 {
    std::string inputFileName = "/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_V4.root";
@@ -51,7 +52,7 @@ void makeRoot(string matching = "Elec",
   }
 
 //   std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_testAntiEMVA%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
-  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA%s_%s_%s.root",discriminator.data(),category.data(),matching.data());
+  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/root/tree_AntiEMVA%s_%s_%s_%s.root",discriminator.data(),category.data(),matching.data(),Region.data());
 
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
@@ -407,8 +408,15 @@ void makeRoot(string matching = "Elec",
     inputTree->GetEntry(iEntry);
 
 
-    if(matching == "Elec" && (Tau_GenEleMatch!=1 || Elec_GenEleMatch!=1)) continue;
-    if(matching == "Tau" && (Tau_GenHadMatch!=1 || Elec_GenHadMatch!=1)) continue;
+    if(matching == "Elec" && Tau_GenEleMatch!=1) continue;
+    if(matching == "Tau" && Tau_GenHadMatch!=1) continue;
+
+    if(Region == "Barrel"){
+      if((Elec_AbsEta>1.479 && Elec_AbsEta<3.0) || (TMath::Abs(Tau_EtaAtEcalEntrance)>1.479 && TMath::Abs(Tau_EtaAtEcalEntrance)<2.3) )continue;
+    }
+    if(Region == "Endcap"){
+      if(Elec_AbsEta<1.479 && TMath::Abs(Tau_EtaAtEcalEntrance)<1.479 )continue;
+    }
 
     //No discriminator applied
     if(discriminator == "" && category == "NoEleMatch"){
@@ -614,18 +622,31 @@ void makeRoot(string matching = "Elec",
 
 void makeAll(){
 
-  makeRoot("Elec","All","");
-  makeRoot("Tau","All","");
-  makeRoot("Elec","NoEleMatch","");
-  makeRoot("Tau","NoEleMatch","");
-  makeRoot("Elec","woG","");
-  makeRoot("Tau","woG","");
-  makeRoot("Elec","wGwoGSF","");
-  makeRoot("Tau","wGwoGSF","");
-  makeRoot("Elec","wGwGSFwoPFMVA","");
-  makeRoot("Tau","wGwGSFwoPFMVA","");
-  makeRoot("Elec","wGwGSFwPFMVA","");
-  makeRoot("Tau","wGwGSFwPFMVA","");
+  makeRoot("Elec","All","","Barrel");
+  makeRoot("Tau","All","","Barrel");
+  makeRoot("Elec","NoEleMatch","","Barrel");
+  makeRoot("Tau","NoEleMatch","","Barrel");
+  makeRoot("Elec","woG","","Barrel");
+  makeRoot("Tau","woG","","Barrel");
+  makeRoot("Elec","wGwoGSF","","Barrel");
+  makeRoot("Tau","wGwoGSF","","Barrel");
+  makeRoot("Elec","wGwGSFwoPFMVA","","Barrel");
+  makeRoot("Tau","wGwGSFwoPFMVA","","Barrel");
+  makeRoot("Elec","wGwGSFwPFMVA","","Barrel");
+  makeRoot("Tau","wGwGSFwPFMVA","","Barrel");
+
+  makeRoot("Elec","All","","Endcap");
+  makeRoot("Tau","All","","Endcap");
+  makeRoot("Elec","NoEleMatch","","Endcap");
+  makeRoot("Tau","NoEleMatch","","Endcap");
+  makeRoot("Elec","woG","","Endcap");
+  makeRoot("Tau","woG","","Endcap");
+  makeRoot("Elec","wGwoGSF","","Endcap");
+  makeRoot("Tau","wGwoGSF","","Endcap");
+  makeRoot("Elec","wGwGSFwoPFMVA","","Endcap");
+  makeRoot("Tau","wGwGSFwoPFMVA","","Endcap");
+  makeRoot("Elec","wGwGSFwPFMVA","","Endcap");
+  makeRoot("Tau","wGwGSFwPFMVA","","Endcap");
 
  
 //   makeRoot("Elec","All","-AntiEMed");

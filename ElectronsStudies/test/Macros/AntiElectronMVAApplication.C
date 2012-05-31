@@ -22,6 +22,7 @@ void MVAOutput(string discriminator = "",
 	       )
 {
 //   std::string inputFileName ="/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL-iter4.root";
+//   std::string inputFileName ="/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_AntiEMVATrees-DYJetsToLL-madgraph-PUS6.root";
   std::string inputFileName ="/data_CMS/cms/ivo/AntiEMVA/Trees/Trees_ForV4/AntiEMVA_V4.root";
 //   std::string inputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/AntiEMVA_Fall11DYJetsToLL%s-iter3.root",discriminator.data());
   TFile* inputFile = new TFile (inputFileName.data(),"READ");
@@ -29,8 +30,9 @@ void MVAOutput(string discriminator = "",
     cout << "No such file!" << endl;
     return;
   }
-  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA-EtaAtEcal_v4%s_%s.root",discriminator.data(),Type.data());
+//   std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA-DYJetsToLL_v4%s_%s.root",discriminator.data(),Type.data());
 //   std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA_v4%s_%s.root",discriminator.data(),Type.data());
+  std::string outputFileName = Form("/data_CMS/cms/ivo/AntiEMVA/Trees/MVAOutput/MvaOutput_AntiEMVA-v5%s_%s.root",discriminator.data(),Type.data());
   
   TFile* outputFile = new TFile (outputFileName.data(),"RECREATE");
   TTree* mytree = new TTree("tree", "tree");
@@ -213,17 +215,28 @@ void MVAOutput(string discriminator = "",
 //   string WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v4_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
 //   string WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification_v4_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
   
-  string WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_NoEleMatch_Barrel_BDT.weights.xml";
-  string WeightwoG_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_woG_Barrel_BDT.weights.xml";
-  string WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwoGSF_Barrel_BDT.weights.xml";
-  string WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
-  string WeightwGwGSFwPFMVA_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwPFMVA_Barrel_BDT.weights.xml";
-  string WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_NoEleMatch_Endcap_BDT.weights.xml";
-  string WeightwoG_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_woG_Endcap_BDT.weights.xml";
-  string WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwoGSF_Endcap_BDT.weights.xml";
-  string WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
-  string WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
-  
+//   string WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_NoEleMatch_Barrel_BDT.weights.xml";
+//   string WeightwoG_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_woG_Barrel_BDT.weights.xml";
+//   string WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwoGSF_Barrel_BDT.weights.xml";
+//   string WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwoPFMVA_Barrel_BDT.weights.xml";
+//   string WeightwGwGSFwPFMVA_BL = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwPFMVA_Barrel_BDT.weights.xml";
+//   string WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_NoEleMatch_Endcap_BDT.weights.xml";
+//   string WeightwoG_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_woG_Endcap_BDT.weights.xml";
+//   string WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwoGSF_Endcap_BDT.weights.xml";
+//   string WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwoPFMVA_Endcap_BDT.weights.xml";
+//   string WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification_v4_EtaAtEcal_wGwGSFwPFMVA_Endcap_BDT.weights.xml";
+ 
+  string WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v5_NoEleMatch_Barrel_BDTG.weights.xml";
+  string WeightwoG_BL = "tmva/weights/TMVAClassification_v5_woG_Barrel_BDTG.weights.xml";
+  string WeightwGwoGSF_BL = "tmva/weights/TMVAClassification_v5_wGwoGSF_Barrel_BDTG.weights.xml";
+  string WeightwGwGSFwoPFMVA_BL = "tmva/weights/TMVAClassification_v5_wGwGSFwoPFMVA_Barrel_BDTG.weights.xml";
+  string WeightwGwGSFwPFMVA_BL = "tmva/weights/TMVAClassification_v5_wGwGSFwPFMVA_Barrel_BDTG.weights.xml";
+  string WeightNoEleMatch_EC = "tmva/weights/TMVAClassification_v5_NoEleMatch_Endcap_BDTG.weights.xml";
+  string WeightwoG_EC = "tmva/weights/TMVAClassification_v5_woG_Endcap_BDTG.weights.xml";
+  string WeightwGwoGSF_EC = "tmva/weights/TMVAClassification_v5_wGwoGSF_Endcap_BDTG.weights.xml";
+  string WeightwGwGSFwoPFMVA_EC = "tmva/weights/TMVAClassification_v5_wGwGSFwoPFMVA_Endcap_BDTG.weights.xml";
+  string WeightwGwGSFwPFMVA_EC = "tmva/weights/TMVAClassification_v5_wGwGSFwPFMVA_Endcap_BDTG.weights.xml";
+   
   if (discriminator.find("-AntiEMed")!=std::string::npos){
     WeightNoEleMatch_BL = "tmva/weights/TMVAClassification_v4-AntiEMed_NoEleMatch_Barrel_BDT.weights.xml";
     WeightwoG_BL = "tmva/weights/TMVAClassification_v4-AntiEMed_woG_Barrel_BDT.weights.xml";
@@ -504,8 +517,8 @@ void MVAOutput(string discriminator = "",
     t_wGwGSFwPFMVA_Endcap = 1;
 
     if(discriminator == "-AntiEMed" && Tau_AntiEMedium<0.5)continue; 
-    if (Type.find("Signal")!=std::string::npos && (Elec_GenHadMatch!=1 || Tau_GenHadMatch!=1))continue;
-    if (Type.find("Backgrd")!=std::string::npos && (Elec_GenEleMatch!=1 || Tau_GenEleMatch!=1))continue;
+    if (Type.find("Signal")!=std::string::npos && Tau_GenHadMatch!=1)continue;
+    if (Type.find("Backgrd")!=std::string::npos && Tau_GenEleMatch!=1)continue;
 
     t_Elec_GenEleMatch = Elec_GenEleMatch;
     t_Elec_GenHadMatch = Elec_GenHadMatch;
