@@ -9,6 +9,9 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/GeometryVector/interface/VectorUtil.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+// #include "DataFormats/PatCandidates/interface/Electron.h"
+
 
 AntiEMVAAnalyzer2::AntiEMVAAnalyzer2(const edm::ParameterSet& cfg)
 { 
