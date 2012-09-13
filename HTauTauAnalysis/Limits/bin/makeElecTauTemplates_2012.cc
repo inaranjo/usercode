@@ -27,35 +27,35 @@ float higgsXsection(int mH = 120, string process = "ggH"){
   float xsection = 1.0;
 
   if(process.find("ggH")!=string::npos){
-    if(mH == 110) xsection = 8.02e-02*19.84;
-    if(mH == 115) xsection = 7.65e-02*18.13;
-    if(mH == 120) xsection = 7.10e-02*16.63;
-    if(mH == 125) xsection = 6.37e-02*15.31;
-    if(mH == 130) xsection = 5.48e-02*14.12;
-    if(mH == 135) xsection = 4.52e-02*13.08;
-    if(mH == 140) xsection = 3.54e-02*12.13;
-    if(mH == 145) xsection = 2.61e-02*11.27;
+//     if(mH == 110) xsection = 8.02e-02*19.84;
+//     if(mH == 115) xsection = 7.65e-02*18.13;
+    if(mH == 120) xsection = 7.04e-02*21.13;
+    if(mH == 125) xsection = 6.32e-02*19.52;
+//     if(mH == 130) xsection = 5.48e-02*14.12;
+//     if(mH == 135) xsection = 4.52e-02*13.08;
+//     if(mH == 140) xsection = 3.54e-02*12.13;
+//     if(mH == 145) xsection = 2.61e-02*11.27;
   }
   if(process.find("qqH")!=string::npos){
-    if(mH == 110) xsection = 8.02e-02*1.398;
-    if(mH == 115) xsection = 7.65e-02*1.332;
-    if(mH == 120) xsection = 7.10e-02*1.269;
-    if(mH == 125) xsection = 6.37e-02*1.211;
-    if(mH == 130) xsection = 5.48e-02*1.154;
-    if(mH == 135) xsection = 4.52e-02*1.100;
-    if(mH == 140) xsection = 3.54e-02*1.052;
-    if(mH == 145) xsection = 2.61e-02*1.004;
+//     if(mH == 110) xsection = 8.02e-02*1.398;
+//     if(mH == 115) xsection = 7.65e-02*1.332;
+    if(mH == 120) xsection = 7.04e-02*1.632;
+    if(mH == 125) xsection = 6.32e-02*1.559;
+//     if(mH == 130) xsection = 5.48e-02*1.154;
+//     if(mH == 135) xsection = 4.52e-02*1.100;
+//     if(mH == 140) xsection = 3.54e-02*1.052;
+//     if(mH == 145) xsection = 2.61e-02*1.004;
   }
-  if(process.find("VH")!=string::npos){
-    if(mH == 110) xsection = 8.02e-02*(0.8754+0.4721+0.1257  );
-    if(mH == 115) xsection = 7.65e-02*(0.7546+0.4107+0.1106  );
-    if(mH == 120) xsection = 7.10e-02*(0.6561+0.3598+0.09756 );
-    if(mH == 125) xsection = 6.37e-02*(0.5729+0.3158+0.08634 );
-    if(mH == 130) xsection = 5.48e-02*(0.4942+0.2778+0.07658 );
-    if(mH == 135) xsection = 4.52e-02*(0.4390+0.2453+0.06810 );
-    if(mH == 140) xsection = 3.54e-02*(0.3857+0.2172+0.06072 );
-    if(mH == 145) xsection = 2.61e-02*(0.3406+0.1930+0.05435 );
-  }
+//   if(process.find("VH")!=string::npos){
+//     if(mH == 110) xsection = 8.02e-02*(0.8754+0.4721+0.1257  );
+//     if(mH == 115) xsection = 7.65e-02*(0.7546+0.4107+0.1106  );
+//     if(mH == 120) xsection = 7.10e-02*(0.6561+0.3598+0.09756 );
+//     if(mH == 125) xsection = 6.37e-02*(0.5729+0.3158+0.08634 );
+//     if(mH == 130) xsection = 5.48e-02*(0.4942+0.2778+0.07658 );
+//     if(mH == 135) xsection = 4.52e-02*(0.4390+0.2453+0.06810 );
+//     if(mH == 140) xsection = 3.54e-02*(0.3857+0.2172+0.06072 );
+//     if(mH == 145) xsection = 2.61e-02*(0.3406+0.1930+0.05435 );
+//   }
 
   return xsection;
 }
@@ -77,15 +77,15 @@ void produce(
   if(analysis_.find("FakeUp")!=string::npos)   analysisFile = "TauUp";
   if(analysis_.find("FakeDown")!=string::npos) analysisFile = "TauDown";
 
-  fin = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/histograms/%s/eTau_mH%d_%s_%s_%s.root", outputDir.Data(), 120, bin_.c_str() , analysisFile.c_str(), variable_.c_str()), "READ");
-
+  fin = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/histograms/%s/eTau_mH%d_%s_%s_%s.root", outputDir.Data(), 125, bin_.c_str() , analysisFile.c_str(), variable_.c_str()), "READ");
+  cout<<"opening file : "<<Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/histograms/%s/eTau_mH%d_%s_%s_%s.root", outputDir.Data(), 125, bin_.c_str() , analysisFile.c_str(), variable_.c_str())<<endl;
 
   ///////////////////////////////////////////////
-  TFile* fin_jUp     = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/histograms/%s/eTau_mH%d_%s_JetUp_%s.root",   outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
-  TFile* fin_jDown   = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/histograms/%s/eTau_mH%d_%s_JetDown_%s.root", outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
-  TFile* fin_tUp     = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/histograms/%s/eTau_mH%d_%s_TauUp_%s.root",   outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
-  TFile* fin_tDown   = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/histograms/%s/eTau_mH%d_%s_TauDown_%s.root", outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
-  TFile* fin_nominal = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/histograms/%s/eTau_mH%d_%s__%s.root",        outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
+//   TFile* fin_jUp     = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/histograms/%s/eTau_mH%d_%s_JetUp_%s.root",   outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
+//   TFile* fin_jDown   = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/histograms/%s/eTau_mH%d_%s_JetDown_%s.root", outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
+//   TFile* fin_tUp     = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/histograms/%s/eTau_mH%d_%s_TauUp_%s.root",   outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
+//   TFile* fin_tDown   = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/histograms/%s/eTau_mH%d_%s_TauDown_%s.root", outputDir.Data(), 120, bin_.c_str() , variable_.c_str()), "READ");
+  TFile* fin_nominal = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/histograms/%s/eTau_mH%d_%s__%s.root",        outputDir.Data(), 125, bin_.c_str() , variable_.c_str()), "READ");
   ///////////////////////////////////////////////
 
   float rescaleggH = RESCALETO1PB ? higgsXsection(mH_,"ggH") : 1.0;
@@ -140,11 +140,12 @@ void produce(
   else if(bin_.find("oneJet")!=string::npos) 
     binNameSpace =  "SMpre2a";
 
-  //TFile* fTemplOut = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/datacards/%s/eTauSM_%s.root",outputDir.Data(), variable_.c_str()),"UPDATE");
+  //TFile* fTemplOut = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/datacards/%s/eTauSM_%s.root",outputDir.Data(), variable_.c_str()),"UPDATE");
   string theory =  !DOSUSY ? "SM" : "MSSM" ;
 
-  TFile* fTemplOut = new TFile(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/datacards/%s/eTau%s.root",outputDir.Data(), theory.c_str()),"UPDATE");
-  
+  TFile* fTemplOut = new TFile(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/datacards/%s/eTau%s.root",outputDir.Data(), theory.c_str()),"UPDATE");
+  cout<<"creating file : "<<Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/datacards/%s/eTau%s.root",outputDir.Data(), theory.c_str())<<endl;
+
   string suffix = "";
   if(analysis_.find("TauUp")!=string::npos)
     suffix = "_CMS_scale_tUp";
@@ -201,7 +202,7 @@ void produce(
 	hSgn3->Write(Form("VH%d%s" ,mH_,suffix.c_str()));
 
     }
-    else{
+    else{// is susy
       TH1F* hSgn1 = (TH1F*)fin->Get(Form("hSUSYGG%d",mH_));
       hSgn1->Write(Form("ggH%d%s" ,mH_,suffix.c_str()));
 
@@ -257,7 +258,7 @@ void produce(
       ((TH1F*)fin->Get("hTTb"))->Write(Form("TT%s"        ,suffix.c_str()));
       ((TH1F*)fin->Get("hVV"))->Write(Form("VV%s"         ,suffix.c_str()));
 
-    }
+    }//novbf
     else if(bin_.find("boost")!=string::npos){
 
     
@@ -309,7 +310,7 @@ void produce(
 
       ((TH1F*)fin->Get("hTTb"))->Write(Form("TT%s"        ,suffix.c_str()));
       ((TH1F*)fin->Get("hVV"))->Write(Form("VV%s"         ,suffix.c_str()));
-    }
+    }//boost
 
     else if(bin_.find("bTag")!=string::npos){
 
@@ -343,7 +344,7 @@ void produce(
 
       ((TH1F*)fin->Get("hTTb"))->Write(Form("TT%s"        ,suffix.c_str()));
       ((TH1F*)fin->Get("hVV"))->Write(Form("VV%s"         ,suffix.c_str()));
-    }
+    }//btag
     else if(bin_.find("vbf")!=string::npos && bin_.find("novbf")==string::npos){
 
 
@@ -406,7 +407,7 @@ void produce(
 
       // VV: MC keys
       ((TH1F*)fin->Get("hVVKeys"))->Write(Form("VV%s"         ,suffix.c_str()));
-    }
+    }//vbf
     else if(bin_.find("vh")!=string::npos){
 
       ((TH1F*)fin->Get("hDataEmb"))->Write(Form("ZTT%s",suffix.c_str()));
@@ -435,12 +436,12 @@ void produce(
       hZfakesKeys->Write(Form("ZLL%s"        ,suffix.c_str()));
       ((TH1F*)fin->Get("hTTb"))->Write(Form("TT%s"        ,suffix.c_str()));
       ((TH1F*)fin->Get("hVVKeys"))->Write(Form("VV%s"         ,suffix.c_str()));
-    }
+    }//vh
     else{
 
 
       ((TH1F*)fin->Get("hDataEmb"))->Write(Form("ZTT%s",suffix.c_str()));
-      ((TH1F*)fin->Get("hQcd"))->Write(Form("QCD%s"    ,suffix.c_str()));
+      ((TH1F*)fin->Get("hQCD"))->Write(Form("QCD%s"    ,suffix.c_str()));
       ((TH1F*)fin->Get("hW"))->Write(Form("W%s"           ,suffix.c_str()));
       ((TH1F*)fin->Get("hZmj"))->Write(Form("ZJ%s"        ,suffix.c_str()));
       ((TH1F*)fin->Get("hZmm"))->Write(Form("ZL%s"        ,suffix.c_str()));
@@ -451,7 +452,8 @@ void produce(
 
 
            
-  }else{
+  }//if(! (fTemplOut->cd( dirName.Data()  ) ) )
+  else{
     cout << "Directory is there, filling new histos..." << endl;
 
     TDirectory* dir = (TDirectory*)fTemplOut->Get( dirName.Data() );
@@ -487,7 +489,7 @@ void produce(
 
       }
     }
-    else{
+    else{//if susy
       if(dir->FindObjectAny(Form("qqH%d%s"         ,mH_,suffix.c_str()))==0 ){
         TH1F* hSgn1 = (TH1F*)fin->Get(Form("hSUSYGG%d",mH_));
         hSgn1->Write(Form("ggH%d%s" ,mH_,suffix.c_str()));
@@ -521,7 +523,6 @@ void produce(
 	  hLooseIso->Scale(hQCD->Integral()/hLooseIso->Integral());
 	  hLooseIso->Write(Form("QCD%s"    ,suffix.c_str()));
 	}
-
       }
       if(dir->FindObjectAny(Form("W%s"       ,suffix.c_str()))==0 ){
 
@@ -540,7 +541,6 @@ void produce(
 	  hWKeys->Write(Form("W%s"    ,suffix.c_str()));
 	  //hW->Write(Form("W%s"    ,suffix.c_str()));
 	}
-	
       }
       if(dir->FindObjectAny(Form("ZJ%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hZmj"))->Write(Form("ZJ%s"        ,suffix.c_str()));
@@ -553,9 +553,7 @@ void produce(
       if(dir->FindObjectAny(Form("VV%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hVV"))->Write(Form("VV%s"         ,suffix.c_str()));
      
-      
-
-    }
+    }//novbf
     else if(bin_.find("boost")!=string::npos){
 
       if(dir->FindObjectAny(Form("ZTT%s"       ,suffix.c_str()))==0 )
@@ -575,7 +573,6 @@ void produce(
 	  hLooseIso->Scale(hQCD->Integral()/hLooseIso->Integral());
 	  hLooseIso->Write(Form("QCD%s"    ,suffix.c_str()));
 	}
-
       }
       if(dir->FindObjectAny(Form("W%s"       ,suffix.c_str()))==0 ){
 	
@@ -589,7 +586,6 @@ void produce(
 	  //hWKeys->Write(Form("W%s"    ,suffix.c_str()));
 	  hW->Write(Form("W%s"    ,suffix.c_str()));
 	}
- 
       }
 
       if(dir->FindObjectAny(Form("ZJ%s"       ,suffix.c_str()))==0 )
@@ -613,7 +609,7 @@ void produce(
       if(dir->FindObjectAny(Form("VV%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hVV"))->Write(Form("VV%s"         ,suffix.c_str()));
     
-    }
+    }//boost
     else if(bin_.find("bTag")!=string::npos){
 
       if(dir->FindObjectAny(Form("ZTT%s"       ,suffix.c_str()))==0 )
@@ -652,9 +648,7 @@ void produce(
       if(dir->FindObjectAny(Form("VV%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hVV"))->Write(Form("VV%s"         ,suffix.c_str()));
 
-   
-
-    }
+    }//btag
     else if(bin_.find("vbf")!=string::npos && bin_.find("novbf")==string::npos){
 
       if(dir->FindObjectAny(Form("ZTT%s"       ,suffix.c_str()))==0 )
@@ -717,8 +711,6 @@ void produce(
       if(dir->FindObjectAny(Form("VV%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hVVKeys"))->Write(Form("VV%s"         ,suffix.c_str()));
 
-     
-
     }
     else if(bin_.find("vh")!=string::npos){
 
@@ -733,8 +725,6 @@ void produce(
 	hLooseIsoKeys->Scale(hAntiIso->Integral()/hLooseIsoKeys->Integral());
 	hLooseIsoKeys->Write(Form("QCD%s"    ,suffix.c_str()));
     
-	hLooseIsoKeys->Write(Form("QCD%s"       ,suffix.c_str()));
-
       }
 
       if(dir->FindObjectAny(Form("W%s"       ,suffix.c_str()))==0 )
@@ -763,9 +753,7 @@ void produce(
       if(dir->FindObjectAny(Form("VV%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hVVKeys"))->Write(Form("VV%s"         ,suffix.c_str()));
 
-
-
-    }
+    }//vh
     else{
       if(dir->FindObjectAny(Form("ZTT%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hDataEmb"))->Write(Form("ZTT%s"       ,suffix.c_str()));
@@ -783,37 +771,31 @@ void produce(
 	((TH1F*)fin->Get("hTTb"))->Write(Form("TT%s"        ,suffix.c_str()));
       if(dir->FindObjectAny(Form("VV%s"       ,suffix.c_str()))==0 )
 	((TH1F*)fin->Get("hVV"))->Write(Form("VV%s"         ,suffix.c_str()));
-
     }
-
-
   }
 
-
-  
   fTemplOut->Close();
   
   // edit the datacards only for the nominal analysis
   if(analysis_.find("Up")!=string::npos || analysis_.find("Down")!=string::npos){
 
     fin->Close();          delete fin;
-    fin_tUp->Close();      delete fin_tUp;
-    fin_tDown->Close();    delete fin_tDown;
-    fin_jUp->Close();      delete fin_jUp;
-    fin_jDown->Close();    delete fin_jDown;
+//     fin_tUp->Close();      delete fin_tUp;
+//     fin_tDown->Close();    delete fin_tDown;
+//     fin_jUp->Close();      delete fin_jUp;
+//     fin_jDown->Close();    delete fin_jDown;
 
     return;
   }
 
-
   ifstream in;
 
   char* c = new char[1000];
-  in.open(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/templates/%s/eTau_%s_template_v3.txt", theory.c_str(),    binNameSpace.c_str()));
-  //ofstream out(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/datacards/%s/eTau_%s_mH%d_%s.txt", outputDir.Data(), binNameSpace.c_str(), mH_, variable_.c_str()));
+  in.open(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/templates/%s/eTau_%s_template_v3.txt", theory.c_str(),    binNameSpace.c_str()));
+  //ofstream out(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/datacards/%s/eTau_%s_mH%d_%s.txt", outputDir.Data(), binNameSpace.c_str(), mH_, variable_.c_str()));
   string resonance = !DOSUSY ? "H" : "A";
 
-  ofstream out(Form("/home/llr/cms/lbianchini/CMSSW_4_2_8_patch7_reload/src/Bianchi/Limits/htautau/datacards/%s/eTau_%s_m%s%d.txt", outputDir.Data(), binNameSpace.c_str(), resonance.c_str(), mH_ ));
+  ofstream out(Form("/home/llr/cms/ivo/HTauTauAnalysis/CMSSW_5_2_6/src/Bianchi/Limits/bin/htautau/datacards/%s/eTau_%s_m%s%d.txt", outputDir.Data(), binNameSpace.c_str(), resonance.c_str(), mH_ ));
   out.precision(8);
 
   float QCDyield = 0;
@@ -893,7 +875,6 @@ void produce(
             //float QCDSdb2     =  hParameters->GetBinContent(26);
             //Wyield      = (DataSdb2-TTbarSdb2-QCDSdb2)/ExtrapFact;
             Wyield = ((TH1F*)fin->Get("hW3JetsLooseTauIso"))->Integral();
-
 	  }
 	  else{
 	    Wyield = ((TH1F*)fin->Get("hW"))->Integral();
@@ -951,120 +932,120 @@ void produce(
 	  out << line << endl;
 
 	}
-	else if(line.find("CMS_scale_j")!=string::npos){
+// 	else if(line.find("CMS_scale_j")!=string::npos){
 
-	  float VBFrel = 0; float VBFrelUp = 0;  float VBFrelDown = 0;
-	  float SMrel  = 0; float SMrelUp  = 0;  float SMrelDown  = 0;
-	  float VHrel  = 0; float VHrelUp  = 0;  float VHrelDown  = 0;
+// 	  float VBFrel = 0; float VBFrelUp = 0;  float VBFrelDown = 0;
+// 	  float SMrel  = 0; float SMrelUp  = 0;  float SMrelDown  = 0;
+// 	  float VHrel  = 0; float VHrelUp  = 0;  float VHrelDown  = 0;
 
-	  if(!DOSUSY){
+// 	  if(!DOSUSY){
 
 	    //////////////////////////////// FIX HERE!!!
 
-	    VBFrel = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral())),
-				TMath::Abs((((TH1F*)fin_jDown->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral()))
-				);
-	    VBFrelUp   = (((TH1F*)fin_jUp->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral());
-	    VBFrelDown = (((TH1F*)fin_jDown->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral());
+// 	    VBFrel = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral())),
+// 				TMath::Abs((((TH1F*)fin_jDown->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral()))
+// 				);
+// 	    VBFrelUp   = (((TH1F*)fin_jUp->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral());
+// 	    VBFrelDown = (((TH1F*)fin_jDown->Get(Form("hqqH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hqqH%d",mH_)))->Integral());
 	    
-	    VBFrel     *= 1./rescaleqqH;
-	    VBFrelUp   *= 1./rescaleqqH;
-	    VBFrelDown *= 1./rescaleqqH;
+// 	    VBFrel     *= 1./rescaleqqH;
+// 	    VBFrelUp   *= 1./rescaleqqH;
+// 	    VBFrelDown *= 1./rescaleqqH;
 
-	    SMrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral())),
-				TMath::Abs((((TH1F*)fin_jDown->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral()))
-				);
+// 	    SMrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral())),
+// 				TMath::Abs((((TH1F*)fin_jDown->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral()))
+// 				);
 	    
-	    SMrelUp   = (((TH1F*)fin_jUp->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral());
-	    SMrelDown = (((TH1F*)fin_jDown->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral());
+// 	    SMrelUp   = (((TH1F*)fin_jUp->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral());
+// 	    SMrelDown = (((TH1F*)fin_jDown->Get(Form("hggH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hggH%d",mH_)))->Integral());
 	    
-	    SMrel     *= 1./rescaleggH;
-	    SMrelUp   *= 1./rescaleggH;
-	    SMrelDown *= 1./rescaleggH;
+// 	    SMrel     *= 1./rescaleggH;
+// 	    SMrelUp   *= 1./rescaleggH;
+// 	    SMrelDown *= 1./rescaleggH;
 
-	    VHrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral())),
-				TMath::Abs((((TH1F*)fin_jDown->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral()))
-				);
+// 	    VHrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral())),
+// 				TMath::Abs((((TH1F*)fin_jDown->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral()))
+// 				);
 	    
-	    VHrelUp   = (((TH1F*)fin_jUp->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral());
-	    VHrelDown = (((TH1F*)fin_jDown->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral());
+// 	    VHrelUp   = (((TH1F*)fin_jUp->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral());
+// 	    VHrelDown = (((TH1F*)fin_jDown->Get(Form("hVH%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hVH%d",mH_)))->Integral());
 
-	    VHrel     *= 1./rescaleVH;
-	    VHrelUp   *= 1./rescaleVH;
-	    VHrelDown *= 1./rescaleVH;
+// 	    VHrel     *= 1./rescaleVH;
+// 	    VHrelUp   *= 1./rescaleVH;
+// 	    VHrelDown *= 1./rescaleVH;
 
-	  }
-	  else{
-	    VBFrel = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral())),
-                                TMath::Abs((((TH1F*)fin_jDown->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral()))
-                                );
-            VBFrelUp   = (((TH1F*)fin_jUp->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral());
-            VBFrelDown = (((TH1F*)fin_jDown->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral());
+// 	  }
+// 	  else{
+// 	    VBFrel = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral())),
+//                                 TMath::Abs((((TH1F*)fin_jDown->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral()))
+//                                 );
+//             VBFrelUp   = (((TH1F*)fin_jUp->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral());
+//             VBFrelDown = (((TH1F*)fin_jDown->Get(Form("hSUSYGG%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYGG%d",mH_)))->Integral());
 
-            SMrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral())),
-                                TMath::Abs((((TH1F*)fin_jDown->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral()))
-                                );
+//             SMrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral())),
+//                                 TMath::Abs((((TH1F*)fin_jDown->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral()))
+//                                 );
 
-            SMrelUp   = (((TH1F*)fin_jUp->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral());
-            SMrelDown = (((TH1F*)fin_jDown->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral());
-	  }
-
-
-	  float ZTTrel = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral())),
-				    TMath::Abs((((TH1F*)fin_jDown->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral()))
-				    );
-
-	  float ZTTrelUp   = (((TH1F*)fin_jUp->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral());
-	  float ZTTrelDown = (((TH1F*)fin_jDown->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral());
+//             SMrelUp   = (((TH1F*)fin_jUp->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral());
+//             SMrelDown = (((TH1F*)fin_jDown->Get(Form("hSUSYBB%d",mH_)))->Integral()/((TH1F*)fin->Get(Form("hSUSYBB%d",mH_)))->Integral());
+// 	  }
 
 
-	  float TTrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral())),
-				    TMath::Abs((((TH1F*)fin_jDown->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral()))
-				    );
+// 	  float ZTTrel = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral())),
+// 				    TMath::Abs((((TH1F*)fin_jDown->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral()))
+// 				    );
 
-	  float TTrelUp   = (((TH1F*)fin_jUp->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral());
-	  float TTrelDown = (((TH1F*)fin_jDown->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral());
-
-
-	  float VVrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral())),
-				    TMath::Abs((((TH1F*)fin_jDown->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral()))
-				    );
-
-	  float VVrelUp   = (((TH1F*)fin_jUp->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral());
-	  float VVrelDown = (((TH1F*)fin_jDown->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral());
+// 	  float ZTTrelUp   = (((TH1F*)fin_jUp->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral());
+// 	  float ZTTrelDown = (((TH1F*)fin_jDown->Get("hZtt"))->Integral()/((TH1F*)fin->Get("hZtt"))->Integral());
 
 
-	  string space      = "                   ";
-	  string longspace  = "                      ";
-	  string shortspace = "     ";
-	  out << "CMS_scale_j";
-	  out << longspace << "lnN" << shortspace;
-	  if(!DOSUSY){
-	    if(binNameSpace.find("0jet_")!=string::npos || binNameSpace.find("2jet")!=string::npos) 
-	      out <<          string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+VHrelDown), TMath::Abs(-1+VHrelUp) ) * TMath::Abs(-1+VHrelUp)/(-1+VHrelUp)   )); // VH
-	    else
-	      out << space << string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+SMrelDown), TMath::Abs(-1+SMrelUp))  * TMath::Abs(-1+SMrelUp)/(-1+SMrelUp)   )); // VH=GGF
-	  }
-	  out << space << string(Form("%.2f",1+TMath::Max(  TMath::Abs(-1+SMrelDown), TMath::Abs(-1+SMrelUp))  * TMath::Abs(-1+SMrelUp)/(-1+SMrelUp)   ));  // GGF/BB
-	  out << space << string(Form("%.2f",1+TMath::Max(  TMath::Abs(-1+VBFrelDown),TMath::Abs(-1+VBFrelUp))* TMath::Abs(-1+VBFrelUp)/(-1+VBFrelUp) ));   // VBF/GG
-	  out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));  // ZTT
-	  out << space << "-" ;                                                // QCD
-	  out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));  // W
-	  out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));  // Z+fakes
+// 	  float TTrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral())),
+// 				    TMath::Abs((((TH1F*)fin_jDown->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral()))
+// 				    );
 
-	  if(binNameSpace.find("0jet_")!=string::npos || binNameSpace.find("boost")!=string::npos) 
-	    out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));
+// 	  float TTrelUp   = (((TH1F*)fin_jUp->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral());
+// 	  float TTrelDown = (((TH1F*)fin_jDown->Get("hTTb"))->Integral()/((TH1F*)fin->Get("hTTb"))->Integral());
 
-	  out << space << string(Form("%.2f",1+TMath::Max(  TMath::Abs(-1+TTrelDown),TMath::Abs(-1+TTrelUp))  * TMath::Abs(-1+TTrelUp)/(-1+TTrelUp) ));  // TT
 
-	  //if(binNameSpace.find("0jet_")!=string::npos) 
-	  out << space << string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+VVrelDown),TMath::Abs(-1+VVrelUp) ) * TMath::Abs(-1+VVrelUp)/(-1+VVrelUp)));   // VV
-	  //else
-	  //out << space << string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+TTrelDown),TMath::Abs(-1+TTrelUp))  * TMath::Abs(-1+TTrelUp)/(-1+TTrelUp) ));  // TT
+// 	  float VVrel  = TMath::Max(TMath::Abs((((TH1F*)fin_jUp->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral())),
+// 				    TMath::Abs((((TH1F*)fin_jDown->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral()))
+// 				    );
 
-	  out << space << "JEC uncertainty";
-	  out << endl;
-	}
+// 	  float VVrelUp   = (((TH1F*)fin_jUp->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral());
+// 	  float VVrelDown = (((TH1F*)fin_jDown->Get("hVV"))->Integral()/((TH1F*)fin->Get("hVV"))->Integral());
+
+
+// 	  string space      = "                   ";
+// 	  string longspace  = "                      ";
+// 	  string shortspace = "     ";
+// 	  out << "CMS_scale_j";
+// 	  out << longspace << "lnN" << shortspace;
+// 	  if(!DOSUSY){
+// 	    if(binNameSpace.find("0jet_")!=string::npos || binNameSpace.find("2jet")!=string::npos) 
+// 	      out <<          string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+VHrelDown), TMath::Abs(-1+VHrelUp) ) * TMath::Abs(-1+VHrelUp)/(-1+VHrelUp)   )); // VH
+// 	    else
+// 	      out << space << string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+SMrelDown), TMath::Abs(-1+SMrelUp))  * TMath::Abs(-1+SMrelUp)/(-1+SMrelUp)   )); // VH=GGF
+// 	  }
+// 	  out << space << string(Form("%.2f",1+TMath::Max(  TMath::Abs(-1+SMrelDown), TMath::Abs(-1+SMrelUp))  * TMath::Abs(-1+SMrelUp)/(-1+SMrelUp)   ));  // GGF/BB
+// 	  out << space << string(Form("%.2f",1+TMath::Max(  TMath::Abs(-1+VBFrelDown),TMath::Abs(-1+VBFrelUp))* TMath::Abs(-1+VBFrelUp)/(-1+VBFrelUp) ));   // VBF/GG
+// 	  out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));  // ZTT
+// 	  out << space << "-" ;                                                // QCD
+// 	  out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));  // W
+// 	  out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));  // Z+fakes
+
+// 	  if(binNameSpace.find("0jet_")!=string::npos || binNameSpace.find("boost")!=string::npos) 
+// 	    out << space << "-" ; //string(Form("%.2f",1+(-1+ZTTrelDown)*1.0));
+
+// 	  out << space << string(Form("%.2f",1+TMath::Max(  TMath::Abs(-1+TTrelDown),TMath::Abs(-1+TTrelUp))  * TMath::Abs(-1+TTrelUp)/(-1+TTrelUp) ));  // TT
+
+// 	  //if(binNameSpace.find("0jet_")!=string::npos) 
+// 	  out << space << string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+VVrelDown),TMath::Abs(-1+VVrelUp) ) * TMath::Abs(-1+VVrelUp)/(-1+VVrelUp)));   // VV
+// 	  //else
+// 	  //out << space << string(Form("%.2f",1+TMath::Max(TMath::Abs(-1+TTrelDown),TMath::Abs(-1+TTrelUp))  * TMath::Abs(-1+TTrelUp)/(-1+TTrelUp) ));  // TT
+
+// 	  out << space << "JEC uncertainty";
+// 	  out << endl;
+// 	}
 	else if(line.find( Form("CMS_htt_eTau_%s_QCDNorm",binNameSpace.c_str()) )!=string::npos){
 	 
 	  line.replace( line.find("XXX") , 3 , string(Form("%.0f",((TH1F*)fin->Get("hParameters"))->GetBinContent(5)))  );
@@ -1101,10 +1082,10 @@ void produce(
    }
 
   fin->Close();          delete fin;
-  fin_tUp->Close();      delete fin_tUp;
-  fin_tDown->Close();    delete fin_tDown;
-  fin_jUp->Close();      delete fin_jUp;
-  fin_jDown->Close();    delete fin_jDown;
+//   fin_tUp->Close();      delete fin_tUp;
+//   fin_tDown->Close();    delete fin_tDown;
+//   fin_jUp->Close();      delete fin_jUp;
+//   fin_jDown->Close();    delete fin_jDown;
 
   return;
 
@@ -1112,12 +1093,13 @@ void produce(
 
 
 
-void produceAll(  TString outputDir = "June2012/Approval_checks2" ){
+void produceAll(  TString outputDir = "ElecTauStream_01Aug2012" ){
 
   vector<string> variables;
   vector<int> mH;
 
   //variables.push_back("diTauVisMass");
+//   variables.push_back("diTauSVFitMass");
   variables.push_back("diTauNSVfitMass");
   //variables.push_back("diTauSVFitMassCal0");
   //variables.push_back("diTauSVFitMassCal1");
@@ -1125,14 +1107,14 @@ void produceAll(  TString outputDir = "June2012/Approval_checks2" ){
 
 
   //mH.push_back(105);
-  mH.push_back(110);
-  mH.push_back(115);
-  mH.push_back(120);
+//   mH.push_back(110);
+//   mH.push_back(115);
+//   mH.push_back(120);
   mH.push_back(125);
-  mH.push_back(130);
-  mH.push_back(135);
-  mH.push_back(140);
-  mH.push_back(145);
+//   mH.push_back(130);
+//   mH.push_back(135);
+//   mH.push_back(140);
+//   mH.push_back(145);
 
   //mH.push_back(90);
   //mH.push_back(100);
@@ -1151,6 +1133,8 @@ void produceAll(  TString outputDir = "June2012/Approval_checks2" ){
 
   for(unsigned int i = 0 ; i < variables.size(); i++){
     for(unsigned j = 0; j < mH.size(); j++){
+
+       produce(mH[j],variables[i], ""        , "inclusive", outputDir);
 
 //        produce(mH[j],variables[i], ""        , "novbfLow", outputDir);
 //        produce(mH[j],variables[i], "TauUp"   , "novbfLow", outputDir);
@@ -1191,10 +1175,10 @@ void produceAll(  TString outputDir = "June2012/Approval_checks2" ){
        produce(mH[j],variables[i], ""        , "vbf", outputDir);
        produce(mH[j],variables[i], "TauUp"   , "vbf", outputDir);
        produce(mH[j],variables[i], "TauDown" , "vbf", outputDir);
-       produce(mH[j],variables[i], "JetUp"   , "vbf", outputDir);
-       produce(mH[j],variables[i], "JetDown" , "vbf", outputDir);
-       produce(mH[j],variables[i], "FakeUp"   , "vbf", outputDir);
-       produce(mH[j],variables[i], "FakeDown" , "vbf", outputDir);
+//        produce(mH[j],variables[i], "JetUp"   , "vbf", outputDir);
+//        produce(mH[j],variables[i], "JetDown" , "vbf", outputDir);
+//        produce(mH[j],variables[i], "FakeUp"   , "vbf", outputDir);
+//        produce(mH[j],variables[i], "FakeDown" , "vbf", outputDir);
 
 //       produce(mH[j],variables[i], ""        , "vh", outputDir);
 //       produce(mH[j],variables[i], "TauUp"   , "vh", outputDir);
