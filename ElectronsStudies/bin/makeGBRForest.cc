@@ -1,0 +1,450 @@
+#include "TFile.h"
+#include "CondFormats/EgammaObjects/interface/GBRForest.h"
+#include "CondFormats/EgammaObjects/interface/GBRTree.h"
+#include "Cintex/Cintex.h"
+#include "TMVA/Factory.h"
+#include "TMVA/Reader.h"
+#include "TMVA/Tools.h"
+#include "TMVA/MethodBDT.h"
+
+int main(int argc, char* argv[]) 
+{
+  float Tau_EtaAtEcalEntrance;
+  float Tau_Pt;
+  float Tau_dCrackEta;
+  float Tau_dCrackPhi;
+  float Tau_NumHitsVariable; 
+  float Tau_GSFChi2; 
+  float Tau_GSFTrackResol; 
+  float Tau_GSFTracklnPt; 
+  float Tau_GSFTrackEta; 
+  float Tau_EmFraction; 
+  float Tau_NumGammaCands; 
+  float Tau_HadrHoP; 
+  float Tau_HadrEoP; 
+  float Tau_VisMass; 
+  float Tau_GammaEtaMom;
+  float Tau_GammaPhiMom;
+  float Tau_GammaEnFrac;
+  float Tau_HadrMva; 
+
+  float Elec_EtotOverPin;
+  float Elec_EgammaOverPdif;
+  float Elec_Fbrem;
+  float Elec_Chi2GSF;
+  float Elec_GSFNumHits;
+  float Elec_GSFTrackResol;
+  float Elec_GSFTracklnPt;
+  float Elec_GSFTrackEta;
+
+  std::string Weight_NoEleMatch_woGwoGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_woGwoGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_NoEleMatch_woGwGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_woGwGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_NoEleMatch_wGwoGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_wGwoGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_NoEleMatch_wGwGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_wGwGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_woGwoGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_woGwoGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_woGwGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_woGwGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_wGwoGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_wGwoGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_wGwGSF_BL = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_wGwGSF_Barrel_BDTG.weights.xml";
+  std::string Weight_NoEleMatch_woGwoGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_woGwoGSF_Endcap_BDTG.weights.xml";
+  std::string Weight_NoEleMatch_woGwGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_woGwGSF_Endcap_BDTG.weights.xml";
+  std::string Weight_NoEleMatch_wGwoGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_wGwoGSF_Endcap_BDTG.weights.xml";
+  std::string Weight_NoEleMatch_wGwGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_NoEleMatch_wGwGSF_Endcap_BDTG.weights.xml";
+  std::string Weight_woGwoGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_woGwoGSF_Endcap_BDTG.weights.xml";
+  std::string Weight_woGwGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_woGwGSF_Endcap_BDTG.weights.xml";
+  std::string Weight_wGwoGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_wGwoGSF_Endcap_BDTG.weights.xml";
+  std::string Weight_wGwGSF_EC = "../test/Macros/tmva/weights/V13/TMVAClassification_v13EleVeto_wGwGSF_Endcap_BDTG.weights.xml";
+
+  TMVA::Reader *reader_NoEleMatch_woGwoGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_woGwoGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_NoEleMatch_woGwoGSF_BL->SetVerbose(kTRUE);
+  reader_NoEleMatch_woGwoGSF_BL->BookMVA("BDTG",Weight_NoEleMatch_woGwoGSF_BL);
+
+  TMVA::Reader *reader_NoEleMatch_woGwGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_woGwGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_NoEleMatch_woGwGSF_BL->SetVerbose(kTRUE);
+  reader_NoEleMatch_woGwGSF_BL->BookMVA("BDTG",Weight_NoEleMatch_woGwGSF_BL);
+
+  TMVA::Reader *reader_NoEleMatch_wGwoGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_wGwoGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_NoEleMatch_wGwoGSF_BL->SetVerbose(kTRUE);
+  reader_NoEleMatch_wGwoGSF_BL->BookMVA("BDTG",Weight_NoEleMatch_wGwoGSF_BL);
+
+  TMVA::Reader *reader_NoEleMatch_wGwGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_wGwGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_NoEleMatch_wGwGSF_BL->SetVerbose(kTRUE);
+  reader_NoEleMatch_wGwGSF_BL->BookMVA("BDTG",Weight_NoEleMatch_wGwGSF_BL);
+
+  TMVA::Reader *reader_woGwoGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );
+  reader_woGwoGSF_BL->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_woGwoGSF_BL->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_woGwoGSF_BL->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_woGwoGSF_BL->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_woGwoGSF_BL->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_woGwoGSF_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_woGwoGSF_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_woGwoGSF_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_woGwoGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_woGwoGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_woGwoGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_woGwoGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_woGwoGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_woGwoGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_woGwoGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_woGwoGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_woGwoGSF_BL->SetVerbose(kTRUE);
+  reader_woGwoGSF_BL->BookMVA("BDTG",Weight_woGwoGSF_BL);
+
+  TMVA::Reader *reader_woGwGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_woGwGSF_BL->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_woGwGSF_BL->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_woGwGSF_BL->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_woGwGSF_BL->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_woGwGSF_BL->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_woGwGSF_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_woGwGSF_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_woGwGSF_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_woGwGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_woGwGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_woGwGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_woGwGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_woGwGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_woGwGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_woGwGSF_BL->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_woGwGSF_BL->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_woGwGSF_BL->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_woGwGSF_BL->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_woGwGSF_BL->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_woGwGSF_BL->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_woGwGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_woGwGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_woGwGSF_BL->SetVerbose(kTRUE);
+  reader_woGwGSF_BL->BookMVA("BDTG",Weight_woGwGSF_BL);
+
+  TMVA::Reader *reader_wGwoGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_wGwoGSF_BL->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_wGwoGSF_BL->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_wGwoGSF_BL->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_wGwoGSF_BL->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_wGwoGSF_BL->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_wGwoGSF_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_wGwoGSF_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_wGwoGSF_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_wGwoGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_wGwoGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_wGwoGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_wGwoGSF_BL->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_wGwoGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_wGwoGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_wGwoGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_wGwoGSF_BL->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_wGwoGSF_BL->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_wGwoGSF_BL->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_wGwoGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_wGwoGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_wGwoGSF_BL->SetVerbose(kTRUE);
+  reader_wGwoGSF_BL->BookMVA("BDTG",Weight_wGwoGSF_BL);
+
+  TMVA::Reader *reader_wGwGSF_BL = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_wGwGSF_BL->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_wGwGSF_BL->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_wGwGSF_BL->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_wGwGSF_BL->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_wGwGSF_BL->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_wGwGSF_BL->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_wGwGSF_BL->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_wGwGSF_BL->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_wGwGSF_BL->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_wGwGSF_BL->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_wGwGSF_BL->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_wGwGSF_BL->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_wGwGSF_BL->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_wGwGSF_BL->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_wGwGSF_BL->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_wGwGSF_BL->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_wGwGSF_BL->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_wGwGSF_BL->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_wGwGSF_BL->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_wGwGSF_BL->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_wGwGSF_BL->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_wGwGSF_BL->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_wGwGSF_BL->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_wGwGSF_BL->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_wGwGSF_BL->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_wGwGSF_BL->AddVariable("Tau_dCrackPhi",&Tau_dCrackPhi);
+  reader_wGwGSF_BL->SetVerbose(kTRUE);
+  reader_wGwGSF_BL->BookMVA("BDTG",Weight_wGwGSF_BL);
+
+  ////////////////////////
+
+  TMVA::Reader *reader_NoEleMatch_woGwoGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_woGwoGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_woGwoGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_woGwoGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_woGwoGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_woGwoGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_woGwoGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_woGwoGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_woGwoGSF_EC->SetVerbose(kTRUE);
+  reader_NoEleMatch_woGwoGSF_EC->BookMVA("BDTG",Weight_NoEleMatch_woGwoGSF_EC);
+
+  TMVA::Reader *reader_NoEleMatch_woGwGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_NoEleMatch_woGwGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_woGwGSF_EC->SetVerbose(kTRUE);
+  reader_NoEleMatch_woGwGSF_EC->BookMVA("BDTG",Weight_NoEleMatch_woGwGSF_EC);
+
+  TMVA::Reader *reader_NoEleMatch_wGwoGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_NoEleMatch_wGwoGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_wGwoGSF_EC->SetVerbose(kTRUE);
+  reader_NoEleMatch_wGwoGSF_EC->BookMVA("BDTG",Weight_NoEleMatch_wGwoGSF_EC);
+
+  TMVA::Reader *reader_NoEleMatch_wGwGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_NoEleMatch_wGwGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_NoEleMatch_wGwGSF_EC->SetVerbose(kTRUE);
+  reader_NoEleMatch_wGwGSF_EC->BookMVA("BDTG",Weight_NoEleMatch_wGwGSF_EC);
+
+  TMVA::Reader *reader_woGwoGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );
+  reader_woGwoGSF_EC->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_woGwoGSF_EC->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_woGwoGSF_EC->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_woGwoGSF_EC->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_woGwoGSF_EC->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_woGwoGSF_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_woGwoGSF_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_woGwoGSF_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_woGwoGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_woGwoGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_woGwoGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_woGwoGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_woGwoGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_woGwoGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_woGwoGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_woGwoGSF_EC->SetVerbose(kTRUE);
+  reader_woGwoGSF_EC->BookMVA("BDTG",Weight_woGwoGSF_EC);
+
+  TMVA::Reader *reader_woGwGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_woGwGSF_EC->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_woGwGSF_EC->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_woGwGSF_EC->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_woGwGSF_EC->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_woGwGSF_EC->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_woGwGSF_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_woGwGSF_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_woGwGSF_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_woGwGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_woGwGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_woGwGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_woGwGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_woGwGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_woGwGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_woGwGSF_EC->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_woGwGSF_EC->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_woGwGSF_EC->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_woGwGSF_EC->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_woGwGSF_EC->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_woGwGSF_EC->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_woGwGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_woGwGSF_EC->SetVerbose(kTRUE);
+  reader_woGwGSF_EC->BookMVA("BDTG",Weight_woGwGSF_EC);
+
+  TMVA::Reader *reader_wGwoGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_wGwoGSF_EC->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_wGwoGSF_EC->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_wGwoGSF_EC->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_wGwoGSF_EC->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_wGwoGSF_EC->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_wGwoGSF_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_wGwoGSF_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_wGwoGSF_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_wGwoGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_wGwoGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_wGwoGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_wGwoGSF_EC->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_wGwoGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_wGwoGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_wGwoGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_wGwoGSF_EC->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_wGwoGSF_EC->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_wGwoGSF_EC->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_wGwoGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_wGwoGSF_EC->SetVerbose(kTRUE);
+  reader_wGwoGSF_EC->BookMVA("BDTG",Weight_wGwoGSF_EC);
+
+  TMVA::Reader *reader_wGwGSF_EC = new TMVA::Reader( "!Color:!Silent:Error" );  
+  reader_wGwGSF_EC->AddVariable("Elec_EtotOverPin",&Elec_EtotOverPin);
+  reader_wGwGSF_EC->AddVariable("Elec_EgammaOverPdif",&Elec_EgammaOverPdif);
+  reader_wGwGSF_EC->AddVariable("Elec_Fbrem",&Elec_Fbrem);
+  reader_wGwGSF_EC->AddVariable("Elec_Chi2GSF",&Elec_Chi2GSF);
+  reader_wGwGSF_EC->AddVariable("Elec_GSFNumHits",&Elec_GSFNumHits);
+  reader_wGwGSF_EC->AddVariable("Elec_GSFTrackResol",&Elec_GSFTrackResol);
+  reader_wGwGSF_EC->AddVariable("Elec_GSFTracklnPt",&Elec_GSFTracklnPt);
+  reader_wGwGSF_EC->AddVariable("Elec_GSFTrackEta",&Elec_GSFTrackEta);
+  reader_wGwGSF_EC->AddVariable("Tau_EtaAtEcalEntrance",&Tau_EtaAtEcalEntrance);
+  reader_wGwGSF_EC->AddVariable("Tau_Pt",&Tau_Pt);
+  reader_wGwGSF_EC->AddVariable("Tau_EmFraction",&Tau_EmFraction);
+  reader_wGwGSF_EC->AddVariable("Tau_NumGammaCands",&Tau_NumGammaCands);
+  reader_wGwGSF_EC->AddVariable("Tau_HadrHoP",&Tau_HadrHoP);
+  reader_wGwGSF_EC->AddVariable("Tau_HadrEoP",&Tau_HadrEoP);
+  reader_wGwGSF_EC->AddVariable("Tau_VisMass",&Tau_VisMass);
+  reader_wGwGSF_EC->AddVariable("Tau_HadrMva",&Tau_HadrMva);
+  reader_wGwGSF_EC->AddVariable("Tau_GammaEtaMom",&Tau_GammaEtaMom);
+  reader_wGwGSF_EC->AddVariable("Tau_GammaPhiMom",&Tau_GammaPhiMom);
+  reader_wGwGSF_EC->AddVariable("Tau_GammaEnFrac",&Tau_GammaEnFrac);
+  reader_wGwGSF_EC->AddVariable("Tau_GSFChi2",&Tau_GSFChi2);
+  reader_wGwGSF_EC->AddVariable("(Tau_GSFNumHits - Tau_KFNumHits)/(Tau_GSFNumHits + Tau_KFNumHits)",&Tau_NumHitsVariable);
+  reader_wGwGSF_EC->AddVariable("Tau_GSFTrackResol",&Tau_GSFTrackResol);
+  reader_wGwGSF_EC->AddVariable("Tau_GSFTracklnPt",&Tau_GSFTracklnPt);
+  reader_wGwGSF_EC->AddVariable("Tau_GSFTrackEta",&Tau_GSFTrackEta);
+  reader_wGwGSF_EC->AddVariable("Tau_dCrackEta",&Tau_dCrackEta);
+  reader_wGwGSF_EC->SetVerbose(kTRUE);
+  reader_wGwGSF_EC->BookMVA("BDTG",Weight_wGwGSF_EC);
+
+
+  TMVA::MethodBDT *bdt_NoEleMatch_woGwoGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_woGwoGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_NoEleMatch_woGwGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_wGwGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_NoEleMatch_wGwoGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_woGwoGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_NoEleMatch_wGwGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_wGwGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_woGwoGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_woGwoGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_woGwGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_wGwGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_wGwoGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_woGwoGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_wGwGSF_BL = dynamic_cast<TMVA::MethodBDT*>(reader_wGwGSF_BL->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_NoEleMatch_woGwoGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_woGwoGSF_EC->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_NoEleMatch_woGwGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_wGwGSF_EC->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_NoEleMatch_wGwoGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_woGwoGSF_EC->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_NoEleMatch_wGwGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_NoEleMatch_wGwGSF_EC->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_woGwoGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_woGwoGSF_EC->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_woGwGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_wGwGSF_EC->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_wGwoGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_woGwoGSF_EC->FindMVA("BDTG"));
+  TMVA::MethodBDT *bdt_wGwGSF_EC = dynamic_cast<TMVA::MethodBDT*>(reader_wGwGSF_EC->FindMVA("BDTG"));
+ 
+  //enable root i/o for objects with reflex dictionaries in standalone root mode
+  ROOT::Cintex::Cintex::Enable();   
+
+  //open output root file
+  TFile *fout = new TFile("gbrtest.root","RECREATE");
+  
+  //create GBRForest from tmva object
+  GBRForest *gbr_NoEleMatch_woGwoGSF_BL = new GBRForest(bdt_NoEleMatch_woGwoGSF_BL);
+  GBRForest *gbr_NoEleMatch_woGwGSF_BL = new GBRForest(bdt_NoEleMatch_woGwGSF_BL);
+  GBRForest *gbr_NoEleMatch_wGwoGSF_BL = new GBRForest(bdt_NoEleMatch_wGwoGSF_BL);
+  GBRForest *gbr_NoEleMatch_wGwGSF_BL = new GBRForest(bdt_NoEleMatch_wGwGSF_BL);
+  GBRForest *gbr_woGwoGSF_BL = new GBRForest(bdt_woGwoGSF_BL);
+  GBRForest *gbr_woGwGSF_BL = new GBRForest(bdt_woGwGSF_BL);
+  GBRForest *gbr_wGwoGSF_BL = new GBRForest(bdt_wGwoGSF_BL);
+  GBRForest *gbr_wGwGSF_BL = new GBRForest(bdt_wGwGSF_BL);
+  GBRForest *gbr_NoEleMatch_woGwoGSF_EC = new GBRForest(bdt_NoEleMatch_woGwoGSF_EC);
+  GBRForest *gbr_NoEleMatch_woGwGSF_EC = new GBRForest(bdt_NoEleMatch_woGwGSF_EC);
+  GBRForest *gbr_NoEleMatch_wGwoGSF_EC = new GBRForest(bdt_NoEleMatch_wGwoGSF_EC);
+  GBRForest *gbr_NoEleMatch_wGwGSF_EC = new GBRForest(bdt_NoEleMatch_wGwGSF_EC);
+  GBRForest *gbr_woGwoGSF_EC = new GBRForest(bdt_woGwoGSF_EC);
+  GBRForest *gbr_woGwGSF_EC = new GBRForest(bdt_woGwGSF_EC);
+  GBRForest *gbr_wGwoGSF_EC = new GBRForest(bdt_wGwoGSF_EC);
+  GBRForest *gbr_wGwGSF_EC = new GBRForest(bdt_wGwGSF_EC);
+ 
+  //write to file
+  fout->WriteObject(gbr_NoEleMatch_woGwoGSF_BL,"gbr_NoEleMatch_woGwoGSF_BL");
+  fout->WriteObject(gbr_NoEleMatch_woGwGSF_BL,"gbr_NoEleMatch_woGwGSF_BL");
+  fout->WriteObject(gbr_NoEleMatch_wGwoGSF_BL,"gbr_NoEleMatch_wGwoGSF_BL");
+  fout->WriteObject(gbr_NoEleMatch_wGwGSF_BL,"gbr_NoEleMatch_wGwGSF_BL");
+  fout->WriteObject(gbr_woGwoGSF_BL,"gbr_woGwoGSF_BL");
+  fout->WriteObject(gbr_woGwGSF_BL,"gbr_woGwGSF_BL");
+  fout->WriteObject(gbr_wGwoGSF_BL,"gbr_wGwoGSF_BL");
+  fout->WriteObject(gbr_wGwGSF_BL,"gbr_wGwGSF_BL");
+  fout->WriteObject(gbr_NoEleMatch_woGwoGSF_EC,"gbr_NoEleMatch_woGwoGSF_EC");
+  fout->WriteObject(gbr_NoEleMatch_woGwGSF_EC,"gbr_NoEleMatch_woGwGSF_EC");
+  fout->WriteObject(gbr_NoEleMatch_wGwoGSF_EC,"gbr_NoEleMatch_wGwoGSF_EC");
+  fout->WriteObject(gbr_NoEleMatch_wGwGSF_EC,"gbr_NoEleMatch_wGwGSF_EC");
+  fout->WriteObject(gbr_woGwoGSF_EC,"gbr_woGwoGSF_EC");
+  fout->WriteObject(gbr_woGwGSF_EC,"gbr_woGwGSF_EC");
+  fout->WriteObject(gbr_wGwoGSF_EC,"gbr_wGwoGSF_EC");
+  fout->WriteObject(gbr_wGwGSF_EC,"gbr_wGwGSF_EC");
+
+  fout->Close();
+  
+  return 0;
+}
