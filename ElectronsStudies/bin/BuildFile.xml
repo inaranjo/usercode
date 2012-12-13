@@ -1,0 +1,18 @@
+<bin   file="makeGBRForest.cc" name="makeGBRForest">
+  <use   name="DataFormats/FWLite"/>
+  <use   name="FWCore/FWLite"/>
+  <use   name="PhysicsTools/FWLite"/>
+  <use   name="CondFormats/EgammaObjects"/>	
+  <use   name="root"/>
+  <use   name="roottmva"/>
+  <use   name="rootgraphics"/>
+</bin>
+<bin   file="AntiElectronMVAApplication_GBRForest.cc" name="AntiElectronMVAApplication_GBRForest">
+  <use   name="DataFormats/FWLite"/>
+  <use   name="FWCore/FWLite"/>
+  <use   name="PhysicsTools/FWLite"/>
+  <use   name="CondFormats/EgammaObjects"/>	
+  <use   name="root"/>
+  <use   name="roottmva"/>
+  <use   name="rootgraphics"/>
+</bin>
