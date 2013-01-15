@@ -42,6 +42,7 @@
 <use   name="boost"/>
 <use   name="rootcore"/>
 <use   name="rootrflx"/>
+<use   name="IvoNaranjo/Utilities"/>
 <use   name="HiggsAnalysis/HiggsToWW2Leptons"/>
 <use   name="EGamma/EGammaAnalysisTools"/>
 <use   name="Muon/MuonAnalysisTools"/>

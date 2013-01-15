@@ -59,15 +59,15 @@ ElectronsUserEmbedded::ElectronsUserEmbedded(const edm::ParameterSet & iConfig){
   //= iConfig.getParameter<edm::FileInPath>("inputFileNameMVADaniele");
   
   if(doMVAMIT_){
-    fMVA_ = new ElectronIDMVA();
-    fMVA_->Initialize("BDTG method",
-		      inputFileName0.fullPath().data(),
-		      inputFileName1.fullPath().data(),
-		      inputFileName2.fullPath().data(),
-		      inputFileName3.fullPath().data(),
-		      inputFileName4.fullPath().data(),
-		      inputFileName5.fullPath().data(),                
-		      ElectronIDMVA::kNoIPInfo);
+//     fMVA_ = new ElectronIDMVA();
+//     fMVA_->Initialize("BDTG method",
+// 		      inputFileName0.fullPath().data(),
+// 		      inputFileName1.fullPath().data(),
+// 		      inputFileName2.fullPath().data(),
+// 		      inputFileName3.fullPath().data(),
+// 		      inputFileName4.fullPath().data(),
+// 		      inputFileName5.fullPath().data(),                
+// 		      ElectronIDMVA::kNoIPInfo);
   }
   if(doMVADaniele_){
 
@@ -113,7 +113,7 @@ ElectronsUserEmbedded::ElectronsUserEmbedded(const edm::ParameterSet & iConfig){
 }
 
 ElectronsUserEmbedded::~ElectronsUserEmbedded(){
-  if(doMVAMIT_) delete fMVA_;
+//   if(doMVAMIT_) delete fMVA_;
   if(doMVADaniele_){
     delete myMVATrig_; //delete fMVADaniele_;
     delete myMVANonTrig_;
@@ -266,8 +266,8 @@ void ElectronsUserEmbedded::produce(edm::Event & iEvent, const edm::EventSetup &
 	&& aElectron.dr03HcalTowerSumEt()/aElectron.pt() < 0.20
 	));
 
-    if(doMVAMIT_)
-      mva = fMVA_->MVAValue(aGsf, lazyTools);
+//     if(doMVAMIT_)
+//       mva = fMVA_->MVAValue(aGsf, lazyTools);
     if(doMVADaniele_){
       //mva2 = fMVADaniele_->mva(*aGsf, vertexes->size());
       mva2 = myMVATrig_->mvaValue( *aGsf , (*vertexes)[0], *transientTrackBuilder, lazyTools, false);
