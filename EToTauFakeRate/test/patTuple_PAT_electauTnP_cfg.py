@@ -56,7 +56,7 @@ removeCleaning(process,
 
 restrictInputToAOD(process, ['All'])
 
-from Bianchi.Utilities.customizePAT  import *
+from IvoNaranjo.Utilities.customizePAT  import *
 addSelectedPFlowParticle(process)
 
 from PhysicsTools.PatAlgos.tools.metTools import *
@@ -118,18 +118,18 @@ process.selectedPatElectronsUserEmbedded = cms.EDProducer(
     inputFileName3 = cms.FileInPath('UserCode/MitPhysics/data/ElectronMVAWeights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml'),
     inputFileName4 = cms.FileInPath('UserCode/MitPhysics/data/ElectronMVAWeights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml'),
     inputFileName5 = cms.FileInPath('UserCode/MitPhysics/data/ElectronMVAWeights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml'),
-    inputFileName0v2 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat1.weights.xml'),
-    inputFileName1v2 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat2.weights.xml'),
-    inputFileName2v2 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat3.weights.xml'),
-    inputFileName3v2 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat4.weights.xml'),
-    inputFileName4v2 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat5.weights.xml'),
-    inputFileName5v2 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat6.weights.xml'),
-    inputFileName0v3 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat1.weights.xml'),
-    inputFileName1v3 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat2.weights.xml'),
-    inputFileName2v3 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat3.weights.xml'),
-    inputFileName3v3 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat4.weights.xml'),
-    inputFileName4v3 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat5.weights.xml'),
-    inputFileName5v3 = cms.FileInPath('Bianchi/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat6.weights.xml')
+    inputFileName0v2 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat1.weights.xml'),
+    inputFileName1v2 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat2.weights.xml'),
+    inputFileName2v2 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat3.weights.xml'),
+    inputFileName3v2 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat4.weights.xml'),
+    inputFileName4v2 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat5.weights.xml'),
+    inputFileName5v2 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_TrigV0_Cat6.weights.xml'),
+    inputFileName0v3 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat1.weights.xml'),
+    inputFileName1v3 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat2.weights.xml'),
+    inputFileName2v3 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat3.weights.xml'),
+    inputFileName3v3 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat4.weights.xml'),
+    inputFileName4v3 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat5.weights.xml'),
+    inputFileName5v3 = cms.FileInPath('IvoNaranjo/Utilities/data/mvaEleId/Electrons_BDTG_NonTrigV0_Cat6.weights.xml')
     
     )
 
@@ -167,7 +167,7 @@ process.selectedPatTausUserEmbedded = cms.EDProducer(
     )
 #####################################################################################
 #####################################################################################
-process.load("Bianchi.TauTauStudies.electauTnP_cff")
+process.load("IvoNaranjo.EToTauFakeRate.electauTnP_cff")
 
 if not runOnMC:
     process.sequence.remove(process.tagMcMatch)
