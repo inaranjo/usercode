@@ -86,15 +86,15 @@ void plotVariable(string variable = "diTauVisMass",
     std::string inputFileName ="";
     if(Type->data()==std::string("Zee"))
 //       inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES/EleTau/nTuple_DYJets_ElecTau.root";
-      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES/EleTau/nTuple_DYJ_EToTau_ElecTau.root";
+      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES_SVfitFix/EleTau/nTuple_DYJ_EToTau_ElecTau_nominal.root";
     else if(Type->data()==std::string("Zej"))
-      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES/EleTau/nTuple_DYJ_JetToTau_ElecTau.root";
+      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES_SVfitFix/EleTau/nTuple_DYJ_JetToTau_ElecTau_nominal.root";
     else if(Type->data()==std::string("VBFH125"))
-      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES/EleTau/nTuple_VBFH125_ElecTau.root";
+      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES_SVfitFix/EleTau/nTuple_VBFH125_ElecTau_nominal.root";
     else if(Type->data()==std::string("GGFH125"))
-      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES/EleTau/nTuple_GGFH125_ElecTau.root";
+      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES_SVfitFix/EleTau/nTuple_GGFH125_ElecTau_nominal.root";
     else if(Type->data()==std::string("VH125"))
-      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES/EleTau/nTuple_VH125_ElecTau.root";
+      inputFileName = "/data_CMS/cms/htautau/PostMoriond/NTUPLES_SVfitFix/EleTau/nTuple_VH125_ElecTau_nominal.root";
 
 
     TFile* inputFile = new TFile (inputFileName.data(),"READ");
@@ -136,7 +136,7 @@ void plotVariable(string variable = "diTauVisMass",
     TCut apZ(Form("((%s)>%f)",antiWcut.c_str(),antiWsdb));
 
     TCut apZ2(Form("((%s)>60 && (%s)<120)",antiWcut.c_str(),antiWcut.c_str()));
-    TCut hltevent("vetoEvent==0 && pairIndexMoriond<1 && HLTx==1");
+    TCut hltevent("vetoEvent==0 && pairIndex[0]<1 && HLTx==1");
     TCut hltmatch("HLTmatch==1");
 
     ////// CATEGORIES ///
@@ -234,21 +234,23 @@ void plotAllVariables(){
 
   std::vector<std::string> categories;
   categories.push_back(std::string("inclusive"));
-  categories.push_back(std::string("vbf"));
-  categories.push_back(std::string("novbf"));
-  categories.push_back(std::string("boost"));
+//   categories.push_back(std::string("vbf"));
+//   categories.push_back(std::string("novbf"));
+//   categories.push_back(std::string("boost"));
 
   std::vector<std::string> variables;
-//   variables.push_back(std::string("ptL1"));
-//   variables.push_back(std::string("scEtaL1"));
-//   variables.push_back(std::string("ptL2"));
-//   variables.push_back(std::string("etaL2"));
-//   variables.push_back(std::string("MEtMVA"));
-//   variables.push_back(std::string("diTauVisMass"));
-//   variables.push_back(std::string("pt1"));
-//   variables.push_back(std::string("pt2"));
-//   variables.push_back(std::string("visibleTauMass"));
-//   variables.push_back(std::string("dPhiL1L2"));
+  variables.push_back(std::string("ptL1"));
+  variables.push_back(std::string("scEtaL1"));
+  variables.push_back(std::string("ptL2"));
+  variables.push_back(std::string("etaL2"));
+  variables.push_back(std::string("MEtMVA"));
+  variables.push_back(std::string("diTauVisMass"));
+  variables.push_back(std::string("pt1"));
+  variables.push_back(std::string("pt2"));
+  variables.push_back(std::string("visibleTauMass"));
+  variables.push_back(std::string("dPhiL1L2"));
+  variables.push_back(std::string("dPhiL1J1"));
+  variables.push_back(std::string("dPhiL1J2"));
   variables.push_back(std::string("AntiEMVA3raw"));
 
 //   variables.push_back(std::string("etaL1"));
