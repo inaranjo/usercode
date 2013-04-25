@@ -39,10 +39,10 @@ void TMVAClassification()
 
   TMVA::Tools::Instance();
 
-  TString outfileName( "tmvaRoot/TMVA_v1.root" );
+  TString outfileName( "tmvaRoot/TMVA_AntiZee_v1.root" );
   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
-  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_v1", outputFile, 
+  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_AntiZee_v1", outputFile, 
 					      "!V:!Silent:Color:DrawProgressBar" );
  
   factory->AddVariable( "ptL1","ptL1","     ", 'F'  );   
