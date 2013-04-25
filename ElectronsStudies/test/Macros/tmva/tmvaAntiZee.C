@@ -39,10 +39,10 @@ void TMVAClassification()
 
   TMVA::Tools::Instance();
 
-  TString outfileName( "tmvaRoot/TMVA_v1"+Discr_+".root" );
+  TString outfileName( "tmvaRoot/TMVA_v1.root" );
   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
-  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_v1"+Discr_+Cat_, outputFile, 
+  TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification_v1", outputFile, 
 					      "!V:!Silent:Color:DrawProgressBar" );
  
   factory->AddVariable( "ptL1","ptL1","     ", 'F'  );   
@@ -55,8 +55,8 @@ void TMVAClassification()
   TFile *fSig = new TFile("/data_CMS/cms/htautau/PostMoriond/NTUPLES_JetIdFix/EleTau/nTupleGGFH125_ElecTau_nominal.root","READ"); 
   TFile *fBkg = new TFile("/data_CMS/cms/htautau/PostMoriond/NTUPLES_JetIdFix/EleTau/nTupleDYJetsJetToTau_ElecTau_nominal.root","READ");
 
-  TTree *tSig = (TTree*)fTau->Get("outTreePtOrd");
-  TTree *tBkg = (TTree*)fEle->Get("outTreePtOrd");
+  TTree *tSig = (TTree*)fSig->Get("outTreePtOrd");
+  TTree *tBkg = (TTree*)fBkg->Get("outTreePtOrd");
  
   bool useMt      = true;
   string antiWcut = useMt ? "MtLeg1MVA" : "-(pZetaMVA-1.5*pZetaVisMVA)" ; 
@@ -100,9 +100,7 @@ void TMVAClassification()
 
   TCut novbf("nJets30<1 && nJets20BTagged==0");
   
-  bool removeMtCut     = false;
-  if (std::string(variable.data()) == "MtLeg1MVA")removeMtCut = true;
-  
+  bool removeMtCut     = false;  
   TCut MtCut       = removeMtCut     ? "(etaL1<999)" : pZ;
   TCut diTauCharge = OS; 
   
@@ -120,13 +118,11 @@ void TMVAClassification()
   
   sbin =  sbinTmp && lpt && tpt && tiso && liso && lveto && diTauCharge  && MtCut  && hltevent && hltmatch ;
   
-  cout<<"MtCut : "<<MtCut<<endl;
-  cout<<"Selection : "<<category.Data()<<" "<<sbin<<endl;
-  
+  cout<<"Selection : "<<sbin<<endl;
 
   ////////////////// compute the weights
-  factory->AddSignalTree( tTau );
-  factory->AddBackgroundTree( tEle );
+  factory->AddSignalTree( tSig );
+  factory->AddBackgroundTree( tBkg );
 //   factory->SetWeightExpression("puWeight");
 
   factory->PrepareTrainingAndTestTree( sbin,sbin,
